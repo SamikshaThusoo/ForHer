@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Her · Tulip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --plum: #5B2A4A;
+    --plum-deep: #3E1B33;
+    --plum-soft: #8E5378;
+    --teal: #2F7A7A;
+    --teal-soft: #8FC4C4;
+    --rose: #F4D4DC;
+    --rose-deep: #E8A8B7;
+    --rose-bg: #FBF3F5;
+    --gold: #C9A24A;
+    --gold-soft: #E8D4A0;
+    --lavender-bg: #F5F0F6;
+    --cream: #FDF9F7;
+    --ink: #2A1A25;
+    --ink-soft: #6B5A65;
+    --line: #EADFE3;
+    --white: #FFFFFF;
+    --shadow-sm: 0 2px 8px rgba(91, 42, 74, 0.06);
+    --shadow-md: 0 4px 20px rgba(91, 42, 74, 0.08);
+    --shadow-lg: 0 8px 32px rgba(91, 42, 74, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: linear-gradient(180deg, var(--rose-bg) 0%, var(--lavender-bg) 100%);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Mobile frame */
+  .app-frame {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--rose-bg) 0%, var(--lavender-bg) 100%);
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    body { padding: 24px 0; }
+    .app-frame {
+      min-height: calc(100vh - 48px);
+      border-radius: 32px;
+      overflow: hidden;
+    }
+  }
+
+  /* Top bar */
+  .topbar {
+    padding: 20px 24px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--plum) 0%, var(--rose-deep) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+  }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: var(--plum-deep);
+    letter-spacing: 0.2px;
+  }
+
+  .brand-name .dot {
+    color: var(--gold);
+    margin: 0 4px;
+  }
+
+  .brand-name .tulip {
+    font-style: italic;
+    color: var(--plum-soft);
+  }
+
+  .back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--plum);
+    font-size: 18px;
+    transition: all 0.2s ease;
+  }
+
+  .back-btn:hover { background: white; transform: translateX(-2px); }
+
+  /* Progress */
+  .progress {
+    padding: 0 24px 20px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(91, 42, 74, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .progress-step.active {
+    background: linear-gradient(90deg, var(--plum) 0%, var(--rose-deep) 100%);
+  }
+
+  .progress-step.complete {
+    background: var(--teal);
+  }
+
+  /* Screens */
+  .screen {
+    padding: 8px 24px 120px;
+    display: none;
+    animation: fadeSlide 0.4s ease;
+  }
+
+  .screen.active { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Headings */
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: rgba(47, 122, 122, 0.08);
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    line-height: 1.15;
+    color: var(--plum-deep);
+    font-weight: 400;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  h1 .italic { font-style: italic; color: var(--plum-soft); }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--plum-deep);
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    margin-bottom: 6px;
+    letter-spacing: 0.1px;
+  }
+
+  .lead {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+
+  /* Cards */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.6);
+    margin-bottom: 14px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--plum-deep);
+    letter-spacing: 0.2px;
+  }
+
+  .card-meta {
+    font-size: 11px;
+    color: var(--ink-soft);
+    background: var(--rose-bg);
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Indicator list */
+  .indicator-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--cream);
+    border-radius: 14px;
+    border-left: 3px solid var(--rose-deep);
+  }
+
+  .indicator.high { border-left-color: #C76B7A; }
+  .indicator.borderline { border-left-color: var(--gold); }
+  .indicator.elevated { border-left-color: var(--plum-soft); }
+
+  .indicator-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .indicator-name {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  .indicator-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--plum-deep);
+  }
+
+  .indicator-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 10px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .tag-high { background: #FCE4E8; color: #A84458; }
+  .tag-borderline { background: #FAF1DC; color: #8A6B1F; }
+  .tag-elevated { background: #EFE4EB; color: var(--plum); }
+
+  /* Context banner */
+  .context-banner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(244, 212, 220, 0.4) 0%, rgba(245, 240, 246, 0.6) 100%);
+    border-radius: 14px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(232, 168, 183, 0.3);
+  }
+
+  .context-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+
+  .context-text {
+    font-size: 13px;
+    color: var(--plum-deep);
+    line-height: 1.45;
+  }
+
+  .context-text strong { font-weight: 600; }
+
+  /* Questions */
+  .question-block {
+    background: white;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.5);
+  }
+
+  .question-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    margin-bottom: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .q-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .option {
+    flex: 1 1 auto;
+    min-width: calc(33.33% - 6px);
+    padding: 10px 12px;
+    background: var(--cream);
+    border: 1.5px solid transparent;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .option:hover {
+    background: var(--rose-bg);
+    color: var(--plum);
+  }
+
+  .option.selected {
+    background: linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
+    color: white;
+    border-color: var(--plum);
+    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.2);
+  }
+
+  /* Button */
+  .cta-wrap {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 0 20px;
+    background: linear-gradient(180deg, transparent 0%, var(--lavender-bg) 40%);
+    margin-top: 24px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--plum-deep) 0%, var(--plum) 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 20px rgba(91, 42, 74, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(91, 42, 74, 0.32);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn .arrow {
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+
+  .btn:hover:not(:disabled) .arrow { transform: translateX(3px); }
+
+  .btn-secondary {
+    background: white;
+    color: var(--plum-deep);
+    border: 1.5px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--cream);
+    border-color: var(--plum-soft);
+  }
+
+  /* Results screen */
+  .risk-hero {
+    padding: 28px 24px;
+    border-radius: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .risk-hero.low {
+    background: linear-gradient(135deg, #E8F4F1 0%, #D4EAE4 100%);
+    border: 1px solid rgba(47, 122, 122, 0.15);
+  }
+
+  .risk-hero.moderate {
+    background: linear-gradient(135deg, #FAF1DC 0%, #F4E4BF 100%);
+    border: 1px solid rgba(201, 162, 74, 0.2);
+  }
+
+  .risk-hero.high {
+    background: linear-gradient(135deg, #F9E0E5 0%, #F4D4DC 100%);
+    border: 1px solid rgba(232, 168, 183, 0.3);
+  }
+
+  .risk-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .risk-level {
+    font-family: 'DM Serif Display', serif;
+    font-size: 34px;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    letter-spacing: -0.5px;
+  }
+
+  .risk-level.low { color: #1F5C5C; }
+  .risk-level.moderate { color: #8A6B1F; }
+  .risk-level.high { color: #A84458; }
+
+  .risk-score {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 8px 18px;
+    background: rgba(255,255,255,0.65);
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
+  }
+
+  .score-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--plum-deep);
+  }
+
+  .score-total {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  /* Why section */
+  .why-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .why-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--rose-bg);
+    border-radius: 12px;
+  }
+
+  .why-bullet {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rose-deep);
+    flex-shrink: 0;
+  }
+
+  .why-text {
+    font-size: 13.5px;
+    color: var(--plum-deep);
+    font-weight: 500;
+  }
+
+  /* Interpretation */
+  .interpretation {
+    padding: 18px;
+    background: white;
+    border-radius: 16px;
+    border-left: 3px solid var(--teal);
+    margin-bottom: 14px;
+  }
+
+  .interpretation p {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  /* Action cards */
+  .action-card {
+    display: flex;
+    gap: 14px;
+    padding: 18px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: 1px solid rgba(234, 223, 227, 0.5);
+  }
+
+  .action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--rose-deep);
+  }
+
+  .action-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .icon-consult { background: linear-gradient(135deg, #F4D4DC 0%, #E8A8B7 100%); }
+  .icon-test { background: linear-gradient(135deg, #E0ECE9 0%, #8FC4C4 100%); }
+  .icon-lifestyle { background: linear-gradient(135deg, #F4E4BF 0%, #E8D4A0 100%); }
+
+  .action-content { flex: 1; min-width: 0; }
+
+  .action-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    margin-bottom: 4px;
+  }
+
+  .action-sub {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  .action-sub ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 4px;
+  }
+
+  .action-sub li {
+    position: relative;
+    padding-left: 12px;
+    margin-bottom: 2px;
+  }
+
+  .action-sub li::before {
+    content: "·";
+    position: absolute;
+    left: 4px;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .action-chevron {
+    color: var(--plum-soft);
+    font-size: 20px;
+    align-self: center;
+    flex-shrink: 0;
+  }
+
+  /* Tulip bridge */
+  .tulip-card {
+    margin-top: 20px;
+    padding: 22px;
+    background: linear-gradient(135deg, rgba(244, 212, 220, 0.5) 0%, rgba(232, 212, 160, 0.3) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(201, 162, 74, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tulip-card::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(201, 162, 74, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .tulip-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--plum);
+    background: white;
+    padding: 5px 11px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-tag::before {
+    content: "❀";
+    color: var(--gold);
+    font-size: 11px;
+  }
+
+  .tulip-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px;
+    color: var(--plum-deep);
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.25;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-card h3 em { color: var(--plum-soft); }
+
+  .tulip-card p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--plum);
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-link:hover { color: var(--plum-deep); }
+
+  /* Section title */
+  .section-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 22px 0 10px;
+    padding-left: 4px;
+  }
+
+  /* Disclaimer */
+  .disclaimer {
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 16px 8px 0;
+    line-height: 1.5;
+    opacity: 0.75;
+  }
+
+  /* Hero illustration on screen 1 */
+  .entry-hero {
+    text-align: center;
+    padding: 12px 0 20px;
+  }
+
+  .entry-hero-mark {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--plum) 0%, var(--rose-deep) 60%, var(--gold) 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 26px;
+    font-style: italic;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.2);
+  }
+</style>
+</head>
+<body>
+
+<div class="app-frame">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">❀</div>
+      <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+    </div>
+    <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none">‹</button>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress">
+    <div class="progress-step active" data-step="1"></div>
+    <div class="progress-step" data-step="2"></div>
+    <div class="progress-step" data-step="3"></div>
+    <div class="progress-step" data-step="4"></div>
+  </div>
+
+  <!-- SCREEN 1: ENTRY -->
+  <div class="screen active" id="screen1">
+    <div class="entry-hero">
+      <div class="entry-hero-mark">f</div>
+    </div>
+    <span class="eyebrow">Your Health Check · 2026</span>
+    <h1>A closer look at <span class="italic">your wellbeing</span></h1>
+    <p class="lead">Based on your recent health check, we've identified a few parameters that may need attention.</p>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Flagged Indicators</div>
+        <div class="card-meta">AHC · Platinum</div>
+      </div>
+      <div class="indicator-list">
+        <div class="indicator high">
+          <div class="indicator-label">
+            <span class="indicator-name">Body Mass Index</span>
+            <span class="indicator-value">28.0 kg/m²</span>
+          </div>
+          <span class="indicator-tag tag-high">High</span>
+        </div>
+        <div class="indicator borderline">
+          <div class="indicator-label">
+            <span class="indicator-name">HbA1c</span>
+            <span class="indicator-value">5.9 %</span>
+          </div>
+          <span class="indicator-tag tag-borderline">Borderline</span>
+        </div>
+        <div class="indicator elevated">
+          <div class="indicator-label">
+            <span class="indicator-name">Thyroid · TSH</span>
+            <span class="indicator-value">4.8 mIU/L</span>
+          </div>
+          <span class="indicator-tag tag-elevated">Elevated</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="context-banner">
+      <div class="context-icon">✦</div>
+      <div class="context-text">
+        A short <strong>8-question check-in</strong> will help us personalise your insights. Takes about 2 minutes.
+      </div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="btn" onclick="goTo(2)">
+        Continue Assessment <span class="arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: HRA -->
+  <div class="screen" id="screen2">
+    <span class="eyebrow">Step 2 of 3 · Symptom Check</span>
+    <h1>Let's understand <span class="italic">your symptoms</span></h1>
+    <p class="lead">Your answers stay private and help us make this more accurate for you.</p>
+
+    <div id="questions-container"></div>
+
+    <div class="cta-wrap">
+      <button class="btn" id="seeInsightsBtn" onclick="computeAndShowResults()" disabled>
+        See My Health Insights <span class="arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: RESULTS -->
+  <div class="screen" id="screen3">
+    <span class="eyebrow">Step 3 of 3 · Your Insights</span>
+    <h1>Your <span class="italic">personalised</span> read</h1>
+    <p class="lead">A combined view of your health check and symptom inputs.</p>
+
+    <div class="risk-hero" id="riskHero">
+      <div class="risk-label">Overall Risk Level</div>
+      <div class="risk-level" id="riskLevel">—</div>
+      <div class="risk-score">
+        <span class="score-num" id="scoreNum">0</span>
+        <span class="score-total">/ 22</span>
+      </div>
+    </div>
+
+    <div class="section-title">Why this result</div>
+    <div class="card">
+      <div class="why-list" id="whyList"></div>
+    </div>
+
+    <div class="section-title">What this means</div>
+    <div class="interpretation">
+      <p id="interpretationText">—</p>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="btn" onclick="goTo(4)">
+        See Action Plan <span class="arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: ACTION PATHWAYS + TULIP -->
+  <div class="screen" id="screen4">
+    <span class="eyebrow">Your Action Plan</span>
+    <h1>Three ways to <span class="italic">move forward</span></h1>
+    <p class="lead">Pick what feels right for you. You can explore each pathway at your own pace.</p>
+
+    <div class="action-card" onclick="showToast('Connecting you with a specialist…')">
+      <div class="action-icon icon-consult">❤</div>
+      <div class="action-content">
+        <div class="action-title">Consult a Gynecologist</div>
+        <div class="action-sub">Discuss your symptoms with a specialist through video or in-clinic.</div>
+      </div>
+      <div class="action-chevron">›</div>
+    </div>
+
+    <div class="action-card" onclick="showToast('Opening test booking…')">
+      <div class="action-icon icon-test">✧</div>
+      <div class="action-content">
+        <div class="action-title">Recommended Tests</div>
+        <div class="action-sub">
+          <ul>
+            <li>Hormonal panel</li>
+            <li>PCOS screening</li>
+            <li>Ultrasound (if needed)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="action-chevron">›</div>
+    </div>
+
+    <div class="action-card" onclick="showToast('Opening lifestyle plan…')">
+      <div class="action-icon icon-lifestyle">❋</div>
+      <div class="action-content">
+        <div class="action-title">Start Lifestyle Plan</div>
+        <div class="action-sub">
+          <ul>
+            <li>Diet plan</li>
+            <li>Yoga for hormonal balance</li>
+            <li>PMS management</li>
+          </ul>
+        </div>
+      </div>
+      <div class="action-chevron">›</div>
+    </div>
+
+    <!-- Tulip bridge -->
+    <div class="tulip-card">
+      <span class="tulip-tag">Tulip · Pre-conception</span>
+      <h3>Planning a family soon? <em>We'll be here.</em></h3>
+      <p>If you are planning pregnancy, this journey can transition into guided pre-conception care under Tulip — supporting you through each step.</p>
+      <a href="#" class="tulip-link" onclick="showToast('Tulip introduction coming up…'); return false;">Learn about Tulip →</a>
+    </div>
+
+    <div class="disclaimer">
+      This is a screening tool, not a diagnosis. Please consult a qualified clinician for medical decisions.
+    </div>
+
+    <div class="cta-wrap">
+      <button class="btn btn-secondary" onclick="restart()">
+        Start Over
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(120%);background:var(--plum-deep);color:white;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);transition:transform 0.3s ease;z-index:100;max-width:340px;text-align:center;"></div>
+
+<script>
+  // ---- Questions config ----
+  const QUESTIONS = [
+    { id: 'cycle', q: 'Are your menstrual cycles regular?', opts: [
+      { label: 'Regular', val: 0 },
+      { label: 'Sometimes irregular', val: 3 },
+      { label: 'Highly irregular', val: 5 }
+    ], factor: { hit: v => v >= 3, name: 'Irregular menstrual cycles' }},
+    { id: 'pain', q: 'Do you experience severe period pain?', opts: [
+      { label: 'No', val: 0 },
+      { label: 'Sometimes', val: 1 },
+      { label: 'Often', val: 2 }
+    ], factor: { hit: v => v >= 2, name: 'Severe period pain' }},
+    { id: 'acne', q: 'Acne frequency?', opts: [
+      { label: 'Never', val: 0 },
+      { label: 'Sometimes', val: 1 },
+      { label: 'Often', val: 2 }
+    ], factor: { hit: v => v >= 2, name: 'Persistent acne' }},
+    { id: 'hair', q: 'Excess facial or body hair?', opts: [
+      { label: 'No', val: 0 },
+      { label: 'Mild', val: 1 },
+      { label: 'Noticeable', val: 2 }
+    ], factor: { hit: v => v >= 1, name: 'Excess hair growth' }},
+    { id: 'weight', q: 'Recent weight gain?', opts: [
+      { label: 'No', val: 0 },
+      { label: 'Mild', val: 1 },
+      { label: 'Significant', val: 3 }
+    ], factor: { hit: v => v >= 1, name: 'Recent weight gain' }},
+    { id: 'energy', q: 'How are your energy levels?', opts: [
+      { label: 'Good', val: 0 },
+      { label: 'Low', val: 1 },
+      { label: 'Very low', val: 2 }
+    ], factor: { hit: v => v >= 1, name: 'Low energy / fatigue' }},
+    { id: 'stress', q: 'Stress levels?', opts: [
+      { label: 'Low', val: 0 },
+      { label: 'Moderate', val: 0 },
+      { label: 'High', val: 1 }
+    ], factor: { hit: v => v >= 1, name: 'High stress levels' }},
+    { id: 'ttc', q: 'Are you trying to conceive?', opts: [
+      { label: 'No', val: 0 },
+      { label: 'Yes', val: 2 }
+    ], factor: { hit: v => v >= 2, name: 'Actively planning pregnancy' }}
+  ];
+
+  // ---- AHC (mocked from screen 1) ----
+  const AHC = {
+    bmi: { value: 28.0, score: 3, flagged: true, label: 'Elevated BMI (28)' },
+    hba1c: { value: 'Borderline', score: 3, flagged: true, label: 'Borderline HbA1c' },
+    tsh: { value: 'Elevated', score: 2, flagged: true, label: 'Elevated TSH (thyroid)' }
+  };
+
+  // ---- State ----
+  const answers = {};
+  let currentScreen = 1;
+  const screenOrder = [1, 2, 3, 4];
+
+  // ---- Render questions ----
+  function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    container.innerHTML = QUESTIONS.map((q, i) => `
+      <div class="question-block">
+        <div class="question-text">
+          <span class="q-num">0${i + 1}</span>
+          <span>${q.q}</span>
+        </div>
+        <div class="options" data-qid="${q.id}">
+          ${q.opts.map((opt, idx) => `
+            <button class="option" data-qid="${q.id}" data-idx="${idx}" data-val="${opt.val}">
+              ${opt.label}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const qid = btn.dataset.qid;
+        const val = parseInt(btn.dataset.val, 10);
+        const idx = parseInt(btn.dataset.idx, 10);
+        container.querySelectorAll(`.option[data-qid="${qid}"]`).forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        answers[qid] = { val, idx };
+        checkCompletion();
+      });
+    });
+  }
+
+  function checkCompletion() {
+    const done = QUESTIONS.every(q => answers[q.id] !== undefined);
+    document.getElementById('seeInsightsBtn').disabled = !done;
+  }
+
+  // ---- Scoring ----
+  function computeScore() {
+    let score = 0;
+    const factors = [];
+
+    // AHC
+    if (AHC.bmi.flagged) { score += AHC.bmi.score; factors.push({ name: AHC.bmi.label, weight: AHC.bmi.score }); }
+    if (AHC.hba1c.flagged) { score += AHC.hba1c.score; factors.push({ name: AHC.hba1c.label, weight: AHC.hba1c.score }); }
+    if (AHC.tsh.flagged) { score += AHC.tsh.score; factors.push({ name: AHC.tsh.label, weight: AHC.tsh.score }); }
+
+    // HRA
+    QUESTIONS.forEach(q => {
+      const ans = answers[q.id];
+      if (!ans) return;
+      score += ans.val;
+      if (q.factor.hit(ans.val)) {
+        factors.push({ name: q.factor.name, weight: ans.val });
+      }
+    });
+
+    return { score, factors };
+  }
+
+  function classifyRisk(score) {
+    if (score <= 6) return {
+      level: 'Low Risk',
+      key: 'low',
+      text: 'No immediate concern. Continue monitoring your health with regular check-ins and healthy lifestyle habits.'
+    };
+    if (score <= 12) return {
+      level: 'Moderate Risk',
+      key: 'moderate',
+      text: 'You may be at risk. Further tests can provide clarity, and a clinical consultation is a good next step.'
+    };
+    return {
+      level: 'High Risk',
+      key: 'high',
+      text: 'This pattern may indicate a hormonal imbalance such as PCOS. Early clinical evaluation is recommended.'
+    };
+  }
+
+  // ---- Show results ----
+  function computeAndShowResults() {
+    const { score, factors } = computeScore();
+    const risk = classifyRisk(score);
+
+    // Risk hero
+    const hero = document.getElementById('riskHero');
+    hero.className = 'risk-hero ' + risk.key;
+    const lvl = document.getElementById('riskLevel');
+    lvl.className = 'risk-level ' + risk.key;
+    lvl.textContent = risk.level;
+    document.getElementById('scoreNum').textContent = score;
+
+    // Why list — top contributing factors (by weight, up to 5)
+    const topFactors = factors
+      .sort((a, b) => b.weight - a.weight)
+      .slice(0, 5);
+    const whyList = document.getElementById('whyList');
+    if (topFactors.length === 0) {
+      whyList.innerHTML = `<div class="why-item"><span class="why-bullet" style="background:var(--teal)"></span><span class="why-text">No significant contributing factors found.</span></div>`;
+    } else {
+      whyList.innerHTML = topFactors.map(f => `
+        <div class="why-item">
+          <span class="why-bullet"></span>
+          <span class="why-text">${f.name}</span>
+        </div>
+      `).join('');
+    }
+
+    // Interpretation
+    document.getElementById('interpretationText').textContent = risk.text;
+
+    goTo(3);
+  }
+
+  // ---- Navigation ----
+  function goTo(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen' + n).classList.add('active');
+    currentScreen = n;
+    updateProgress(n);
+    document.getElementById('backBtn').style.display = n === 1 ? 'none' : 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress(n) {
+    const steps = document.querySelectorAll('.progress-step');
+    steps.forEach((s, i) => {
+      s.classList.remove('active', 'complete');
+      if (i + 1 < n) s.classList.add('complete');
+      else if (i + 1 === n) s.classList.add('active');
+    });
+  }
+
+  function goBack() {
+    if (currentScreen > 1) goTo(currentScreen - 1);
+  }
+
+  function restart() {
+    Object.keys(answers).forEach(k => delete answers[k]);
+    document.querySelectorAll('.option.selected').forEach(o => o.classList.remove('selected'));
+    document.getElementById('seeInsightsBtn').disabled = true;
+    goTo(1);
+  }
+
+  // ---- Toast ----
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      t.style.transform = 'translateX(-50%) translateY(120%)';
+    }, 2200);
+  }
+
+  // ---- Init ----
+  renderQuestions();
+</script>
+
+</body>
+</html>
