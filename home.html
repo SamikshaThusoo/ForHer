@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Her · Tulip — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --plum: #5B2A4A;
+    --plum-deep: #3E1B33;
+    --plum-soft: #8E5378;
+    --teal: #2F7A7A;
+    --teal-soft: #8FC4C4;
+    --teal-bg: #E8F4F1;
+    --rose: #F4D4DC;
+    --rose-deep: #E8A8B7;
+    --rose-bg: #FBF3F5;
+    --gold: #C9A24A;
+    --gold-soft: #E8D4A0;
+    --gold-bg: #FAF1DC;
+    --lavender-bg: #F5F0F6;
+    --cream: #FDF9F7;
+    --ink: #2A1A25;
+    --ink-soft: #6B5A65;
+    --line: #EADFE3;
+    --white: #FFFFFF;
+    --shadow-sm: 0 2px 8px rgba(91, 42, 74, 0.06);
+    --shadow-md: 0 4px 20px rgba(91, 42, 74, 0.08);
+    --shadow-lg: 0 8px 32px rgba(91, 42, 74, 0.12);
+    --shadow-xl: 0 16px 48px rgba(91, 42, 74, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: #E8DFE8;
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .app-frame {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--rose-bg) 0%, var(--lavender-bg) 100%);
+    position: relative;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    body { padding: 24px 0; }
+    .app-frame {
+      min-height: calc(100vh - 48px);
+      border-radius: 32px;
+      overflow: hidden;
+    }
+  }
+
+  /* =========================
+     TOP BAR
+     ========================= */
+  .topbar {
+    padding: 22px 24px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--plum) 0%, var(--rose-deep) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    box-shadow: 0 4px 14px rgba(91, 42, 74, 0.18);
+  }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--plum-deep);
+    letter-spacing: 0.2px;
+  }
+
+  .brand-name .dot { color: var(--gold); margin: 0 4px; }
+  .brand-name .tulip { font-style: italic; color: var(--plum-soft); }
+
+  .topbar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--plum);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .topbar-icon:hover { background: white; transform: translateY(-1px); }
+  .topbar-icon:active { transform: scale(0.94); }
+
+  /* =========================
+     HERO
+     ========================= */
+  .hero {
+    padding: 26px 24px 8px;
+    position: relative;
+    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-bg);
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    line-height: 1.18;
+    color: var(--plum-deep);
+    font-weight: 400;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  h1 .italic { font-style: italic; color: var(--plum-soft); }
+
+  .lead {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    max-width: 92%;
+  }
+
+  /* =========================
+     CARD STACK
+     ========================= */
+  .stack {
+    padding: 22px 20px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .section-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 4px 4px 0;
+  }
+
+  .entry-card {
+    position: relative;
+    border-radius: 20px;
+    padding: 22px 22px 20px;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid rgba(234, 223, 227, 0.6);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 0;
+    transform: translateY(16px);
+    animation: cardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .entry-card:nth-child(2) { animation-delay: 0.08s; }
+  .entry-card:nth-child(3) { animation-delay: 0.16s; }
+  .entry-card:nth-child(4) { animation-delay: 0.24s; }
+
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .entry-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .entry-card:active {
+    transform: translateY(-1px) scale(0.99);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Decorative orb on each card */
+  .entry-card::after {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    opacity: 0.5;
+    transition: transform 0.5s ease;
+    pointer-events: none;
+  }
+
+  .entry-card:hover::after {
+    transform: scale(1.12) translate(4px, -4px);
+  }
+
+  /* Card variants ─ AHC (rose / plum) */
+  .card-ahc {
+    background: linear-gradient(135deg, #FFFFFF 0%, var(--rose-bg) 100%);
+  }
+  .card-ahc::after {
+    background: radial-gradient(circle, rgba(232, 168, 183, 0.45) 0%, transparent 70%);
+  }
+  .card-ahc .card-icon {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+  }
+
+  /* Card variants ─ PCOS (gold / amber) */
+  .card-pcos {
+    background: linear-gradient(135deg, #FFFFFF 0%, var(--gold-bg) 100%);
+  }
+  .card-pcos::after {
+    background: radial-gradient(circle, rgba(201, 162, 74, 0.32) 0%, transparent 70%);
+  }
+  .card-pcos .card-icon {
+    background: linear-gradient(135deg, var(--gold-soft) 0%, var(--gold) 100%);
+  }
+
+  /* Card variants ─ Period (teal / mint) */
+  .card-period {
+    background: linear-gradient(135deg, #FFFFFF 0%, var(--teal-bg) 100%);
+  }
+  .card-period::after {
+    background: radial-gradient(circle, rgba(143, 196, 196, 0.45) 0%, transparent 70%);
+  }
+  .card-period .card-icon {
+    background: linear-gradient(135deg, var(--teal-soft) 0%, var(--teal) 100%);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    box-shadow: 0 4px 14px rgba(91, 42, 74, 0.15);
+    flex-shrink: 0;
+  }
+
+  .card-pill {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--plum-deep);
+    border: 1px solid var(--line);
+  }
+
+  .card-pill.pill-new {
+    background: var(--plum-deep);
+    color: white;
+    border-color: var(--plum-deep);
+  }
+
+  .card-body {
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 21px;
+    line-height: 1.2;
+    color: var(--plum-deep);
+    font-weight: 400;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    max-width: 92%;
+  }
+
+  .card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    letter-spacing: 0.2px;
+    transition: gap 0.2s ease;
+  }
+
+  .entry-card:hover .card-cta { gap: 10px; }
+
+  .cta-arrow {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--plum-deep);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: transform 0.25s ease;
+  }
+
+  .entry-card:hover .cta-arrow { transform: translateX(2px) rotate(-8deg); }
+
+  /* =========================
+     FOOTER NOTE
+     ========================= */
+  .foot {
+    padding: 0 24px 32px;
+    text-align: center;
+    animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+  }
+
+  .foot-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--line) 50%, transparent 100%);
+    margin-bottom: 18px;
+  }
+
+  .foot-text {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    opacity: 0.85;
+  }
+
+  .foot-text strong { color: var(--plum); font-weight: 600; }
+
+  /* =========================
+     TOAST
+     ========================= */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: var(--plum-deep);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 100;
+    max-width: 340px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-frame">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">❀</div>
+      <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+    </div>
+    <button class="topbar-icon" onclick="showToast('Profile coming soon')" aria-label="Profile">◐</button>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="eyebrow">Welcome</span>
+    <h1>Your space for <span class="italic">women's health</span></h1>
+    <p class="lead">Choose how you'd like to begin your health journey today.</p>
+  </div>
+
+  <!-- CARD STACK -->
+  <div class="stack">
+    <div class="section-label">Begin where it fits you</div>
+
+    <!-- 1. AHC-Based Insights -->
+    <div class="entry-card card-ahc" onclick="navigateTo('ahc.html')" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' '){navigateTo('ahc.html')}">
+      <div class="card-top">
+        <div class="card-icon">h</div>
+        <span class="card-pill">From your check-up</span>
+      </div>
+      <div class="card-body">
+        <h2 class="card-title">View Your Health Insights</h2>
+        <p class="card-desc">Continue from your recent health check and see what needs attention.</p>
+        <div class="card-cta">
+          Continue <span class="cta-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PCOS Risk Check -->
+    <div class="entry-card card-pcos" onclick="navigateTo('for_her_v4.html')" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' '){navigateTo('for_her_v4.html')}">
+      <div class="card-top">
+        <div class="card-icon">f</div>
+        <span class="card-pill">2 min</span>
+      </div>
+      <div class="card-body">
+        <h2 class="card-title">Check PCOS Risk</h2>
+        <p class="card-desc">Answer a few questions to understand your symptoms.</p>
+        <div class="card-cta">
+          Start Check <span class="cta-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Period Tracker -->
+    <div class="entry-card card-period" onclick="navigateTo('cycle.html')" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' '){navigateTo('cycle.html')}">
+      <div class="card-top">
+        <div class="card-icon">☾</div>
+        <span class="card-pill pill-new">New</span>
+      </div>
+      <div class="card-body">
+        <h2 class="card-title">Track Your Cycle</h2>
+        <p class="card-desc">Log periods, predict cycles, and stay in sync with your body.</p>
+        <div class="card-cta">
+          Start Tracking <span class="cta-arrow">→</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    <div class="foot-divider"></div>
+    <p class="foot-text">
+      Built with care, grounded in science.<br>
+      <strong>For Her · Tulip</strong> — your health, your pace.
+    </p>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+  function navigateTo(url) {
+    // Soft exit animation before navigation
+    document.querySelector('.app-frame').style.transition = 'opacity 0.25s ease';
+    document.querySelector('.app-frame').style.opacity = '0.85';
+    setTimeout(() => { window.location.href = url; }, 180);
+  }
+
+  function openPeriodTracker() {
+    showToast('Period Tracker coming soon');
+    console.log('[Tulip] Period Tracker entry clicked — flow not yet wired');
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      t.style.transform = 'translateX(-50%) translateY(120%)';
+    }, 2200);
+  }
+</script>
+</body>
+</html>

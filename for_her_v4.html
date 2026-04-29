@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Her · Tulip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --plum: #5B2A4A;
+    --plum-deep: #3E1B33;
+    --plum-soft: #8E5378;
+    --teal: #2F7A7A;
+    --teal-soft: #8FC4C4;
+    --teal-bg: #E8F4F1;
+    --rose: #F4D4DC;
+    --rose-deep: #E8A8B7;
+    --rose-bg: #FBF3F5;
+    --gold: #C9A24A;
+    --gold-soft: #E8D4A0;
+    --gold-bg: #FAF1DC;
+    --lavender-bg: #F5F0F6;
+    --cream: #FDF9F7;
+    --ink: #2A1A25;
+    --ink-soft: #6B5A65;
+    --line: #EADFE3;
+    --white: #FFFFFF;
+    --shadow-sm: 0 2px 8px rgba(91, 42, 74, 0.06);
+    --shadow-md: 0 4px 20px rgba(91, 42, 74, 0.08);
+    --shadow-lg: 0 8px 32px rgba(91, 42, 74, 0.12);
+    --shadow-xl: 0 16px 48px rgba(91, 42, 74, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: #E8DFE8;
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .app-frame {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--rose-bg) 0%, var(--lavender-bg) 100%);
+    position: relative;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    body { padding: 24px 0; }
+    .app-frame {
+      min-height: calc(100vh - 48px);
+      border-radius: 32px;
+      overflow: hidden;
+    }
+  }
+
+  /* =========================
+     SHARED
+     ========================= */
+
+  .topbar {
+    padding: 20px 24px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--plum) 0%, var(--rose-deep) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+  }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: var(--plum-deep);
+    letter-spacing: 0.2px;
+  }
+
+  .brand-name .dot { color: var(--gold); margin: 0 4px; }
+  .brand-name .tulip { font-style: italic; color: var(--plum-soft); }
+
+  .back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--plum);
+    font-size: 18px;
+    transition: all 0.2s ease;
+  }
+
+  .back-btn:hover { background: white; transform: translateX(-2px); }
+
+  .back-btn:active { transform: scale(0.94); }
+
+  /* Screens */
+  .screen {
+    display: none;
+    animation: fadeSlide 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .screen.active { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Typography */
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-bg);
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    line-height: 1.15;
+    color: var(--plum-deep);
+    font-weight: 400;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  h1 .italic { font-style: italic; color: var(--plum-soft); }
+
+  .lead {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--plum-deep) 0%, var(--plum) 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 20px rgba(91, 42, 74, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(91, 42, 74, 0.32);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.2);
+  }
+
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .btn .arrow { font-size: 18px; transition: transform 0.2s; display: inline-block; }
+  .btn:hover:not(:disabled) .arrow { transform: translateX(3px); }
+
+  .btn-secondary {
+    background: white;
+    color: var(--plum-deep);
+    border: 1.5px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--cream);
+    border-color: var(--plum-soft);
+  }
+
+  .cta-wrap {
+    position: sticky;
+    bottom: 0;
+    padding: 16px 24px 20px;
+    background: linear-gradient(180deg, transparent 0%, var(--lavender-bg) 40%);
+  }
+
+  /* Section title */
+  .section-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 22px 0 10px;
+    padding-left: 4px;
+  }
+
+  /* =========================
+     SCREEN 0 — HOME
+     ========================= */
+
+  .home {
+    padding: 0 0 100px;
+  }
+
+  .home-hero {
+    padding: 18px 24px 24px;
+  }
+
+  .home-greeting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .home-greeting {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .greeting-label {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+
+  .greeting-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--plum-deep);
+    line-height: 1.1;
+  }
+
+  .greeting-name em { font-style: italic; color: var(--plum-soft); }
+
+  .home-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose-deep) 0%, var(--gold) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Vitals strip */
+  .vitals-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 14px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.5);
+  }
+
+  .vital {
+    text-align: center;
+    padding: 4px 2px;
+    border-right: 1px solid var(--line);
+  }
+
+  .vital:last-child { border-right: none; }
+
+  .vital-icon {
+    font-size: 16px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .vital-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--plum-deep);
+    line-height: 1;
+  }
+
+  .vital-value .unit {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-left: 1px;
+  }
+
+  .vital-label {
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-top: 3px;
+  }
+
+  /* For Her hero banner */
+  .forher-section {
+    padding: 8px 24px 0;
+  }
+
+  .forher-banner {
+    position: relative;
+    border-radius: 24px;
+    padding: 26px 22px 22px;
+    overflow: hidden;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6B2E54 0%, #8E5378 50%, #C97A8E 100%);
+    box-shadow: 0 12px 32px rgba(91, 42, 74, 0.25);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    margin-top: 6px;
+  }
+
+  .forher-banner:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(91, 42, 74, 0.32);
+  }
+
+  .forher-banner:active { transform: translateY(-1px) scale(0.99); }
+
+  /* Decorative orbs */
+  .forher-banner::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -30px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(232, 212, 160, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: orbFloat 6s ease-in-out infinite;
+  }
+
+  .forher-banner::after {
+    content: "";
+    position: absolute;
+    bottom: -50px;
+    left: -20px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(244, 212, 220, 0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: orbFloat 7s ease-in-out infinite reverse;
+  }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(8px, -10px) scale(1.06); }
+  }
+
+  .forher-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .forher-tag::before {
+    content: "❀";
+    color: var(--gold-soft);
+    font-size: 12px;
+  }
+
+  .forher-banner h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    line-height: 1.2;
+    color: white;
+    font-weight: 400;
+    margin-bottom: 8px;
+    letter-spacing: -0.2px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .forher-banner h2 em { font-style: italic; color: var(--gold-soft); }
+
+  .forher-banner p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+    line-height: 1.5;
+    margin-bottom: 18px;
+    max-width: 86%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .forher-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: var(--plum-deep);
+    padding: 11px 18px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    position: relative;
+    z-index: 2;
+  }
+
+  .forher-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  }
+
+  .forher-cta:active { transform: translateY(0) scale(0.97); }
+
+  .forher-cta-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--plum) 0%, var(--rose-deep) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: transform 0.2s;
+  }
+
+  .forher-cta:hover .forher-cta-icon { transform: translateX(2px); }
+
+  .forher-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-left: 12px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Today section */
+  .today-section {
+    padding: 18px 24px 0;
+  }
+
+  .today-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .today-card {
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .today-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .today-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .icon-period { background: linear-gradient(135deg, #F4D4DC 0%, #E8A8B7 100%); }
+  .icon-water { background: linear-gradient(135deg, #E0ECE9 0%, #8FC4C4 100%); }
+  .icon-steps { background: linear-gradient(135deg, #F4E4BF 0%, #E8D4A0 100%); }
+  .icon-mood { background: linear-gradient(135deg, #EFE4EB 0%, #C9A6BC 100%); }
+
+  .today-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    margin-bottom: 2px;
+  }
+
+  .today-card-sub {
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--line);
+    padding: 10px 12px 14px;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: 0 -4px 16px rgba(91, 42, 74, 0.04);
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--ink-soft);
+  }
+
+  .nav-item.active { color: var(--plum); }
+
+  .nav-item-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .nav-item-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* =========================
+     SCREENS 1+ — FLOW
+     ========================= */
+
+  /* Progress */
+  .progress {
+    padding: 0 24px 20px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(91, 42, 74, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .progress-step.active {
+    background: linear-gradient(90deg, var(--plum) 0%, var(--rose-deep) 100%);
+  }
+
+  .progress-step.complete { background: var(--teal); }
+
+  .screen-pad { padding: 8px 24px 24px; }
+
+  /* Intro screen */
+  .intro-hero {
+    text-align: center;
+    padding: 32px 0 28px;
+  }
+
+  .intro-orb {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 30%, var(--rose-deep) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, var(--gold) 0%, transparent 55%),
+      linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 38px;
+    font-style: italic;
+    box-shadow: 0 12px 40px rgba(91, 42, 74, 0.3);
+    animation: orbBreath 4s ease-in-out infinite;
+    position: relative;
+  }
+
+  .intro-orb::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 1px solid rgba(232, 168, 183, 0.4);
+    animation: orbRing 3s ease-in-out infinite;
+  }
+
+  @keyframes orbBreath {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  @keyframes orbRing {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.15); opacity: 0; }
+  }
+
+  .intro-feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 8px 0 12px;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.5);
+  }
+
+  .feature-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .feature-text {
+    font-size: 13.5px;
+    color: var(--plum-deep);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .feature-text .feature-sub {
+    display: block;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* Diagnosis cards */
+  .diag-card {
+    background: white;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1.5px solid var(--line);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .diag-card:hover {
+    border-color: var(--plum-soft);
+    transform: translateX(2px);
+  }
+
+  .diag-card.selected {
+    border-color: var(--plum);
+    background: linear-gradient(135deg, rgba(91, 42, 74, 0.04) 0%, rgba(244, 212, 220, 0.18) 100%);
+    box-shadow: 0 4px 16px rgba(91, 42, 74, 0.12);
+  }
+
+  .diag-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: white;
+  }
+
+  .diag-card.selected .diag-check {
+    border-color: var(--plum);
+    background: var(--plum);
+  }
+
+  .diag-check::after {
+    content: '✓';
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .diag-card.selected .diag-check::after { opacity: 1; }
+
+  .diag-body { flex: 1; min-width: 0; }
+
+  .diag-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    margin-bottom: 4px;
+  }
+
+  .diag-sub {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  .diag-divider {
+    text-align: center;
+    margin: 16px 0;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    position: relative;
+  }
+
+  .diag-divider::before,
+  .diag-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 32%;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .diag-divider::before { left: 0; }
+  .diag-divider::after { right: 0; }
+
+  /* =========================
+     QUESTIONNAIRE — one per screen
+     ========================= */
+
+  .q-progress-bar {
+    height: 4px;
+    background: rgba(91, 42, 74, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .q-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--plum) 0%, var(--rose-deep) 100%);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    width: 0%;
+  }
+
+  .q-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+  }
+
+  .q-counter { font-weight: 600; color: var(--plum); }
+
+  .q-stage {
+    animation: qSlideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes qSlideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .q-stage.exit {
+    animation: qSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  @keyframes qSlideOut {
+    to { opacity: 0; transform: translateX(-30px); }
+  }
+
+  .q-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    line-height: 1.25;
+    color: var(--plum-deep);
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+    font-weight: 400;
+  }
+
+  .q-help {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 22px;
+    font-style: italic;
+  }
+
+  .q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .q-option {
+    width: 100%;
+    padding: 16px 18px;
+    background: white;
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--plum-deep);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .q-option:hover {
+    border-color: var(--plum-soft);
+    transform: translateX(3px);
+  }
+
+  .q-option.selected {
+    background: linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
+    color: white;
+    border-color: var(--plum);
+    box-shadow: 0 6px 20px rgba(91, 42, 74, 0.25);
+    transform: translateX(0);
+  }
+
+  .q-option.selected::after {
+    content: "✓";
+    position: absolute;
+    right: 18px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes checkPop {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .q-option-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+
+  .q-option:hover .q-option-radio { border-color: var(--plum-soft); }
+  .q-option.selected .q-option-radio {
+    border-color: white;
+    background: white;
+  }
+
+  .q-nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .q-nav .btn-secondary { flex: 0 0 96px; }
+  .q-nav .btn { flex: 1; }
+
+  /* =========================
+     ANALYSING SCREEN
+     ========================= */
+
+  .analyse-wrap {
+    min-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  .analyse-orb {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 28px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 30%, var(--rose-deep) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, var(--gold) 0%, transparent 55%),
+      linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
+    position: relative;
+    box-shadow: 0 16px 48px rgba(91, 42, 74, 0.3);
+    animation: analyseSpin 3s ease-in-out infinite;
+  }
+
+  .analyse-orb::before,
+  .analyse-orb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(232, 168, 183, 0.5);
+    animation: ringPulse 2s ease-in-out infinite;
+  }
+
+  .analyse-orb::after { animation-delay: 1s; }
+
+  @keyframes analyseSpin {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.06) rotate(180deg); }
+  }
+
+  @keyframes ringPulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  .analyse-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--plum-deep);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  .analyse-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 24px;
+    max-width: 280px;
+  }
+
+  .analyse-steps {
+    width: 100%;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .analyse-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    opacity: 0.4;
+    transition: all 0.4s ease;
+    text-align: left;
+  }
+
+  .analyse-step.done {
+    opacity: 1;
+    background: var(--teal-bg);
+    border-color: rgba(47, 122, 122, 0.2);
+  }
+
+  .analyse-step-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--line);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .analyse-step.done .analyse-step-dot {
+    background: var(--teal);
+  }
+
+  .analyse-step-dot::after {
+    content: "";
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .analyse-step.done .analyse-step-dot::after {
+    content: "✓";
+    opacity: 1;
+  }
+
+  .analyse-step-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .analyse-step.done .analyse-step-text { color: var(--plum-deep); }
+
+  /* =========================
+     RESULTS
+     ========================= */
+
+  .risk-hero {
+    padding: 28px 24px;
+    border-radius: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+    animation: scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .risk-hero.low {
+    background: linear-gradient(135deg, #E8F4F1 0%, #D4EAE4 100%);
+    border: 1px solid rgba(47, 122, 122, 0.15);
+  }
+
+  .risk-hero.moderate {
+    background: linear-gradient(135deg, #FAF1DC 0%, #F4E4BF 100%);
+    border: 1px solid rgba(201, 162, 74, 0.2);
+  }
+
+  .risk-hero.high {
+    background: linear-gradient(135deg, #F9E0E5 0%, #F4D4DC 100%);
+    border: 1px solid rgba(232, 168, 183, 0.3);
+  }
+
+  .risk-hero.diagnosed {
+    background: linear-gradient(135deg, rgba(91, 42, 74, 0.06) 0%, rgba(244, 212, 220, 0.4) 100%);
+    border: 1px solid rgba(91, 42, 74, 0.15);
+  }
+
+  .risk-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .risk-level {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    line-height: 1.15;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+
+  .risk-level.low { color: #1F5C5C; }
+  .risk-level.moderate { color: #8A6B1F; }
+  .risk-level.high { color: #A84458; }
+  .risk-level.diagnosed { color: var(--plum-deep); }
+
+  .risk-caption {
+    font-size: 13px;
+    color: var(--ink-soft);
+    padding: 0 12px;
+    line-height: 1.5;
+  }
+
+  /* Personalised line */
+  .personal-note {
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(244, 212, 220, 0.3) 0%, rgba(245, 240, 246, 0.5) 100%);
+    border-radius: 14px;
+    border-left: 3px solid var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .personal-note p {
+    font-size: 13.5px;
+    color: var(--plum-deep);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* Domain summary */
+  .domain-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .domain-chip {
+    flex: 1;
+    padding: 12px 10px;
+    border-radius: 14px;
+    text-align: center;
+    background: white;
+    border: 1.5px solid var(--line);
+    transition: all 0.2s ease;
+  }
+
+  .domain-chip.positive {
+    background: linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
+    border-color: var(--plum);
+  }
+
+  .domain-chip .chip-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .domain-chip .chip-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.3;
+  }
+
+  .domain-chip.positive .chip-label { color: white; }
+
+  .domain-chip .chip-status {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--plum-soft);
+    margin-top: 2px;
+    display: block;
+  }
+
+  .domain-chip.positive .chip-status { color: var(--gold-soft); }
+
+  /* Why */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.6);
+    margin-bottom: 14px;
+  }
+
+  .why-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .why-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--rose-bg);
+    border-radius: 12px;
+  }
+
+  .why-item.primary {
+    background: linear-gradient(135deg, var(--rose-bg) 0%, var(--gold-bg) 100%);
+    border-left: 3px solid var(--gold);
+  }
+
+  .why-bullet {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rose-deep);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .why-item.primary .why-bullet { background: var(--gold); }
+
+  .why-body { flex: 1; }
+
+  .why-text {
+    font-size: 13.5px;
+    color: var(--plum-deep);
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .why-tag {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: white;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  .why-item.primary .why-tag {
+    background: var(--gold);
+    color: white;
+  }
+
+  .interpretation {
+    padding: 18px;
+    background: white;
+    border-radius: 16px;
+    border-left: 3px solid var(--teal);
+    margin-bottom: 14px;
+  }
+
+  .interpretation p {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  .source-note {
+    padding: 12px 14px;
+    background: var(--cream);
+    border-radius: 12px;
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    border: 1px dashed var(--line);
+  }
+
+  .source-note strong { color: var(--plum); font-weight: 600; }
+
+  /* Action cards */
+  .action-card {
+    display: flex;
+    gap: 14px;
+    padding: 18px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: 1px solid rgba(234, 223, 227, 0.5);
+  }
+
+  .action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--rose-deep);
+  }
+
+  .action-card:active { transform: translateY(0) scale(0.99); }
+
+  .action-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .icon-consult { background: linear-gradient(135deg, #F4D4DC 0%, #E8A8B7 100%); }
+  .icon-test { background: linear-gradient(135deg, #E0ECE9 0%, #8FC4C4 100%); }
+  .icon-lifestyle { background: linear-gradient(135deg, #F4E4BF 0%, #E8D4A0 100%); }
+  .icon-track { background: linear-gradient(135deg, #EFE4EB 0%, #C9A6BC 100%); }
+
+  .action-content { flex: 1; min-width: 0; }
+
+  .action-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    margin-bottom: 4px;
+  }
+
+  .action-sub {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  .action-sub ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 4px;
+  }
+
+  .action-sub li {
+    position: relative;
+    padding-left: 12px;
+    margin-bottom: 2px;
+  }
+
+  .action-sub li::before {
+    content: "·";
+    position: absolute;
+    left: 4px;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .action-chevron {
+    color: var(--plum-soft);
+    font-size: 20px;
+    align-self: center;
+    flex-shrink: 0;
+  }
+
+  /* Tulip cards */
+  .tulip-card {
+    margin-top: 8px;
+    padding: 22px;
+    background: linear-gradient(135deg, rgba(244, 212, 220, 0.5) 0%, rgba(232, 212, 160, 0.3) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(201, 162, 74, 0.2);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .tulip-card::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(201, 162, 74, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .tulip-card.featured {
+    background: linear-gradient(135deg, #5B2A4A 0%, #8E5378 60%, #C97A8E 100%);
+    border-color: rgba(201, 162, 74, 0.4);
+    box-shadow: 0 12px 32px rgba(91, 42, 74, 0.25);
+    margin-bottom: 18px;
+  }
+
+  .tulip-card.featured::before {
+    background: radial-gradient(circle, rgba(232, 212, 160, 0.3) 0%, transparent 70%);
+    width: 180px;
+    height: 180px;
+    top: -40px;
+    right: -40px;
+  }
+
+  .tulip-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--plum);
+    background: white;
+    padding: 5px 11px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-tag::before {
+    content: "❀";
+    color: var(--gold);
+    font-size: 11px;
+  }
+
+  .tulip-card.featured .tulip-tag {
+    background: rgba(255,255,255,0.95);
+    color: var(--plum-deep);
+  }
+
+  .tulip-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px;
+    color: var(--plum-deep);
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.25;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-card h3 em { color: var(--plum-soft); font-style: italic; }
+
+  .tulip-card.featured h3 { color: white; font-size: 22px; }
+  .tulip-card.featured h3 em { color: var(--gold-soft); }
+
+  .tulip-card p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-card.featured p {
+    color: rgba(255,255,255,0.92);
+    font-size: 13.5px;
+  }
+
+  .tulip-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--plum);
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+    transition: gap 0.2s;
+  }
+
+  .tulip-link:hover { gap: 10px; }
+
+  .tulip-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: var(--plum-deep);
+    padding: 11px 18px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    position: relative;
+    z-index: 1;
+  }
+
+  .tulip-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  }
+
+  .tulip-cta:active { transform: translateY(0) scale(0.97); }
+
+  .tulip-cta-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--plum) 0%, var(--rose-deep) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  /* Disclaimer */
+  .disclaimer {
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 16px 8px 0;
+    line-height: 1.5;
+    opacity: 0.75;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: var(--plum-deep);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 100;
+    max-width: 340px;
+    text-align: center;
+  }
+
+  /* Dev panel */
+  .dev-toggle {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--plum-deep);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    z-index: 50;
+    opacity: 0.75;
+    transition: opacity 0.2s;
+  }
+
+  .dev-toggle:hover { opacity: 1; }
+
+  .dev-panel {
+    position: fixed;
+    bottom: 64px;
+    right: 16px;
+    width: 320px;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--line);
+    z-index: 49;
+    font-size: 11px;
+    display: none;
+  }
+
+  .dev-panel.open { display: block; }
+
+  .dev-panel h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    color: var(--plum-deep);
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+
+  .dev-panel pre {
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 10.5px;
+    background: var(--cream);
+    padding: 10px;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.5;
+    color: var(--plum-deep);
+  }
+
+  .dev-panel .dev-note {
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-frame">
+
+  <!-- ====================================================
+       SCREEN 0: HOME (legacy internal home — bypassed when entered via home.html)
+       ==================================================== -->
+  <div class="screen" id="screen0">
+    <div class="home">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">❀</div>
+          <div class="brand-name">Habit<span class="dot">·</span><span class="tulip">Health</span></div>
+        </div>
+      </div>
+
+      <div class="home-hero">
+        <div class="home-greeting-row">
+          <div class="home-greeting">
+            <span class="greeting-label">Tuesday, 28 April</span>
+            <span class="greeting-name">Hello, <em>Aanya</em></span>
+          </div>
+          <div class="home-avatar">A</div>
+        </div>
+
+        <div class="vitals-strip">
+          <div class="vital">
+            <span class="vital-icon">☾</span>
+            <div class="vital-value">21<span class="unit">d</span></div>
+            <div class="vital-label">Cycle</div>
+          </div>
+          <div class="vital">
+            <span class="vital-icon">✦</span>
+            <div class="vital-value">6,420</div>
+            <div class="vital-label">Steps</div>
+          </div>
+          <div class="vital">
+            <span class="vital-icon">◐</span>
+            <div class="vital-value">7.2<span class="unit">h</span></div>
+            <div class="vital-label">Sleep</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="forher-section">
+        <div class="forher-banner" onclick="goTo(1)">
+          <span class="forher-tag">For Her · Tulip</span>
+          <h2>Irregular cycles? <em>Let's check in.</em></h2>
+          <p>A quick, science-backed read on your hormonal health. Built for women, by clinicians.</p>
+          <button class="forher-cta" onclick="event.stopPropagation(); goTo(1);">
+            Start Check
+            <span class="forher-cta-icon">→</span>
+          </button>
+          <span class="forher-meta">· 2 min</span>
+        </div>
+      </div>
+
+      <div class="today-section">
+        <div class="section-title">Today's check-ins</div>
+        <div class="today-grid">
+          <div class="today-card" onclick="showToast('Opening cycle tracker…')">
+            <div class="today-card-icon icon-period">☾</div>
+            <div class="today-card-title">Log your cycle</div>
+            <div class="today-card-sub">Day 21 of 28</div>
+          </div>
+          <div class="today-card" onclick="showToast('Opening water tracker…')">
+            <div class="today-card-icon icon-water">◇</div>
+            <div class="today-card-title">Hydration</div>
+            <div class="today-card-sub">5 of 8 glasses</div>
+          </div>
+          <div class="today-card" onclick="showToast('Opening movement…')">
+            <div class="today-card-icon icon-steps">✦</div>
+            <div class="today-card-title">Steps</div>
+            <div class="today-card-sub">64% of goal</div>
+          </div>
+          <div class="today-card" onclick="showToast('Opening mood log…')">
+            <div class="today-card-icon icon-mood">❋</div>
+            <div class="today-card-title">Mood check</div>
+            <div class="today-card-sub">Tap to log</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="nav-item active">
+        <span class="nav-item-icon">⌂</span>
+        <span class="nav-item-label">Home</span>
+      </button>
+      <button class="nav-item" onclick="showToast('Care section coming soon')">
+        <span class="nav-item-icon">❤</span>
+        <span class="nav-item-label">Care</span>
+      </button>
+      <button class="nav-item" onclick="showToast('Activity coming soon')">
+        <span class="nav-item-icon">✦</span>
+        <span class="nav-item-label">Move</span>
+      </button>
+      <button class="nav-item" onclick="showToast('Profile coming soon')">
+        <span class="nav-item-icon">◐</span>
+        <span class="nav-item-label">You</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 1: SCREENING INTRO
+       ==================================================== -->
+  <div class="screen active" id="screen1">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">❀</div>
+        <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+      </div>
+      <a class="back-btn" href="home.html" title="Back to home">‹</a>
+    </div>
+
+    <div class="screen-pad">
+      <div class="intro-hero">
+        <div class="intro-orb">f</div>
+        <span class="eyebrow">Hormonal Health Check</span>
+        <h1>A quick check on <span class="italic">your hormonal health</span></h1>
+        <p class="lead">Cycles, skin, energy, weight — they all tell a story. We'll listen, then give you a clear, evidence-based read.</p>
+      </div>
+
+      <div class="intro-feature-list">
+        <div class="feature-row">
+          <div class="feature-icon icon-consult">◐</div>
+          <div class="feature-text">
+            <strong>2 minutes</strong>
+            <span class="feature-sub">8 simple questions about your symptoms</span>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon icon-test">✓</div>
+          <div class="feature-text">
+            <strong>Clinically grounded</strong>
+            <span class="feature-sub">Built on published primary-care PCOS research</span>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon icon-lifestyle">❀</div>
+          <div class="feature-text">
+            <strong>Personal action plan</strong>
+            <span class="feature-sub">Consult, tests, and lifestyle support — your call</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-wrap" style="padding-left: 0; padding-right: 0;">
+        <button class="btn" onclick="goTo(2)">
+          Start Assessment <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 2: DIAGNOSIS GATE
+       ==================================================== -->
+  <div class="screen" id="screen2">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">❀</div>
+        <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+      </div>
+      <button class="back-btn" onclick="goTo(1)">‹</button>
+    </div>
+
+    <div class="screen-pad">
+      <span class="eyebrow">Quick check</span>
+      <h1>First, a <span class="italic">quick question</span></h1>
+      <p class="lead">Have you been formally diagnosed with any of the following? This helps us tailor what comes next.</p>
+
+      <div id="diag-options">
+        <div class="diag-card" data-diag="pcos" onclick="toggleDiag('pcos')">
+          <div class="diag-check"></div>
+          <div class="diag-body">
+            <div class="diag-title">PCOS / PCOD</div>
+            <div class="diag-sub">Polycystic ovary syndrome, diagnosed by a doctor</div>
+          </div>
+        </div>
+
+        <div class="diag-card" data-diag="thyroid" onclick="toggleDiag('thyroid')">
+          <div class="diag-check"></div>
+          <div class="diag-body">
+            <div class="diag-title">Thyroid disorder</div>
+            <div class="diag-sub">Hypothyroidism, hyperthyroidism, or Hashimoto's</div>
+          </div>
+        </div>
+
+        <div class="diag-card" data-diag="diabetes" onclick="toggleDiag('diabetes')">
+          <div class="diag-check"></div>
+          <div class="diag-body">
+            <div class="diag-title">Diabetes or pre-diabetes</div>
+            <div class="diag-sub">Type 1, Type 2, or insulin resistance</div>
+          </div>
+        </div>
+
+        <div class="diag-divider">or</div>
+
+        <div class="diag-card" data-diag="none" onclick="toggleDiag('none')">
+          <div class="diag-check"></div>
+          <div class="diag-body">
+            <div class="diag-title">None of these</div>
+            <div class="diag-sub">I haven't been diagnosed with any of the above</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-wrap" style="padding-left: 0; padding-right: 0;">
+        <button class="btn" id="diagContinueBtn" onclick="handleDiagContinue()" disabled>
+          Continue <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 3: QUESTIONNAIRE (one-per-screen)
+       ==================================================== -->
+  <div class="screen" id="screen3">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">❀</div>
+        <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+      </div>
+      <button class="back-btn" onclick="qBack()">‹</button>
+    </div>
+
+    <div class="screen-pad">
+      <div class="q-progress-bar">
+        <div class="q-progress-fill" id="qProgressFill"></div>
+      </div>
+      <div class="q-progress-text">
+        <span><span class="q-counter" id="qCounter">1</span> of <span id="qTotal">8</span></span>
+        <span id="qDomainLabel">Menstrual</span>
+      </div>
+
+      <div class="q-stage" id="qStage">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 4: ANALYSING
+       ==================================================== -->
+  <div class="screen" id="screen4">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">❀</div>
+        <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+      </div>
+    </div>
+
+    <div class="analyse-wrap">
+      <div class="analyse-orb"></div>
+      <h2 class="analyse-title">Analysing your responses…</h2>
+      <p class="analyse-sub">We're reading your inputs across menstrual, metabolic, and dermatological signals.</p>
+
+      <div class="analyse-steps">
+        <div class="analyse-step" data-step="1">
+          <div class="analyse-step-dot"></div>
+          <div class="analyse-step-text">Reviewing symptom inputs</div>
+        </div>
+        <div class="analyse-step" data-step="2">
+          <div class="analyse-step-dot"></div>
+          <div class="analyse-step-text">Mapping to clinical domains</div>
+        </div>
+        <div class="analyse-step" data-step="3">
+          <div class="analyse-step-dot"></div>
+          <div class="analyse-step-text">Generating your insights</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 5: RESULTS
+       ==================================================== -->
+  <div class="screen" id="screen5">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">❀</div>
+        <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+      </div>
+      <button class="back-btn" onclick="goTo(0)">‹</button>
+    </div>
+
+    <div class="screen-pad">
+      <span class="eyebrow">Your insights</span>
+      <h1>Your <span class="italic">personalised</span> read</h1>
+      <p class="lead">Here's what your responses suggest, using a published clinical framework for primary-care PCOS screening.</p>
+
+      <div class="risk-hero" id="riskHero">
+        <div class="risk-label">Screening Outcome</div>
+        <div class="risk-level" id="riskLevel">—</div>
+        <div class="risk-caption" id="riskCaption"></div>
+      </div>
+
+      <div class="personal-note">
+        <p id="personalNote">—</p>
+      </div>
+
+      <div class="section-title">Domain findings</div>
+      <div class="domain-row" id="domainRow"></div>
+
+      <div class="section-title">Why this result</div>
+      <div class="card">
+        <div class="why-list" id="whyList"></div>
+      </div>
+
+      <div class="section-title">What this means</div>
+      <div class="interpretation">
+        <p id="interpretationText">—</p>
+      </div>
+
+      <div class="source-note">
+        <strong>Clinical basis:</strong> Primary-care domain framework by Kalra et al. (<em>Indian J Endocrinol Metab</em>, 2023) with symptom weighting from Pedersen et al. (<em>Can Fam Physician</em>, 2007) and self-report methodology adapted from Bedrick et al. (<em>Women's Health Rep</em>, 2020). This is a screening tool, not a diagnosis.
+      </div>
+
+      <div class="cta-wrap" style="padding-left: 0; padding-right: 0;">
+        <button class="btn" onclick="goTo(6)">
+          See Your Action Plan <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 6: ACTION PLAN (screening path)
+       ==================================================== -->
+  <div class="screen" id="screen6">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">❀</div>
+        <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+      </div>
+      <button class="back-btn" onclick="goTo(5)">‹</button>
+    </div>
+
+    <div class="screen-pad">
+      <span class="eyebrow">Your action plan</span>
+      <h1 id="actionTitle">Three ways to <span class="italic">move forward</span></h1>
+      <p class="lead" id="actionLead">Pick what feels right for you. You can explore each pathway at your own pace.</p>
+
+      <!-- Featured Tulip card (if TTC flagged) -->
+      <div id="featuredTulipSlot"></div>
+
+      <!-- Action cards -->
+      <div class="action-card" onclick="showToast('Connecting you with a specialist…')">
+        <div class="action-icon icon-consult">❤</div>
+        <div class="action-content">
+          <div class="action-title">Consult a Gynecologist</div>
+          <div class="action-sub">Discuss your symptoms with a specialist through video or in-clinic.</div>
+        </div>
+        <div class="action-chevron">›</div>
+      </div>
+
+      <div class="action-card" onclick="showToast('Opening test booking…')">
+        <div class="action-icon icon-test">✧</div>
+        <div class="action-content">
+          <div class="action-title">Recommended Tests</div>
+          <div class="action-sub">
+            <ul>
+              <li>Hormonal panel (LH, FSH, testosterone, AMH)</li>
+              <li>Pelvic ultrasound (if clinically indicated)</li>
+              <li>Expanded metabolic screen</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-chevron">›</div>
+      </div>
+
+      <div class="action-card" onclick="showToast('Opening lifestyle plan…')">
+        <div class="action-icon icon-lifestyle">❋</div>
+        <div class="action-content">
+          <div class="action-title">Start Lifestyle Plan</div>
+          <div class="action-sub">
+            <ul>
+              <li>Diet guidance for insulin sensitivity</li>
+              <li>Movement & yoga for hormonal balance</li>
+              <li>PMS & cycle management</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-chevron">›</div>
+      </div>
+
+      <!-- Secondary Tulip card (if TTC NOT flagged) -->
+      <div id="secondaryTulipSlot"></div>
+
+      <div class="disclaimer">
+        This is a screening tool, not a diagnosis. Please consult a qualified clinician for medical decisions.
+      </div>
+
+      <div class="cta-wrap" style="padding-left: 0; padding-right: 0;">
+        <button class="btn btn-secondary" onclick="restart()">
+          Back to Home
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       SCREEN 7: ALREADY DIAGNOSED PATH
+       ==================================================== -->
+  <div class="screen" id="screen7">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">❀</div>
+        <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
+      </div>
+      <button class="back-btn" onclick="goTo(2)">‹</button>
+    </div>
+
+    <div class="screen-pad">
+      <span class="eyebrow">Managing your condition</span>
+      <h1>We're here to <span class="italic">support you</span></h1>
+      <p class="lead">Since you're already diagnosed, let's focus on managing your condition with the right care, tracking, and lifestyle support.</p>
+
+      <div class="risk-hero diagnosed">
+        <div class="risk-label">Your status</div>
+        <div class="risk-level diagnosed" id="diagnosedLabel">Already diagnosed</div>
+        <div class="risk-caption" id="diagnosedCaption">We'll skip the screening and route you to ongoing care.</div>
+      </div>
+
+      <div class="section-title">Personalised care pathways</div>
+
+      <div class="action-card" onclick="showToast('Connecting you with a specialist…')">
+        <div class="action-icon icon-consult">❤</div>
+        <div class="action-content">
+          <div class="action-title">Follow-up consultation</div>
+          <div class="action-sub" id="diagConsultSub">Connect with a specialist to review your management plan.</div>
+        </div>
+        <div class="action-chevron">›</div>
+      </div>
+
+      <div class="action-card" onclick="showToast('Opening test booking…')">
+        <div class="action-icon icon-test">✧</div>
+        <div class="action-content">
+          <div class="action-title">Routine monitoring tests</div>
+          <div class="action-sub" id="diagTestSub">
+            <ul>
+              <li>Periodic monitoring as per your treatment plan</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-chevron">›</div>
+      </div>
+
+      <div class="action-card" onclick="showToast('Opening symptom tracker…')">
+        <div class="action-icon icon-track">◐</div>
+        <div class="action-content">
+          <div class="action-title">Track your symptoms</div>
+          <div class="action-sub">Log cycles, weight, mood, and medication adherence to share with your doctor.</div>
+        </div>
+        <div class="action-chevron">›</div>
+      </div>
+
+      <div class="action-card" onclick="showToast('Opening lifestyle plan…')">
+        <div class="action-icon icon-lifestyle">❋</div>
+        <div class="action-content">
+          <div class="action-title">Lifestyle support</div>
+          <div class="action-sub" id="diagLifestyleSub">
+            <ul>
+              <li>Condition-specific diet guidance</li>
+              <li>Movement and stress management</li>
+              <li>Sleep and recovery</li>
+            </ul>
+          </div>
+        </div>
+        <div class="action-chevron">›</div>
+      </div>
+
+      <div class="tulip-card">
+        <span class="tulip-tag">Tulip · Pre-conception</span>
+        <h3>Planning a family? <em>Specialised support awaits.</em></h3>
+        <p>Many conditions can affect fertility planning. Our pre-conception care under Tulip is built for this — guided support tailored to your diagnosis.</p>
+        <a href="#" class="tulip-link" onclick="showToast('Tulip introduction coming up…'); return false;">Explore Tulip →</a>
+      </div>
+
+      <div class="disclaimer">
+        Always follow the advice of your treating clinician. The information here supports — but does not replace — your medical care.
+      </div>
+
+      <div class="cta-wrap" style="padding-left: 0; padding-right: 0;">
+        <button class="btn btn-secondary" onclick="restart()">
+          Back to Home
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Dev panel -->
+<button class="dev-toggle" onclick="toggleDev()">◐ Clinical log</button>
+<div class="dev-panel" id="devPanel">
+  <h4>Clinical traceability</h4>
+  <pre id="devLog">Complete the assessment to see the engine output.</pre>
+  <p class="dev-note">Backend classification — domain triggers, Pedersen predictors, TTC flag, final tier. Visible to clinical reviewers only; not shown to end users in production.</p>
+</div>
+
+<script>
+/* =================================================================
+   For Her · Tulip — End-to-end prototype v4
+   -----------------------------------------------------------------
+   Flow:
+   0. Home (entry banner)
+   1. Screening intro (no AHC context)
+   2. Diagnosis gate (PCOS / Thyroid / Diabetes / None)
+       → if PCOS: jump to Screen 7 (managed path)
+       → else: continue to questionnaire
+   3. Questionnaire (one question per screen)
+   4. Analysing… (transient)
+   5. Results
+   6. Action plan (with conditional Tulip placement based on TTC flag)
+   7. Already-diagnosed path
+   ================================================================= */
+
+// =================================================================
+// DATA
+// =================================================================
+
+// No AHC pre-fill in this version (user has not taken health check)
+const HAS_AHC = false;
+
+const QUESTIONS = [
+  {
+    id: 'cycle',
+    q: 'How regular are your menstrual cycles?',
+    help: 'Typical cycles are 21–35 days apart, year-round.',
+    domain: 'menstrual',
+    domainLabel: 'Menstrual',
+    pedersen: 'menses',
+    opts: [
+      { label: 'Regular', level: 0 },
+      { label: 'Sometimes irregular', level: 1 },
+      { label: 'Often irregular or missed', level: 2 }
+    ]
+  },
+  {
+    id: 'pain',
+    q: 'Do you experience severe period pain?',
+    help: 'Pain that limits your activities or needs medication beyond usual.',
+    domain: 'menstrual',
+    domainLabel: 'Menstrual',
+    pedersen: null,
+    opts: [
+      { label: 'No', level: 0 },
+      { label: 'Sometimes', level: 1 },
+      { label: 'Often', level: 2 }
+    ]
+  },
+  {
+    id: 'ttc',
+    q: 'Are you trying to conceive, or have you had difficulty conceiving?',
+    help: 'Includes fertility planning, attempts, or early pregnancy loss.',
+    domain: 'menstrual',
+    domainLabel: 'Family planning',
+    pedersen: null,
+    opts: [
+      { label: 'No', level: 0 },
+      { label: 'Yes, planning or trying', level: 1, ttcFlag: true },
+      { label: 'Yes, with difficulty', level: 2, ttcFlag: true }
+    ]
+  },
+  {
+    id: 'hair',
+    q: 'Do you notice excess facial or body hair?',
+    help: 'Coarse, dark hair on the upper lip, chin, chest, abdomen, or inner thighs.',
+    domain: 'dermatological',
+    domainLabel: 'Skin & hair',
+    pedersen: 'hirsutism',
+    opts: [
+      { label: 'No', level: 0 },
+      { label: 'Mild — a few areas', level: 1 },
+      { label: 'Noticeable — multiple areas', level: 2 }
+    ]
+  },
+  {
+    id: 'depilatory',
+    q: 'Do you regularly remove facial or body hair?',
+    help: 'Waxing, threading, laser, or shaving on a routine basis.',
+    domain: 'dermatological',
+    domainLabel: 'Skin & hair',
+    pedersen: 'hirsutism',
+    opts: [
+      { label: 'Rarely or never', level: 0 },
+      { label: 'Occasionally', level: 1 },
+      { label: 'Regularly', level: 2 }
+    ]
+  },
+  {
+    id: 'acne',
+    q: 'Do you experience persistent acne?',
+    help: 'Particularly along the jawline, chin, or back — often cyclical.',
+    domain: 'dermatological',
+    domainLabel: 'Skin & hair',
+    pedersen: 'acne',
+    opts: [
+      { label: 'Never', level: 0 },
+      { label: 'Sometimes', level: 1 },
+      { label: 'Often', level: 2 }
+    ]
+  },
+  {
+    id: 'acanthosis',
+    q: 'Have you noticed darkening of skin on the neck, armpits, or other folds?',
+    help: 'Called acanthosis nigricans — often linked to insulin resistance.',
+    domain: 'dermatological',
+    domainLabel: 'Skin & hair',
+    pedersen: null,
+    opts: [
+      { label: 'No', level: 0 },
+      { label: 'Slight', level: 1 },
+      { label: 'Clearly visible', level: 2 }
+    ]
+  },
+  {
+    id: 'weight',
+    q: 'Have you gained weight recently without a clear reason?',
+    help: 'Especially around the midsection, over the last 6–12 months.',
+    domain: 'metabolic',
+    domainLabel: 'Metabolic',
+    pedersen: 'obesity',
+    opts: [
+      { label: 'No', level: 0 },
+      { label: 'Mild', level: 1 },
+      { label: 'Significant', level: 2 }
+    ]
+  }
+];
+
+// =================================================================
+// STATE
+// =================================================================
+const answers = {};
+const diagnoses = new Set();
+let currentScreen = 0;
+let currentQIndex = 0;
+let ttcFlag = false;
+
+// =================================================================
+// DIAGNOSIS GATE
+// =================================================================
+
+function toggleDiag(diag) {
+  const card = document.querySelector(`.diag-card[data-diag="${diag}"]`);
+
+  if (diag === 'none') {
+    if (diagnoses.has('none')) {
+      diagnoses.delete('none');
+      card.classList.remove('selected');
+    } else {
+      diagnoses.clear();
+      document.querySelectorAll('.diag-card').forEach(c => c.classList.remove('selected'));
+      diagnoses.add('none');
+      card.classList.add('selected');
+    }
+  } else {
+    if (diagnoses.has('none')) {
+      diagnoses.delete('none');
+      document.querySelector('.diag-card[data-diag="none"]').classList.remove('selected');
+    }
+    if (diagnoses.has(diag)) {
+      diagnoses.delete(diag);
+      card.classList.remove('selected');
+    } else {
+      diagnoses.add(diag);
+      card.classList.add('selected');
+    }
+  }
+
+  document.getElementById('diagContinueBtn').disabled = diagnoses.size === 0;
+}
+
+function handleDiagContinue() {
+  if (diagnoses.has('pcos')) {
+    renderDiagnosedPath();
+    goTo(7);
+    return;
+  }
+  // Reset questionnaire state and start
+  currentQIndex = 0;
+  Object.keys(answers).forEach(k => delete answers[k]);
+  ttcFlag = false;
+  renderQuestion();
+  goTo(3);
+}
+
+// =================================================================
+// DIAGNOSED PATH RENDERING
+// =================================================================
+
+function renderDiagnosedPath() {
+  const labels = { pcos: 'PCOS', thyroid: 'Thyroid', diabetes: 'Diabetes' };
+  const active = [...diagnoses].filter(d => d !== 'none').map(d => labels[d]);
+
+  const headline = active.length === 1
+    ? `Living with ${active[0]}`
+    : `Managing ${active.slice(0, -1).join(', ')} and ${active.slice(-1)}`;
+  document.getElementById('diagnosedLabel').textContent = headline;
+
+  let caption = "We'll skip the PCOS screening and focus on ongoing management. ";
+  if (diagnoses.has('thyroid') || diagnoses.has('diabetes')) {
+    caption += 'Your other conditions also influence how we tailor your care.';
+  }
+  document.getElementById('diagnosedCaption').textContent = caption;
+
+  const consultMap = {
+    pcos: 'Connect with a gynaecologist or endocrinologist to review your PCOS management.',
+    thyroid: 'Connect with an endocrinologist to review your thyroid management.',
+    diabetes: 'Connect with a diabetologist or endocrinologist to review your diabetes care.'
+  };
+  const primary = diagnoses.has('pcos') ? 'pcos' : (diagnoses.has('thyroid') ? 'thyroid' : 'diabetes');
+  document.getElementById('diagConsultSub').textContent = consultMap[primary];
+
+  const testItems = [];
+  if (diagnoses.has('pcos')) {
+    testItems.push('Hormonal panel (LH, FSH, testosterone, AMH) — annually or as advised');
+    testItems.push('Lipid profile and HbA1c — every 6 to 12 months');
+    testItems.push('Pelvic ultrasound if clinically indicated');
+  }
+  if (diagnoses.has('thyroid')) {
+    testItems.push('TSH, Free T3, Free T4 — every 3 to 6 months');
+  }
+  if (diagnoses.has('diabetes')) {
+    testItems.push('HbA1c — every 3 months');
+    testItems.push('Fasting lipid profile and kidney function — annually');
+  }
+  document.getElementById('diagTestSub').innerHTML = `<ul>${testItems.map(t => `<li>${t}</li>`).join('')}</ul>`;
+
+  const lifestyleItems = [];
+  if (diagnoses.has('pcos')) {
+    lifestyleItems.push('Insulin-sensitivity-focused diet');
+    lifestyleItems.push('Strength training and cycle-aware movement');
+    lifestyleItems.push('Sleep, stress, and PMS support');
+  }
+  if (diagnoses.has('thyroid') && !diagnoses.has('pcos')) {
+    lifestyleItems.push('Iodine-balanced, anti-inflammatory diet');
+    lifestyleItems.push('Energy-aware movement and recovery');
+  }
+  if (diagnoses.has('diabetes') && !diagnoses.has('pcos')) {
+    lifestyleItems.push('Glycaemic-friendly meal planning');
+    lifestyleItems.push('Daily activity and post-meal walks');
+  }
+  if (lifestyleItems.length === 0) {
+    lifestyleItems.push('Condition-specific diet guidance', 'Movement and stress management', 'Sleep and recovery');
+  }
+  document.getElementById('diagLifestyleSub').innerHTML = `<ul>${lifestyleItems.map(t => `<li>${t}</li>`).join('')}</ul>`;
+
+  document.getElementById('devLog').textContent = JSON.stringify({
+    pathway: 'diagnosed-management',
+    diagnosesReported: [...diagnoses].filter(d => d !== 'none'),
+    screeningSkipped: diagnoses.has('pcos'),
+    primaryCarePath: primary
+  }, null, 2);
+}
+
+// =================================================================
+// QUESTIONNAIRE — one per screen
+// =================================================================
+
+function renderQuestion() {
+  const total = QUESTIONS.length;
+  const q = QUESTIONS[currentQIndex];
+  const stage = document.getElementById('qStage');
+  const progressFill = document.getElementById('qProgressFill');
+  const counter = document.getElementById('qCounter');
+  const totalEl = document.getElementById('qTotal');
+  const domainLabel = document.getElementById('qDomainLabel');
+
+  totalEl.textContent = total;
+  counter.textContent = currentQIndex + 1;
+  domainLabel.textContent = q.domainLabel;
+  progressFill.style.width = `${((currentQIndex) / total) * 100}%`;
+
+  // Animate fill *to* the end of current question after a beat
+  setTimeout(() => {
+    progressFill.style.width = `${((currentQIndex + 1) / total) * 100}%`;
+  }, 80);
+
+  const currentAns = answers[q.id];
+
+  stage.innerHTML = `
+    <h2 class="q-question">${q.q}</h2>
+    <p class="q-help">${q.help}</p>
+    <div class="q-options">
+      ${q.opts.map((opt, idx) => `
+        <button class="q-option ${currentAns && currentAns.idx === idx ? 'selected' : ''}"
+                data-idx="${idx}"
+                data-level="${opt.level}"
+                ${opt.ttcFlag ? 'data-ttc="1"' : ''}>
+          <span>${opt.label}</span>
+          <span class="q-option-radio"></span>
+        </button>
+      `).join('')}
+    </div>
+    <div class="q-nav">
+      <button class="btn btn-secondary" onclick="qPrev()" ${currentQIndex === 0 ? 'style="visibility:hidden"' : ''}>
+        Back
+      </button>
+      <button class="btn" id="qNextBtn" onclick="qNext()" ${!currentAns ? 'disabled' : ''}>
+        ${currentQIndex === total - 1 ? 'See My Insights' : 'Next'} <span class="arrow">→</span>
+      </button>
+    </div>
+  `;
+
+  stage.classList.remove('exit');
+
+  // Wire option clicks
+  stage.querySelectorAll('.q-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx, 10);
+      const level = parseInt(btn.dataset.level, 10);
+      const isTtc = btn.dataset.ttc === '1';
+
+      stage.querySelectorAll('.q-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      answers[q.id] = { idx, level };
+
+      // Track TTC flag
+      if (q.id === 'ttc') {
+        ttcFlag = isTtc;
+      }
+
+      document.getElementById('qNextBtn').disabled = false;
+    });
+  });
+}
+
+function qNext() {
+  const stage = document.getElementById('qStage');
+  if (currentQIndex < QUESTIONS.length - 1) {
+    stage.classList.add('exit');
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 250);
+  } else {
+    // Done — go to analysing
+    runAnalysing();
+  }
+}
+
+function qPrev() {
+  if (currentQIndex === 0) return;
+  const stage = document.getElementById('qStage');
+  stage.style.animation = 'qSlideOut 0.25s reverse';
+  setTimeout(() => {
+    currentQIndex--;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 200);
+}
+
+function qBack() {
+  // Back button on the topbar from question screen → diagnosis gate
+  if (currentQIndex > 0) {
+    qPrev();
+  } else {
+    goTo(2);
+  }
+}
+
+// =================================================================
+// ANALYSING TRANSITION
+// =================================================================
+
+function runAnalysing() {
+  goTo(4);
+  const steps = document.querySelectorAll('.analyse-step');
+  steps.forEach(s => s.classList.remove('done'));
+
+  setTimeout(() => steps[0].classList.add('done'), 350);
+  setTimeout(() => steps[1].classList.add('done'), 850);
+  setTimeout(() => steps[2].classList.add('done'), 1350);
+
+  setTimeout(() => {
+    const result = classify();
+    renderResults(result);
+    goTo(5);
+  }, 1900);
+}
+
+// =================================================================
+// CLASSIFICATION
+// =================================================================
+
+function classify() {
+  const domainSignals = {
+    menstrual: [],
+    metabolic: [],
+    dermatological: []
+  };
+
+  const pedersenPredictors = {
+    menses: false,
+    hirsutism: false,
+    obesity: false,
+    acne: false
+  };
+
+  let severitySum = 0;
+
+  QUESTIONS.forEach(q => {
+    const ans = answers[q.id];
+    if (!ans || ans.level === 0) return;
+
+    // TTC is family-planning intent, not a PCOS symptom — exclude from screening logic
+    if (q.id === 'ttc') return;
+
+    domainSignals[q.domain].push({
+      source: 'HRA',
+      label: labelFor(q.id, ans.level),
+      level: ans.level,
+      pedersen: q.pedersen
+    });
+
+    if (q.pedersen) pedersenPredictors[q.pedersen] = true;
+    severitySum += ans.level;
+  });
+
+  const domainPositive = {
+    menstrual: domainSignals.menstrual.some(s => s.level >= 1),
+    metabolic: domainSignals.metabolic.some(s => s.level >= 1),
+    dermatological: domainSignals.dermatological.some(s => s.level >= 1)
+  };
+
+  const positiveDomainCount = Object.values(domainPositive).filter(Boolean).length;
+  const pedersenCount = Object.values(pedersenPredictors).filter(Boolean).length;
+
+  let tier;
+  if (positiveDomainCount < 2) {
+    tier = 'low';
+  } else {
+    if (pedersenCount >= 3 || (positiveDomainCount === 3 && severitySum >= 8)) {
+      tier = 'high';
+    } else {
+      tier = 'moderate';
+    }
+  }
+
+  return {
+    tier,
+    domainSignals,
+    domainPositive,
+    positiveDomainCount,
+    pedersenPredictors,
+    pedersenCount,
+    severitySum,
+    coDiagnoses: [...diagnoses].filter(d => d !== 'none' && d !== 'pcos'),
+    ttcFlag
+  };
+}
+
+function labelFor(qid, level) {
+  const labels = {
+    cycle: ['', 'Sometimes irregular cycles', 'Frequently irregular cycles'],
+    pain: ['', 'Occasional severe period pain', 'Frequent severe period pain'],
+    ttc: ['', 'Planning pregnancy', 'Difficulty conceiving'],
+    hair: ['', 'Mild excess hair growth', 'Noticeable excess hair growth'],
+    depilatory: ['', 'Occasional hair removal practice', 'Regular hair removal practice'],
+    acne: ['', 'Occasional persistent acne', 'Frequent persistent acne'],
+    acanthosis: ['', 'Slight skin darkening', 'Clear acanthosis nigricans'],
+    weight: ['', 'Mild recent weight gain', 'Significant recent weight gain']
+  };
+  return labels[qid][level];
+}
+
+// =================================================================
+// RESULTS RENDERING
+// =================================================================
+
+function renderResults(result) {
+  const { tier, domainSignals, domainPositive, pedersenCount, coDiagnoses, ttcFlag } = result;
+
+  const tierConfig = {
+    low: {
+      level: 'Low Likelihood',
+      caption: 'Your current pattern does not strongly suggest PCOS. Continue regular monitoring.',
+      interpretation: 'Based on your responses, the pattern does not currently meet the threshold for PCOS suspicion. Continue tracking your cycles and lifestyle, and revisit if symptoms change.'
+    },
+    moderate: {
+      level: 'Further Evaluation Suggested',
+      caption: 'Your pattern meets the primary-care threshold for PCOS screening. A clinical consultation will add clarity.',
+      interpretation: 'Your symptom pattern meets the threshold for further evaluation under the Kalra et al. primary-care framework — positive signals in at least 2 of 3 clinical domains. A consultation with a gynaecologist or endocrinologist, with appropriate blood work, is the recommended next step.'
+    },
+    high: {
+      level: 'Clinical Evaluation Recommended',
+      caption: 'Your pattern shows multiple hallmark features consistent with PCOS. Early clinical evaluation is recommended.',
+      interpretation: 'Your profile shows strong signals across multiple clinical domains, including several of the four key predictors identified in validated PCOS screening literature. Early evaluation by a gynaecologist or endocrinologist is recommended — earlier diagnosis supports better long-term metabolic and reproductive outcomes.'
+    }
+  };
+
+  const config = tierConfig[tier];
+
+  const hero = document.getElementById('riskHero');
+  hero.className = 'risk-hero ' + tier;
+  const lvl = document.getElementById('riskLevel');
+  lvl.className = 'risk-level ' + tier;
+  lvl.textContent = config.level;
+  document.getElementById('riskCaption').textContent = config.caption;
+
+  // Personalised note based on inputs
+  document.getElementById('personalNote').textContent = generatePersonalNote(result);
+
+  const domainLabels = {
+    menstrual: { icon: '☾', label: 'Menstrual' },
+    metabolic: { icon: '◆', label: 'Metabolic' },
+    dermatological: { icon: '✦', label: 'Skin & hair' }
+  };
+  const domainRow = document.getElementById('domainRow');
+  domainRow.innerHTML = ['menstrual', 'metabolic', 'dermatological'].map(d => `
+    <div class="domain-chip ${domainPositive[d] ? 'positive' : ''}">
+      <span class="chip-icon">${domainLabels[d].icon}</span>
+      <span class="chip-label">${domainLabels[d].label}</span>
+      <span class="chip-status">${domainPositive[d] ? 'flagged' : 'clear'}</span>
+    </div>
+  `).join('');
+
+  const whyList = document.getElementById('whyList');
+  const allSignals = [];
+  ['menstrual', 'metabolic', 'dermatological'].forEach(d => {
+    domainSignals[d].forEach(s => allSignals.push({ ...s, domainKey: d }));
+  });
+
+  allSignals.sort((a, b) => {
+    if (!!a.pedersen !== !!b.pedersen) return a.pedersen ? -1 : 1;
+    return b.level - a.level;
+  });
+
+  if (allSignals.length === 0) {
+    whyList.innerHTML = `
+      <div class="why-item">
+        <span class="why-bullet" style="background:var(--teal)"></span>
+        <div class="why-body">
+          <span class="why-text">No contributing signals identified — your responses don't show patterns commonly linked to PCOS.</span>
+        </div>
+      </div>`;
+  } else {
+    whyList.innerHTML = allSignals.slice(0, 6).map(s => `
+      <div class="why-item ${s.pedersen ? 'primary' : ''}">
+        <span class="why-bullet"></span>
+        <div class="why-body">
+          <span class="why-text">${s.label}</span><br>
+          <span class="why-tag">${domainLabels[s.domainKey].label}${s.pedersen ? ' · Key predictor' : ''}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  let interpretationText = config.interpretation;
+  if (coDiagnoses.length > 0) {
+    const coText = coDiagnoses.map(d => d === 'thyroid' ? 'thyroid disorder' : 'diabetes').join(' and ');
+    interpretationText += ` Your existing ${coText} diagnosis is also factored into this read, since these conditions can overlap with PCOS-related symptoms.`;
+  }
+  document.getElementById('interpretationText').textContent = interpretationText;
+
+  // Render Tulip slots based on TTC
+  renderTulipSlots(ttcFlag, tier);
+
+  // Update action plan headline based on TTC
+  if (ttcFlag) {
+    document.getElementById('actionTitle').innerHTML = 'Your <span class="italic">guided next steps</span>';
+    document.getElementById('actionLead').textContent = 'Since you\'re planning a pregnancy, we\'ve placed pre-conception care first. The supporting actions below complement that journey.';
+  } else {
+    document.getElementById('actionTitle').innerHTML = 'Three ways to <span class="italic">move forward</span>';
+    document.getElementById('actionLead').textContent = 'Pick what feels right for you. You can explore each pathway at your own pace.';
+  }
+
+  document.getElementById('devLog').textContent = JSON.stringify({
+    pathway: 'screening',
+    classification: tier,
+    positiveDomains: Object.entries(domainPositive).filter(([_, v]) => v).map(([k]) => k),
+    pedersenCount,
+    ttcFlag,
+    tulipPlacement: ttcFlag ? 'featured-top' : 'secondary-bottom',
+    coDiagnosesReported: coDiagnoses,
+    engineVersion: 'v4 (Kalra + Pedersen + Bedrick + diagnosis gate + TTC routing)'
+  }, null, 2);
+}
+
+function generatePersonalNote(result) {
+  const { tier, domainPositive, pedersenCount, ttcFlag } = result;
+  const positiveDomains = Object.entries(domainPositive).filter(([_, v]) => v).map(([k]) => k);
+
+  const domainNames = {
+    menstrual: 'menstrual',
+    metabolic: 'metabolic',
+    dermatological: 'skin and hair'
+  };
+
+  if (tier === 'low') {
+    if (positiveDomains.length === 0) {
+      return ttcFlag
+        ? "Your responses don't show patterns commonly linked to hormonal imbalance — a reassuring base as you plan ahead."
+        : "Your responses don't show patterns commonly linked to hormonal imbalance. Continue tracking and check in if anything changes.";
+    }
+    const domainText = positiveDomains.map(d => domainNames[d]).join(' and ');
+    return `We noticed mild signals in your ${domainText} responses, but not enough to suggest a strong pattern. Worth keeping an eye on.`;
+  }
+
+  if (tier === 'moderate') {
+    const domainText = positiveDomains.map(d => domainNames[d]).join(' and ');
+    return `Your responses suggest patterns commonly seen in hormonal imbalance — particularly across your ${domainText} signals. A clinical conversation will help clarify the picture.`;
+  }
+
+  // high
+  return `Your responses show strong signals across ${positiveDomains.length} clinical domains, with ${pedersenCount} of the four key predictors clinicians look for. Earlier evaluation typically leads to better long-term outcomes.`;
+}
+
+function renderTulipSlots(showFeatured, tier) {
+  const featuredSlot = document.getElementById('featuredTulipSlot');
+  const secondarySlot = document.getElementById('secondaryTulipSlot');
+
+  const featuredCard = `
+    <div class="tulip-card featured">
+      <span class="tulip-tag">Tulip · Pre-conception</span>
+      <h3>Planning a pregnancy? <em>Let's start the right way.</em></h3>
+      <p>Since you're trying to conceive, we recommend starting with guided pre-conception care under Tulip — tailored to your hormonal profile and built around the milestones that matter.</p>
+      <button class="tulip-cta" onclick="showToast('Opening Tulip Care…')">
+        Explore Tulip Care
+        <span class="tulip-cta-icon">→</span>
+      </button>
+    </div>
+  `;
+
+  const secondaryCard = `
+    <div class="tulip-card">
+      <span class="tulip-tag">Tulip · Pre-conception</span>
+      <h3>Planning a family soon? <em>We'll be here.</em></h3>
+      <p>If you decide to plan pregnancy, this journey can transition into guided pre-conception care under Tulip — supporting you through each step.</p>
+      <a href="#" class="tulip-link" onclick="showToast('Tulip introduction coming up…'); return false;">Learn about Tulip →</a>
+    </div>
+  `;
+
+  if (showFeatured) {
+    featuredSlot.innerHTML = featuredCard;
+    secondarySlot.innerHTML = '';
+  } else {
+    featuredSlot.innerHTML = '';
+    secondarySlot.innerHTML = secondaryCard;
+  }
+}
+
+// =================================================================
+// NAVIGATION
+// =================================================================
+
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + n).classList.add('active');
+  currentScreen = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  diagnoses.clear();
+  ttcFlag = false;
+  currentQIndex = 0;
+  document.querySelectorAll('.diag-card.selected').forEach(o => o.classList.remove('selected'));
+  document.getElementById('diagContinueBtn').disabled = true;
+  document.getElementById('devLog').textContent = 'Complete the assessment to see the engine output.';
+  // Route back to master home page rather than legacy internal home
+  window.location.href = 'home.html';
+}
+
+// =================================================================
+// TOAST + DEV
+// =================================================================
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    t.style.transform = 'translateX(-50%) translateY(120%)';
+  }, 2200);
+}
+
+function toggleDev() {
+  document.getElementById('devPanel').classList.toggle('open');
+}
+
+// Init
+renderQuestion();
+</script>
+</body>
+</html>
