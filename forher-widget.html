@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Her — Homepage Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+
+<!--
+  ============================================================
+  FOR HER — Homepage Widget
+  ============================================================
+  Drop-in component for the Habit Health homepage.
+  All styles are scoped under `.fh-widget`, so it will not
+  collide with the host page CSS.
+
+  HOW TO PLUG IN
+  --------------
+  1. Copy the <style id="fh-widget-styles"> block into the
+     homepage <head> (or your shared CSS bundle).
+  2. Copy ONE <section class="fh-widget" ...> block into the
+     homepage layout — recommended placement: directly under
+     the "Health records / Bookings" two-tile row, above the
+     "Extensive Range Of Wellness Solutions" section.
+  3. Set the state attribute based on user context:
+       data-state="new"        → first-time users
+       data-state="returning"  → users with prior activity
+       data-state="high-risk"  → users flagged by AHC / risk model
+  4. Wire CTAs to your router. Hrefs are placeholder paths.
+
+  PERSONALISATION
+  ---------------
+  - Headline / subtext are inside [data-fh-headline] and
+    [data-fh-sub], so they can be swapped server-side or via JS.
+  - Tertiary "Health Insights" CTA shows only when the host
+    sets `data-has-ahc="true"` on the widget root.
+  ============================================================
+-->
+
+<style id="fh-widget-styles">
+  /* Demo-only page chrome — NOT part of the widget. */
+  body {
+    margin: 0;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: #F7F8FA;
+    color: #1B1B1F;
+    -webkit-font-smoothing: antialiased;
+  }
+  .demo-shell {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 28px 16px 64px;
+  }
+  .demo-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #6B7280;
+    margin: 28px 4px 10px;
+  }
+  .demo-label:first-child { margin-top: 0; }
+  .demo-note {
+    margin: 8px 4px 0;
+    font-size: 12px;
+    color: #6B7280;
+    line-height: 1.5;
+  }
+
+  /* =========================================================
+     FOR HER WIDGET — START
+     ========================================================= */
+  .fh-widget {
+    /* Tokens (scoped) */
+    --fh-plum: #5B2A4A;
+    --fh-plum-deep: #3E1B33;
+    --fh-plum-soft: #8E5378;
+    --fh-rose: #F4D4DC;
+    --fh-rose-deep: #E8A8B7;
+    --fh-rose-bg: #FBF3F5;
+    --fh-lavender-bg: #F5F0F6;
+    --fh-cream: #FFFCFA;
+    --fh-ink: #2A1A25;
+    --fh-ink-soft: #6B5A65;
+    --fh-line: #EADFE3;
+    --fh-amber: #C9772A;
+    --fh-amber-bg: #FCEDD9;
+
+    position: relative;
+    display: block;
+    width: 100%;
+    border-radius: 22px;
+    padding: 20px 20px 18px;
+    background:
+      radial-gradient(120% 140% at 100% 0%, var(--fh-rose) 0%, transparent 55%),
+      linear-gradient(135deg, #FFFFFF 0%, var(--fh-rose-bg) 60%, var(--fh-lavender-bg) 100%);
+    border: 1px solid rgba(91, 42, 74, 0.08);
+    box-shadow: 0 2px 10px rgba(91, 42, 74, 0.06);
+    overflow: hidden;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    color: var(--fh-ink);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: fhFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fhFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .fh-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(91, 42, 74, 0.12);
+  }
+
+  /* Decorative motif — soft tulip orb top-right */
+  .fh-widget::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 168, 183, 0.45) 0%, transparent 70%);
+    pointer-events: none;
+    transition: transform 0.5s ease;
+  }
+  .fh-widget:hover::before { transform: scale(1.08) translate(4px, -4px); }
+
+  /* Floral glyph accent */
+  .fh-widget::after {
+    content: "❀";
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 22px;
+    color: var(--fh-rose-deep);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .fh-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .fh-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--fh-plum);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(91, 42, 74, 0.1);
+  }
+  .fh-eyebrow .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--fh-rose-deep);
+  }
+
+  .fh-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--fh-amber-bg);
+    color: var(--fh-amber);
+    border: 1px solid rgba(201, 119, 42, 0.2);
+    display: none;
+  }
+
+  .fh-title {
+    font-family: 'DM Serif Display', serif;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.22;
+    letter-spacing: -0.2px;
+    color: var(--fh-plum-deep);
+    margin: 0 36px 6px 0; /* keep clear of floral glyph */
+  }
+  .fh-title .italic { font-style: italic; color: var(--fh-plum-soft); }
+
+  .fh-sub {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--fh-ink-soft);
+    margin: 0 0 14px;
+    max-width: 95%;
+  }
+
+  /* Optional contextual chip (returning users) */
+  .fh-context {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--fh-line);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    color: var(--fh-plum-deep);
+    margin-bottom: 12px;
+  }
+  .fh-context .pulse {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--fh-rose-deep);
+    box-shadow: 0 0 0 0 rgba(232, 168, 183, 0.7);
+    animation: fhPulse 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  @keyframes fhPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(232, 168, 183, 0.7); }
+    70%  { box-shadow: 0 0 0 10px rgba(232, 168, 183, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(232, 168, 183, 0); }
+  }
+
+  /* CTAs */
+  .fh-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .fh-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+    white-space: nowrap;
+  }
+  .fh-cta .arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+  .fh-cta:hover .arrow { transform: translateX(2px); }
+
+  .fh-cta--primary {
+    background: var(--fh-plum-deep);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22);
+  }
+  .fh-cta--primary:hover {
+    background: var(--fh-plum);
+    transform: translateY(-1px);
+  }
+  .fh-cta--primary:active { transform: scale(0.97); }
+
+  .fh-cta--secondary {
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--fh-plum-deep);
+    border-color: rgba(91, 42, 74, 0.12);
+  }
+  .fh-cta--secondary:hover {
+    background: #fff;
+    border-color: var(--fh-plum-soft);
+  }
+  .fh-cta--secondary:active { transform: scale(0.97); }
+
+  .fh-cta--ghost {
+    background: transparent;
+    color: var(--fh-plum-deep);
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .fh-cta--ghost:hover { color: var(--fh-plum); }
+  .fh-cta--ghost .arrow { opacity: 0.7; }
+
+  /* ========= STATE: NEW (default) ========= */
+  /* nothing extra */
+
+  /* ========= STATE: RETURNING ========= */
+  .fh-widget[data-state="returning"] .fh-context { display: inline-flex; }
+
+  /* ========= STATE: HIGH-RISK ========= */
+  .fh-widget[data-state="high-risk"] {
+    background:
+      radial-gradient(120% 140% at 100% 0%, #F8DDD0 0%, transparent 55%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBF1EA 60%, var(--fh-lavender-bg) 100%);
+    border-color: rgba(201, 119, 42, 0.22);
+  }
+  .fh-widget[data-state="high-risk"] .fh-badge { display: inline-flex; }
+  .fh-widget[data-state="high-risk"] .fh-cta--primary {
+    box-shadow: 0 0 0 0 rgba(201, 119, 42, 0.45);
+    animation: fhCtaPulse 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  @keyframes fhCtaPulse {
+    0%   { box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22), 0 0 0 0 rgba(201, 119, 42, 0.45); }
+    70%  { box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22), 0 0 0 12px rgba(201, 119, 42, 0); }
+    100% { box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22), 0 0 0 0 rgba(201, 119, 42, 0); }
+  }
+
+  /* Hide tertiary CTA unless host opts in */
+  .fh-widget:not([data-has-ahc="true"]) .fh-cta--ahc { display: none; }
+
+  /* Tap target affordance for entire card (optional) */
+  .fh-widget[data-card-tap="true"] { cursor: pointer; }
+
+  /* Small-screen tightening */
+  @media (max-width: 360px) {
+    .fh-widget { padding: 18px 16px 16px; }
+    .fh-title { font-size: 18.5px; }
+    .fh-cta { padding: 9px 12px; font-size: 12.5px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .fh-widget,
+    .fh-widget[data-state="high-risk"] .fh-cta--primary,
+    .fh-context .pulse {
+      animation: none;
+    }
+    .fh-widget:hover { transform: none; }
+  }
+  /* =========================================================
+     FOR HER WIDGET — END
+     ========================================================= */
+</style>
+</head>
+<body>
+
+<div class="demo-shell">
+
+  <!-- ================== STATE 1 — NEW USER ================== -->
+  <div class="demo-label">State 1 · New user</div>
+
+  <section class="fh-widget" data-state="new" aria-label="For Her — women's wellness">
+    <div class="fh-head">
+      <span class="fh-eyebrow"><span class="dot"></span>For Her</span>
+      <span class="fh-badge">Recommended</span>
+    </div>
+
+    <h3 class="fh-title" data-fh-headline>
+      Understand your <span class="italic">cycle</span> better
+    </h3>
+    <p class="fh-sub" data-fh-sub>
+      Check PCOS risk, track cycles, and get personalised care.
+    </p>
+
+    <div class="fh-context">
+      <span class="pulse"></span>
+      <span data-fh-context>Your journey starts here</span>
+    </div>
+
+    <div class="fh-ctas">
+      <a class="fh-cta fh-cta--primary" href="/forher/banner-flow.html">
+        Check PCOS Risk <span class="arrow">→</span>
+      </a>
+      <a class="fh-cta fh-cta--secondary" href="/forher/cycle.html">
+        Track My Cycle
+      </a>
+      <a class="fh-cta fh-cta--ghost fh-cta--ahc" href="/forher/ahc-flow.html">
+        Health Insights <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+  <p class="demo-note">Default headline + generic CTAs. Tertiary "Health Insights" hidden (no AHC).</p>
+
+
+  <!-- ================== STATE 2 — RETURNING USER ================== -->
+  <div class="demo-label">State 2 · Returning user (with AHC)</div>
+
+  <section class="fh-widget" data-state="returning" data-has-ahc="true" aria-label="For Her — women's wellness">
+    <div class="fh-head">
+      <span class="fh-eyebrow"><span class="dot"></span>For Her</span>
+    </div>
+
+    <h3 class="fh-title" data-fh-headline>
+      Welcome back, <span class="italic">Prashansa</span>
+    </h3>
+    <p class="fh-sub" data-fh-sub>
+      Pick up where you left off — your insights are ready.
+    </p>
+
+    <div class="fh-context">
+      <span class="pulse"></span>
+      <span data-fh-context>Cycle log updated 2 days ago · next period in ~9 days</span>
+    </div>
+
+    <div class="fh-ctas">
+      <a class="fh-cta fh-cta--primary" href="/forher/cycle.html">
+        Continue Tracking <span class="arrow">→</span>
+      </a>
+      <a class="fh-cta fh-cta--secondary fh-cta--ahc" href="/forher/ahc-flow.html">
+        View Insights
+      </a>
+      <a class="fh-cta fh-cta--ghost" href="/forher/banner-flow.html">
+        PCOS Check <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+  <p class="demo-note">Contextual chip shows last activity. Primary CTA shifts to the most likely next action.</p>
+
+
+  <!-- ================== STATE 3 — HIGH-RISK USER ================== -->
+  <div class="demo-label">State 3 · High-risk (AHC flagged)</div>
+
+  <section class="fh-widget" data-state="high-risk" data-has-ahc="true" aria-label="For Her — women's wellness">
+    <div class="fh-head">
+      <span class="fh-eyebrow"><span class="dot"></span>For Her</span>
+      <span class="fh-badge">Recommended</span>
+    </div>
+
+    <h3 class="fh-title" data-fh-headline>
+      Let's complete your <span class="italic">evaluation</span>
+    </h3>
+    <p class="fh-sub" data-fh-sub>
+      Your recent check-up flagged a few markers worth a closer look.
+    </p>
+
+    <div class="fh-ctas">
+      <a class="fh-cta fh-cta--primary" href="/forher/ahc-flow.html">
+        Continue Evaluation <span class="arrow">→</span>
+      </a>
+      <a class="fh-cta fh-cta--secondary" href="/forher/banner-flow.html">
+        Quick PCOS Check
+      </a>
+      <a class="fh-cta fh-cta--ghost" href="/forher/cycle.html">
+        Track Cycle <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+  <p class="demo-note">Warm amber accent + softly pulsing primary CTA. Tone stays supportive, not alarming.</p>
+
+</div>
+
+<script>
+  // Optional: make whole card tappable when data-card-tap="true".
+  // The host can flip this on per-state if desired.
+  document.querySelectorAll('.fh-widget[data-card-tap="true"]').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.fh-cta')) return; // CTAs handle their own nav
+      const primary = card.querySelector('.fh-cta--primary');
+      if (primary) primary.click();
+    });
+  });
+</script>
+</body>
+</html>
