@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Habit Health — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+
+<!--
+  Habit Health home — extended with the "For Her" floating widget.
+  Single-file, no frameworks, deploy-anywhere.
+
+  Wiring points (set in <script id="fh-state">):
+    const FH_STATE = 'new' | 'returning' | 'risk';
+  Replace with the real value sourced from the host context.
+-->
+
+<style>
+  :root {
+    /* Habit Health-ish palette */
+    --hh-blue:        #2C5BB6;
+    --hh-blue-soft:   #EAF2FB;
+    --hh-orange:      #E37A1A;
+    --hh-peach-bg:    #FDEAD7;
+    --hh-mint:        #DDF1E5;
+    --ink:            #111827;
+    --ink-soft:       #6B7280;
+    --line:           #EEF0F4;
+    --bg:             #FFFFFF;
+    --shell-bg:       #ECEEF2;
+
+    /* For Her tokens */
+    --fh-plum:        #5B2A4A;
+    --fh-plum-deep:   #3E1B33;
+    --fh-plum-soft:   #8E5378;
+    --fh-rose-deep:   #E8A8B7;
+    --fh-rose-bg:     #FBF3F5;
+    --fh-lavender-bg: #F5F0F6;
+    --fh-amber:       #C9772A;
+    --fh-amber-bg:    #FCEDD9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--shell-bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(15, 23, 42, 0.08);
+  }
+
+  /* ======================
+     TOP BAR
+     ====================== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    font-family: 'DM Serif Display', serif;
+    color: var(--hh-blue);
+    font-size: 22px;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .brand span { color: var(--hh-orange); }
+  .brand small {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #6B7280;
+    margin-top: 2px;
+  }
+  .top-icons {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--ink);
+  }
+  .top-icons .ic {
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    position: relative;
+  }
+  .top-icons .badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 14px; height: 14px;
+    background: #E45252;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ======================
+     GREETING + HERO
+     ====================== */
+  .greet {
+    font-size: 16px;
+    padding: 16px 18px 8px;
+  }
+  .greet strong { font-weight: 700; }
+
+  .hero {
+    margin: 6px 14px 0;
+    border-radius: 18px;
+    background: linear-gradient(120deg, #FFF4DD 0%, #FFE9C7 100%);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    height: 168px;
+  }
+  .hero h2 {
+    font-size: 18px;
+    color: var(--hh-blue);
+    line-height: 1.2;
+    font-weight: 700;
+    max-width: 60%;
+  }
+  .hero h2 em { font-style: normal; color: var(--hh-orange); }
+  .hero p {
+    margin-top: 10px;
+    max-width: 60%;
+    font-size: 11.5px;
+    color: #6B5536;
+  }
+  .hero-illus {
+    position: absolute;
+    right: -10px; bottom: -8px;
+    font-size: 110px;
+    opacity: 0.85;
+  }
+  .hero-dots {
+    position: absolute;
+    left: 20px; bottom: 14px;
+    display: flex; gap: 5px;
+  }
+  .hero-dots i {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--hh-orange);
+    opacity: 0.4;
+  }
+  .hero-dots i:first-child { opacity: 1; }
+
+  /* ======================
+     QUICK TILES
+     ====================== */
+  .tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px;
+  }
+  .tile {
+    background: var(--hh-blue-soft);
+    border-radius: 16px;
+    padding: 14px 14px 14px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .tile:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15,23,42,0.06); }
+  .tile.peach { background: var(--hh-peach-bg); color: #B0561A; }
+  .tile-ic {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .tile-text {
+    line-height: 1.2;
+    flex: 1;
+  }
+  .tile-text strong {
+    display: block;
+    font-weight: 700;
+    color: var(--hh-blue);
+    font-size: 14px;
+  }
+  .tile.peach .tile-text strong { color: #B0561A; }
+  .tile-text small {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .tile-arrow {
+    color: inherit;
+    font-size: 16px;
+    opacity: 0.7;
+  }
+
+  /* ======================
+     WELLNESS RAIL
+     ====================== */
+  .section-title {
+    margin: 22px 16px 12px;
+    font-size: 15.5px;
+    font-weight: 700;
+  }
+  .rail {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 0 14px 4px;
+    scrollbar-width: none;
+  }
+  .rail::-webkit-scrollbar { display: none; }
+  .rail-item {
+    flex: 0 0 auto;
+    width: 88px;
+    text-align: center;
+    padding: 6px;
+  }
+  .rail-ic {
+    width: 56px; height: 56px;
+    margin: 0 auto 6px;
+    background: var(--hh-blue-soft);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    color: var(--hh-blue);
+  }
+  .rail-item small {
+    font-size: 11.5px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ======================
+     CHALLENGE
+     ====================== */
+  .challenge {
+    margin: 14px 14px 0;
+    border-radius: 18px;
+    background: linear-gradient(150deg, #DDF1E5 0%, #F0F8E0 100%);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .challenge .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.85);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .challenge .pill .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--hh-orange);
+  }
+  .challenge .runners {
+    height: 96px;
+    background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.6) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 8px;
+    font-size: 32px;
+  }
+  .challenge .leaderboard {
+    margin-top: 10px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+  }
+  .leaderboard .you, .leaderboard .top {
+    line-height: 1.2;
+  }
+  .leaderboard small { color: var(--ink-soft); font-size: 10.5px; }
+  .leaderboard .open {
+    background: var(--hh-peach-bg);
+    color: #B0561A;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  /* ======================
+     BOTTOM NAV
+     ====================== */
+  .nav {
+    position: sticky;
+    bottom: 0;
+    margin-top: 28px;
+    background: #1B1B22;
+    color: #fff;
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+    padding: 14px 12px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    align-items: center;
+    z-index: 5;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: #fff;
+    font-size: 11px;
+    text-decoration: none;
+  }
+  .nav-item .ic { font-size: 18px; opacity: 0.9; }
+  .nav-item.center {
+    transform: translateY(-18px);
+  }
+  .nav-item.center .ic {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--hh-blue);
+    font-size: 22px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+
+  /* ==============================================================
+     FOR HER FLOATING WIDGET
+     ============================================================== */
+  .fh-fab {
+    --fh-fab-bottom: 96px;   /* clears 80px nav + breathing room */
+    --fh-fab-right:  12px;
+    --fh-fab-width:  236px;
+
+    position: fixed;
+    bottom: var(--fh-fab-bottom);
+    right: max(var(--fh-fab-right), calc(50vw - 210px + var(--fh-fab-right)));
+    width: var(--fh-fab-width);
+    z-index: 60;
+    border-radius: 18px;
+    padding: 12px 12px 12px 14px;
+    background:
+      radial-gradient(120% 140% at 100% 0%, #F4D4DC 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, var(--fh-rose-bg) 60%, var(--fh-lavender-bg) 100%);
+    border: 1px solid rgba(91, 42, 74, 0.1);
+    box-shadow: 0 12px 28px rgba(91, 42, 74, 0.18),
+                0 2px 6px rgba(91, 42, 74, 0.08);
+    overflow: hidden;
+    cursor: pointer;
+    color: var(--fh-plum-deep);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.2s ease;
+    animation: fhFabIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+  }
+  @keyframes fhFabIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .fh-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(91, 42, 74, 0.22), 0 2px 6px rgba(91, 42, 74, 0.1);
+  }
+  .fh-fab:active { transform: scale(0.98); }
+  .fh-fab::before {
+    content: "";
+    position: absolute;
+    top: -28px; right: -28px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,168,183,0.5) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .fh-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .fh-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--fh-plum);
+    background: rgba(255,255,255,0.85);
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(91, 42, 74, 0.12);
+  }
+  .fh-eyebrow .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--fh-rose-deep);
+  }
+  .fh-flag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: var(--fh-amber-bg);
+    color: var(--fh-amber);
+    border: 1px solid rgba(201,119,42,0.22);
+    display: none;
+  }
+  .fh-close {
+    margin-left: auto;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.75);
+    color: var(--fh-plum);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .fh-close:hover { background: #fff; transform: scale(1.06); }
+
+  .fh-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    line-height: 1.18;
+    color: var(--fh-plum-deep);
+    margin: 0 0 2px;
+    position: relative; z-index: 1;
+  }
+  .fh-title em { font-style: italic; color: var(--fh-plum-soft); }
+  .fh-sub {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: #6B5A65;
+    margin: 0 0 10px;
+    position: relative; z-index: 1;
+  }
+  .fh-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--fh-plum-deep);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(91,42,74,0.22);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    position: relative; z-index: 1;
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .fh-cta:hover { background: var(--fh-plum); transform: translateY(-1px); }
+  .fh-cta .arrow { transition: transform 0.2s ease; }
+  .fh-cta:hover .arrow { transform: translateX(2px); }
+
+  .fh-fab[data-state="risk"] {
+    background:
+      radial-gradient(120% 140% at 100% 0%, #F8DDD0 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBF1EA 60%, var(--fh-lavender-bg) 100%);
+    border-color: rgba(201,119,42,0.28);
+  }
+  .fh-fab[data-state="risk"] .fh-flag { display: inline-flex; }
+  .fh-fab[data-state="risk"] .fh-cta {
+    animation: fhCtaPulse 2.2s cubic-bezier(0.22,1,0.36,1) infinite;
+  }
+  @keyframes fhCtaPulse {
+    0%   { box-shadow: 0 4px 12px rgba(91,42,74,0.22), 0 0 0 0 rgba(201,119,42,0.45); }
+    70%  { box-shadow: 0 4px 12px rgba(91,42,74,0.22), 0 0 0 10px rgba(201,119,42,0); }
+    100% { box-shadow: 0 4px 12px rgba(91,42,74,0.22), 0 0 0 0 rgba(201,119,42,0); }
+  }
+
+  .fh-fab[hidden] { display: none; }
+
+  /* ==============================================================
+     ENTRY SELECTION SHEET
+     ============================================================== */
+  .sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 10, 18, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+    z-index: 80;
+  }
+  .sheet-backdrop.open { opacity: 1; visibility: visible; }
+
+  .sheet {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%) translateY(100%);
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(180deg, #FFFFFF 0%, var(--fh-rose-bg) 100%);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    padding: 14px 18px 26px;
+    z-index: 90;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 -16px 40px rgba(91, 42, 74, 0.18);
+  }
+  .sheet.open { transform: translateX(-50%) translateY(0); }
+
+  .sheet-handle {
+    width: 38px; height: 4px;
+    background: rgba(91, 42, 74, 0.18);
+    border-radius: 999px;
+    margin: 4px auto 12px;
+  }
+  .sheet-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .sheet-head h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--fh-plum-deep);
+    max-width: 80%;
+  }
+  .sheet-head h2 em { font-style: italic; color: var(--fh-plum-soft); }
+  .sheet-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(91,42,74,0.12);
+    background: #fff;
+    color: var(--fh-plum-deep);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .sheet-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .opt {
+    background: #fff;
+    border: 1px solid rgba(91, 42, 74, 0.08);
+    border-radius: 16px;
+    padding: 14px 12px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--fh-plum-deep);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    display: block;
+  }
+  .opt:hover {
+    transform: translateY(-2px);
+    border-color: var(--fh-plum-soft);
+    box-shadow: 0 8px 18px rgba(91, 42, 74, 0.12);
+  }
+  .opt-ic {
+    width: 36px; height: 36px;
+    border-radius: 12px;
+    background: var(--fh-rose-bg);
+    color: var(--fh-plum);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .opt-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 2px;
+  }
+  .opt-sub {
+    font-size: 11px;
+    color: #6B5A65;
+    line-height: 1.35;
+  }
+
+  @media (max-width: 360px) {
+    .fh-fab { --fh-fab-width: 220px; }
+    .fh-title { font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fh-fab,
+    .fh-fab[data-state="risk"] .fh-cta { animation: none; }
+    .fh-fab:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">HA<span>BIT</span><small>HEALTH</small></div>
+    <div class="top-icons">
+      <span class="ic" title="HC">🟢</span>
+      <span class="ic">🔔</span>
+      <span class="ic">👛</span>
+      <span class="ic">🛒<span class="badge">1</span></span>
+    </div>
+  </header>
+
+  <!-- GREETING -->
+  <p class="greet">Hi <strong>Prashansa Pimpalkar</strong></p>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h2>Employer Health Benefits, <em>Just a Click Away!</em></h2>
+    <p>Explore &amp; avail corporate sponsored services today!</p>
+    <div class="hero-illus">👩‍💼</div>
+    <div class="hero-dots"><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- QUICK TILES -->
+  <div class="tiles">
+    <a class="tile" href="#" aria-label="Health records">
+      <div class="tile-ic">📋</div>
+      <div class="tile-text">
+        <strong>Health records</strong>
+        <small>Health Documents</small>
+      </div>
+      <span class="tile-arrow">›</span>
+    </a>
+    <a class="tile peach" href="#" aria-label="Bookings">
+      <div class="tile-ic">📅</div>
+      <div class="tile-text">
+        <strong>Bookings</strong>
+        <small>Past &amp; Upcoming</small>
+      </div>
+      <span class="tile-arrow">›</span>
+    </a>
+  </div>
+
+  <!-- WELLNESS RAIL -->
+  <div class="section-title">Extensive Range Of Wellness Solutions</div>
+  <div class="rail">
+    <div class="rail-item"><div class="rail-ic">🧪</div><small>Lab Tests</small></div>
+    <div class="rail-item"><div class="rail-ic">👨‍⚕️</div><small>Doctor Consult</small></div>
+    <div class="rail-item"><div class="rail-ic">💊</div><small>Pharmacy</small></div>
+    <div class="rail-item"><div class="rail-ic">🩺</div><small>Health Checks</small></div>
+    <div class="rail-item"><div class="rail-ic">🧘‍♀️</div><small>Mental Wellness</small></div>
+  </div>
+
+  <!-- CHALLENGE -->
+  <div class="section-title">Join a challenge</div>
+  <div class="challenge">
+    <span class="pill"><span class="dot"></span>Last sync: 2 minutes ago</span>
+    <div class="runners">🏃‍♀️ 🏃 🏃‍♂️</div>
+    <div class="leaderboard">
+      <div class="you"><strong>6.</strong> You <small>· 10k</small></div>
+      <div class="top"><strong>1.</strong> Prashansa <small>· 2k</small></div>
+      <div class="open">Leaderboard ›</div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav" aria-label="Primary navigation">
+    <a href="#" class="nav-item"><span class="ic">🏠</span>Home</a>
+    <a href="#" class="nav-item"><span class="ic">👟</span>Play</a>
+    <a href="#" class="nav-item center"><span class="ic">✚</span>My Benefits</a>
+    <a href="#" class="nav-item"><span class="ic">👤</span>Profile</a>
+    <a href="#" class="nav-item"><span class="ic">≡</span>Menu</a>
+  </nav>
+
+</div>
+
+<!-- ============================================================
+     FOR HER FLOATING WIDGET (above bottom nav, right corner)
+     ============================================================ -->
+<aside
+  class="fh-fab"
+  data-state="new"
+  role="button"
+  tabindex="0"
+  aria-label="For Her — open women's wellness"
+>
+  <div class="fh-head">
+    <span class="fh-eyebrow"><span class="dot"></span>For Her</span>
+    <span class="fh-flag" data-fh-flag>Recommended</span>
+    <button class="fh-close" data-fh-close type="button" aria-label="Dismiss">×</button>
+  </div>
+  <h3 class="fh-title" data-fh-title>
+    Track your <em>cycle</em>.
+  </h3>
+  <p class="fh-sub" data-fh-sub>
+    Understand your body, simplified.
+  </p>
+  <button class="fh-cta" data-fh-cta type="button">
+    <span data-fh-cta-label>Start now</span> <span class="arrow">→</span>
+  </button>
+</aside>
+
+<!-- ============================================================
+     ENTRY SELECTION SHEET
+     ============================================================ -->
+<div class="sheet-backdrop" data-sheet-backdrop></div>
+<section class="sheet" id="fhSheet" role="dialog" aria-modal="true" aria-labelledby="fhSheetTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 id="fhSheetTitle">Welcome to <em>For Her</em></h2>
+    <button class="sheet-close" data-sheet-close aria-label="Close">×</button>
+  </div>
+  <div class="sheet-options">
+    <a class="opt" href="cycle.html">
+      <div class="opt-ic">☾</div>
+      <div class="opt-title">Track my cycle</div>
+      <div class="opt-sub">Daily log &amp; predictions</div>
+    </a>
+    <a class="opt" href="banner.html">
+      <div class="opt-ic">✿</div>
+      <div class="opt-title">Check PCOS risk</div>
+      <div class="opt-sub">2-min self assessment</div>
+    </a>
+    <a class="opt" href="fertility.html">
+      <div class="opt-ic">♡</div>
+      <div class="opt-title">Trying to conceive</div>
+      <div class="opt-sub">Plan with confidence</div>
+    </a>
+    <a class="opt" href="explore.html">
+      <div class="opt-ic">✦</div>
+      <div class="opt-title">Just exploring</div>
+      <div class="opt-sub">See what's inside</div>
+    </a>
+  </div>
+</section>
+
+<script id="fh-state">
+  /* -----------------------------------------------------------
+     Mocked user state — swap with real context on the host.
+       'new'        → first-time user
+       'returning'  → has cycle history
+       'risk'       → flagged by AHC / PCOS model
+     ----------------------------------------------------------- */
+  const FH_STATE = 'new';
+
+  const FH_COPY = {
+    new: {
+      title:    'Track your <em>cycle</em>.',
+      sub:      'Check PCOS risk &amp; understand your body.',
+      ctaLabel: 'Start now',
+    },
+    returning: {
+      title:    'Continue <em>tracking</em>',
+      sub:      'Pick up where you left off.',
+      ctaLabel: 'View today',
+    },
+    risk: {
+      title:    'View your <em>PCOS</em> insights',
+      sub:      'A few signals worth a closer look.',
+      ctaLabel: 'See insights',
+    },
+  };
+
+  const FHWidget = (() => {
+    const root      = document.querySelector('.fh-fab');
+    const $title    = root.querySelector('[data-fh-title]');
+    const $sub      = root.querySelector('[data-fh-sub]');
+    const $ctaLabel = root.querySelector('[data-fh-cta-label]');
+    const $close    = root.querySelector('[data-fh-close]');
+
+    function set(stateKey) {
+      const copy = FH_COPY[stateKey];
+      if (!copy) return;
+      root.dataset.state    = stateKey;
+      $title.innerHTML      = copy.title;
+      $sub.innerHTML        = copy.sub;
+      $ctaLabel.textContent = copy.ctaLabel;
+    }
+
+    // Whole card + CTA → open the entry sheet.
+    function openSheet() { Sheet.open(); }
+    root.addEventListener('click', (e) => {
+      if (e.target.closest('[data-fh-close]')) return;
+      openSheet();
+    });
+    root.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      openSheet();
+    });
+    $close.addEventListener('click', (e) => {
+      e.stopPropagation();
+      root.hidden = true;
+    });
+
+    return { set };
+  })();
+
+  const Sheet = (() => {
+    const sheet    = document.getElementById('fhSheet');
+    const backdrop = document.querySelector('[data-sheet-backdrop]');
+    const closeBtn = document.querySelector('[data-sheet-close]');
+
+    function open()  { sheet.classList.add('open');  backdrop.classList.add('open');  document.body.style.overflow = 'hidden'; }
+    function close() { sheet.classList.remove('open'); backdrop.classList.remove('open'); document.body.style.overflow = ''; }
+
+    backdrop.addEventListener('click', close);
+    closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+    return { open, close };
+  })();
+
+  // Boot
+  FHWidget.set(FH_STATE);
+</script>
+</body>
+</html>
