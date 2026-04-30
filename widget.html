@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Her — Homepage Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+
+<!--
+  ============================================================
+  FOR HER — Homepage Widget (v2, glanceable)
+  ============================================================
+  Drop-in component for the Habit Health homepage.
+  Single instance, three states driven by data-state.
+
+  HOW TO PLUG IN
+  --------------
+  1. Copy the <style id="fh-widget-styles"> block into your
+     homepage <head> (or your shared CSS bundle).
+  2. Copy the <section class="fh-widget"> markup into the
+     homepage layout — recommended placement: directly under
+     the "Health records / Bookings" two-tile row, above the
+     "Extensive Range Of Wellness Solutions" section.
+  3. Copy the inline <script id="fh-widget-logic"> at the
+     bottom — or call FHWidget.set('new' | 'returning' | 'risk')
+     based on the user context you have on the homepage.
+
+  The bordered "DEMO" panel at the top of this file is for
+  preview only — delete it before shipping.
+  ============================================================
+-->
+
+<style id="fh-widget-styles">
+  /* ----- Demo-only page chrome (NOT part of the widget) ----- */
+  body {
+    margin: 0;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: #F7F8FA;
+    color: #1B1B1F;
+    -webkit-font-smoothing: antialiased;
+  }
+  .demo-shell {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+  }
+  .demo-dock {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  }
+  .demo-dock__title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #6B7280;
+    margin-bottom: 8px;
+  }
+  .demo-dock__row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .demo-dock__btn {
+    flex: 1;
+    min-width: 92px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #E5E7EB;
+    background: #F9FAFB;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .demo-dock__btn:hover { background: #fff; border-color: #C7CCD4; }
+  .demo-dock__btn[aria-pressed="true"] {
+    background: #3E1B33;
+    border-color: #3E1B33;
+    color: #fff;
+  }
+
+  /* =========================================================
+     FOR HER WIDGET — START
+     ========================================================= */
+  .fh-widget {
+    /* Scoped tokens */
+    --fh-plum: #5B2A4A;
+    --fh-plum-deep: #3E1B33;
+    --fh-plum-soft: #8E5378;
+    --fh-rose-deep: #E8A8B7;
+    --fh-rose-bg: #FBF3F5;
+    --fh-lavender-bg: #F5F0F6;
+    --fh-ink: #2A1A25;
+    --fh-ink-soft: #6B5A65;
+    --fh-amber: #C9772A;
+    --fh-amber-bg: #FCEDD9;
+
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    border-radius: 22px;
+    padding: 20px 20px 18px;
+    background:
+      radial-gradient(120% 140% at 100% 0%, #F4D4DC 0%, transparent 55%),
+      linear-gradient(135deg, #FFFFFF 0%, var(--fh-rose-bg) 60%, var(--fh-lavender-bg) 100%);
+    border: 1px solid rgba(91, 42, 74, 0.08);
+    box-shadow: 0 2px 10px rgba(91, 42, 74, 0.06);
+    overflow: hidden;
+    cursor: pointer;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    color: var(--fh-ink);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: fhFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes fhFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fh-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(91, 42, 74, 0.14);
+  }
+  .fh-widget:active { transform: scale(0.98); }
+
+  /* Decorative orb + glyph */
+  .fh-widget::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 168, 183, 0.45) 0%, transparent 70%);
+    pointer-events: none;
+    transition: transform 0.5s ease;
+  }
+  .fh-widget:hover::before { transform: scale(1.08) translate(4px, -4px); }
+  .fh-widget::after {
+    content: "❀";
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 22px;
+    color: var(--fh-rose-deep);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .fh-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .fh-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--fh-plum);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(91, 42, 74, 0.1);
+  }
+  .fh-eyebrow .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--fh-rose-deep);
+  }
+  .fh-flag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--fh-amber-bg);
+    color: var(--fh-amber);
+    border: 1px solid rgba(201, 119, 42, 0.2);
+    display: none;
+  }
+
+  .fh-title {
+    font-family: 'DM Serif Display', serif;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.18;
+    letter-spacing: -0.2px;
+    color: var(--fh-plum-deep);
+    margin: 0 36px 6px 0;  /* clear of glyph */
+  }
+  .fh-title .italic { font-style: italic; color: var(--fh-plum-soft); }
+
+  .fh-sub {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--fh-ink-soft);
+    margin: 0 0 14px;
+    max-width: 95%;
+  }
+
+  .fh-ctas {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .fh-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    white-space: nowrap;
+  }
+  .fh-cta .arrow { display: inline-block; transition: transform 0.2s ease; }
+  .fh-cta:hover .arrow { transform: translateX(2px); }
+
+  .fh-cta--primary {
+    background: var(--fh-plum-deep);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22);
+  }
+  .fh-cta--primary:hover { background: var(--fh-plum); transform: translateY(-1px); }
+  .fh-cta--primary:active { transform: scale(0.97); }
+
+  .fh-cta--secondary {
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--fh-plum-deep);
+    border-color: rgba(91, 42, 74, 0.12);
+  }
+  .fh-cta--secondary:hover { background: #fff; border-color: var(--fh-plum-soft); }
+  .fh-cta--secondary:active { transform: scale(0.97); }
+
+  .fh-cta--ghost {
+    background: transparent;
+    color: var(--fh-plum-deep);
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .fh-cta--ghost:hover { color: var(--fh-plum); }
+  .fh-cta--ghost .arrow { opacity: 0.7; }
+  .fh-cta--ghost { display: none; }
+  .fh-widget[data-show-tertiary="true"] .fh-cta--ghost { display: inline-flex; }
+
+  /* ----- State: risk ----- */
+  .fh-widget[data-state="risk"] {
+    background:
+      radial-gradient(120% 140% at 100% 0%, #F8DDD0 0%, transparent 55%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBF1EA 60%, var(--fh-lavender-bg) 100%);
+    border-color: rgba(201, 119, 42, 0.22);
+  }
+  .fh-widget[data-state="risk"] .fh-flag { display: inline-flex; }
+  .fh-widget[data-state="risk"] .fh-cta--primary {
+    animation: fhCtaPulse 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  @keyframes fhCtaPulse {
+    0%   { box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22), 0 0 0 0 rgba(201, 119, 42, 0.45); }
+    70%  { box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22), 0 0 0 12px rgba(201, 119, 42, 0); }
+    100% { box-shadow: 0 4px 14px rgba(91, 42, 74, 0.22), 0 0 0 0 rgba(201, 119, 42, 0); }
+  }
+
+  @media (max-width: 360px) {
+    .fh-widget { padding: 18px 16px 16px; }
+    .fh-title { font-size: 19.5px; }
+    .fh-cta { padding: 9px 12px; font-size: 12.5px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fh-widget,
+    .fh-widget[data-state="risk"] .fh-cta--primary { animation: none; }
+    .fh-widget:hover { transform: none; }
+  }
+  /* =========================================================
+     FOR HER WIDGET — END
+     ========================================================= */
+</style>
+</head>
+<body>
+
+<div class="demo-shell">
+
+  <!-- ============ DEMO CONTROLS — REMOVE BEFORE SHIPPING ============ -->
+  <div class="demo-dock" role="group" aria-label="Preview state">
+    <div class="demo-dock__title">Preview state</div>
+    <div class="demo-dock__row">
+      <button class="demo-dock__btn" data-go="new"       aria-pressed="true">New user</button>
+      <button class="demo-dock__btn" data-go="returning" aria-pressed="false">Returning</button>
+      <button class="demo-dock__btn" data-go="risk"      aria-pressed="false">Risk signal</button>
+    </div>
+  </div>
+  <!-- ============ /DEMO CONTROLS ============ -->
+
+
+  <!-- ====================================================================
+       FOR HER WIDGET — copy this block into the homepage
+       ==================================================================== -->
+  <section
+    class="fh-widget"
+    data-state="new"
+    data-show-tertiary="false"
+    role="link"
+    tabindex="0"
+    aria-label="For Her — women's wellness"
+  >
+    <div class="fh-head">
+      <span class="fh-eyebrow"><span class="dot"></span>For Her</span>
+      <span class="fh-flag" data-fh-flag>Recommended</span>
+    </div>
+
+    <h3 class="fh-title" data-fh-title>Is your <span class="italic">cycle</span> normal?</h3>
+    <p class="fh-sub"   data-fh-sub>Check PCOS risk &amp; track patterns.</p>
+
+    <div class="fh-ctas">
+      <a class="fh-cta fh-cta--primary"   data-fh-primary   href="/banner-flow.html">
+        <span data-fh-primary-label>Check PCOS</span> <span class="arrow">→</span>
+      </a>
+      <a class="fh-cta fh-cta--secondary" data-fh-secondary href="/cycle.html">
+        <span data-fh-secondary-label>Track cycle</span>
+      </a>
+      <a class="fh-cta fh-cta--ghost"     data-fh-tertiary  href="/ahc-flow.html">
+        <span data-fh-tertiary-label>View report</span> <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+  <!-- ====================================================================
+       /FOR HER WIDGET
+       ==================================================================== -->
+
+</div>
+
+<script id="fh-widget-logic">
+  /**
+   * For Her widget — minimal state controller.
+   * Public API:
+   *   FHWidget.set('new' | 'returning' | 'risk')
+   *
+   * Replace the demo-dock with a real call from the homepage,
+   * driven by the user context you already have:
+   *
+   *   const state = ctx.hasRiskSignal      ? 'risk'
+   *               : ctx.hasCycleHistory    ? 'returning'
+   *               :                          'new';
+   *   FHWidget.set(state);
+   */
+  const FH_COPY = {
+    new: {
+      title:        'Is your <span class="italic">cycle</span> normal?',
+      sub:          'Check PCOS risk & track patterns.',
+      primary:      { label: 'Check PCOS',  href: '/banner-flow.html' },
+      secondary:    { label: 'Track cycle', href: '/cycle.html' },
+      showTertiary: false,
+    },
+    returning: {
+      title:        'You’re in <span class="italic">ovulation</span>',
+      sub:          'See what your body needs today.',
+      primary:      { label: 'View today',   href: '/cycle.html' },
+      secondary:    { label: 'Log symptoms', href: '/cycle.html' },
+      showTertiary: false,
+    },
+    risk: {
+      title:        'Your cycle needs <span class="italic">attention</span>',
+      sub:          'A few signals worth a closer look.',
+      primary:      { label: 'Check now',   href: '/banner-flow.html' },
+      secondary:    { label: 'View report', href: '/ahc-flow.html' },
+      showTertiary: true,
+    },
+  };
+
+  const FHWidget = (() => {
+    const root = document.querySelector('.fh-widget');
+    if (!root) return { set: () => {} };
+
+    const $title       = root.querySelector('[data-fh-title]');
+    const $sub         = root.querySelector('[data-fh-sub]');
+    const $primary     = root.querySelector('[data-fh-primary]');
+    const $primaryLbl  = root.querySelector('[data-fh-primary-label]');
+    const $secondary   = root.querySelector('[data-fh-secondary]');
+    const $secondaryLbl= root.querySelector('[data-fh-secondary-label]');
+
+    function set(stateKey) {
+      const copy = FH_COPY[stateKey];
+      if (!copy) return;
+      root.dataset.state         = stateKey;
+      root.dataset.showTertiary  = copy.showTertiary ? 'true' : 'false';
+      $title.innerHTML           = copy.title;
+      $sub.textContent           = copy.sub;
+      $primaryLbl.textContent    = copy.primary.label;
+      $primary.setAttribute('href', copy.primary.href);
+      $secondaryLbl.textContent  = copy.secondary.label;
+      $secondary.setAttribute('href', copy.secondary.href);
+    }
+
+    // Whole-card tap → primary action (skips inner CTA clicks).
+    root.addEventListener('click', (e) => {
+      if (e.target.closest('.fh-cta')) return;
+      const href = $primary.getAttribute('href');
+      if (href) window.location.href = href;
+    });
+    root.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      const href = $primary.getAttribute('href');
+      if (href) window.location.href = href;
+    });
+
+    return { set };
+  })();
+
+  // Expose for host page to call.
+  window.FHWidget = FHWidget;
+
+  // ---- Demo dock wiring (delete with the dock) ----
+  document.querySelectorAll('.demo-dock__btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.demo-dock__btn').forEach((b) =>
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false')
+      );
+      FHWidget.set(btn.dataset.go);
+    });
+  });
+</script>
+</body>
+</html>
