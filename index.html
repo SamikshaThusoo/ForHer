@@ -340,8 +340,9 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(135deg, #f8e8ee, #f3d6df);
-    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.18);
+    background: linear-gradient(135deg, #5B2A4A, #7B3F61);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.25);
     z-index: -1;
     animation: fhBreathe 2.8s ease-in-out 700ms infinite;
     transition: box-shadow 200ms ease;
@@ -349,7 +350,7 @@
   }
 
   .fh-widget:hover         { transform: translateY(-2px); }
-  .fh-widget:hover::before { box-shadow: 0 14px 32px rgba(91, 42, 74, 0.26); }
+  .fh-widget:hover::before { box-shadow: 0 14px 32px rgba(91, 42, 74, 0.35); }
   .fh-widget:active        { transform: scale(0.96); }
 
   @keyframes fhEntry {
@@ -370,7 +371,8 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: white;
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -379,15 +381,17 @@
 
   .fh-text {
     font-weight: 600;
-    color: #3E1B33;
+    color: #FFFFFF;
     font-size: 14px;
   }
 
   .fh-arrow {
     font-size: 16px;
-    color: #3E1B33;
-    opacity: 0.7;
+    color: #FFFFFF;
+    opacity: 0.8;
+    transition: opacity 200ms ease;
   }
+  .fh-widget:hover .fh-arrow { opacity: 1; }
 
   /* BOTTOM SHEET */
   .sheet-backdrop {
@@ -587,7 +591,7 @@
 
 <!-- FOR HER FLOATING WIDGET -->
 <div class="fh-widget" onclick="openForHer()">
-  <div class="fh-icon">🌸</div>
+  <div class="fh-icon">❀</div>
   <div class="fh-text">For Her</div>
   <div class="fh-arrow">→</div>
 </div>
