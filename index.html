@@ -329,8 +329,15 @@
        visible during the 300ms delay, then yields to base styles
        so :hover / :active transforms can apply afterwards. */
     animation: fhEntry 400ms ease-out 300ms backwards;
-    transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 200ms ease;
     will-change: transform, opacity;
+  }
+
+  .fh-widget.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
   }
 
   /* Visual chrome lives on ::before so the breathing animation
@@ -629,6 +636,7 @@
 
 <script>
   (function () {
+    const widget   = document.querySelector('.fh-widget');
     const sheet    = document.getElementById('fhSheet');
     const backdrop = document.getElementById('sheetBackdrop');
     const closeBtn = document.getElementById('sheetClose');
@@ -636,11 +644,13 @@
     function openSheet() {
       sheet.classList.add('open');
       backdrop.classList.add('open');
+      widget.classList.add('is-hidden');
       document.body.style.overflow = 'hidden';
     }
     function closeSheet() {
       sheet.classList.remove('open');
       backdrop.classList.remove('open');
+      widget.classList.remove('is-hidden');
       document.body.style.overflow = '';
     }
 
