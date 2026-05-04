@@ -312,7 +312,7 @@
   .fh-widget {
     position: fixed;
     bottom: 90px; /* above bottom nav */
-    right: 16px;
+    right: max(16px, calc(50vw - 194px)); /* hug right edge of 420px column */
 
     display: flex;
     align-items: center;
