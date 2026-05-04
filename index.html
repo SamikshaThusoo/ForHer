@@ -320,19 +320,50 @@
 
     padding: 12px 16px;
     border-radius: 999px;
-
-    background: linear-gradient(135deg, #f8e8ee, #f3d6df);
-    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.18);
+    isolation: isolate; /* contain ::before stacking */
 
     cursor: pointer;
     z-index: 1000;
 
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Entry: fade + slide up. `backwards` keeps the from-state
+       visible during the 300ms delay, then yields to base styles
+       so :hover / :active transforms can apply afterwards. */
+    animation: fhEntry 400ms ease-out 300ms backwards;
+    transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, opacity;
   }
 
-  .fh-widget:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(91, 42, 74, 0.25);
+  /* Visual chrome lives on ::before so the breathing animation
+     runs independently of hover-lift / tap-scale on the widget. */
+  .fh-widget::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #f8e8ee, #f3d6df);
+    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.18);
+    z-index: -1;
+    animation: fhBreathe 2.8s ease-in-out 700ms infinite;
+    transition: box-shadow 200ms ease;
+    will-change: transform;
+  }
+
+  .fh-widget:hover         { transform: translateY(-2px); }
+  .fh-widget:hover::before { box-shadow: 0 14px 32px rgba(91, 42, 74, 0.26); }
+  .fh-widget:active        { transform: scale(0.96); }
+
+  @keyframes fhEntry {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fhBreathe {
+    0%, 100% { transform: scale(1);    }
+    50%      { transform: scale(1.03); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fh-widget,
+    .fh-widget::before { animation: none; }
   }
 
   .fh-icon {
