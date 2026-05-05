@@ -502,91 +502,6 @@
     flex-shrink: 0;
   }
 
-  /* ============ FOR HER FLOATING WIDGET ============ */
-  .fh-widget {
-    --fh-bottom: 95px;
-
-    position: fixed;
-    bottom: var(--fh-bottom);
-    right: max(16px, calc(50vw - 194px));
-
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    padding: 10px 14px 10px 10px;
-    border-radius: 999px;
-    isolation: isolate;
-
-    cursor: pointer;
-    z-index: 60;
-
-    animation: fhEntry 400ms ease-out 300ms backwards;
-    transition: bottom 0.3s ease,
-                transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
-                opacity 200ms ease;
-    will-change: bottom, transform, opacity;
-  }
-  .fh-widget::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(135deg, var(--fh-plum-1), var(--fh-plum-2));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.30);
-    z-index: -1;
-    animation: fhBreathe 2.8s ease-in-out 700ms infinite;
-    transition: box-shadow 200ms ease;
-    will-change: transform;
-  }
-
-  /* When the feedback popup is up, lift the widget above it. */
-  body.has-feedback .fh-widget { --fh-bottom: 160px; }
-
-  .fh-widget:hover         { transform: translateY(-2px); }
-  .fh-widget:hover::before { box-shadow: 0 14px 32px rgba(91, 42, 74, 0.38); }
-  .fh-widget:active        { transform: scale(0.96); }
-
-  .fh-widget.is-hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(8px);
-  }
-
-  .fh-icon {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    color: #FFFFFF;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
-    flex-shrink: 0;
-  }
-  .fh-text {
-    color: #FFFFFF;
-    font-size: 13.5px;
-    font-weight: 600;
-    letter-spacing: 0.1px;
-  }
-  .fh-arrow {
-    color: #FFFFFF;
-    font-size: 14px;
-    opacity: 0.8;
-    transition: opacity 200ms ease, transform 200ms ease;
-    margin-left: 2px;
-  }
-  .fh-widget:hover .fh-arrow { opacity: 1; transform: translateX(2px); }
-
-  @keyframes fhEntry {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fhBreathe {
-    0%, 100% { transform: scale(1);    }
-    50%      { transform: scale(1.03); }
-  }
-
   /* ============ BOTTOM SHEET ============ */
   .sheet-backdrop {
     position: fixed;
@@ -681,10 +596,9 @@
   .opt-go    { color: var(--fh-plum-1); font-size: 18px; opacity: 0.6; }
 
   @media (prefers-reduced-motion: reduce) {
-    .fh-widget,
-    .fh-widget::before,
-    .feedback-popup { animation: none; }
-    .fh-widget:hover { transform: none; }
+    .feedback-popup,
+    .ql.ql-fh::after { animation: none; }
+    .ql.ql-fh:hover { transform: none; }
   }
 </style>
 </head>
@@ -798,13 +712,6 @@
   <a class="nav-cta" href="#"><span>♡⁺</span>My Benefits</a>
 </div>
 
-<!-- FOR HER FLOATING WIDGET -->
-<div class="fh-widget" id="fhWidget" role="button" tabindex="0" aria-label="Open For Her">
-  <div class="fh-icon">❀</div>
-  <div class="fh-text">For Her</div>
-  <div class="fh-arrow">→</div>
-</div>
-
 <!-- BOTTOM SHEET -->
 <div class="sheet-backdrop" id="sheetBackdrop"></div>
 <section class="sheet" id="fhSheet" role="dialog" aria-modal="true" aria-labelledby="fhSheetTitle">
@@ -849,7 +756,6 @@
   };
 
   (function () {
-    const widget   = document.getElementById('fhWidget');
     const tile     = document.getElementById('fhTile');
     const sheet    = document.getElementById('fhSheet');
     const backdrop = document.getElementById('sheetBackdrop');
@@ -857,36 +763,16 @@
     const popup    = document.getElementById('feedbackPopup');
     const fbClose  = document.getElementById('fbClose');
 
-    /* --- Adaptive widget position based on feedback popup --- */
-    function syncFeedbackState() {
-      const visible = popup && !popup.classList.contains('is-hidden')
-                            && popup.offsetParent !== null;
-      document.body.classList.toggle('has-feedback', !!visible);
-    }
-
-    /* Detect future show/hide of any element with this class so a
-       host page that reuses the same component will sync too. */
-    new MutationObserver(syncFeedbackState).observe(document.body, {
-      subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'],
-    });
-
-    /* --- Bottom sheet --- */
     function openSheet() {
       sheet.classList.add('open');
       backdrop.classList.add('open');
-      widget.classList.add('is-hidden');
       document.body.style.overflow = 'hidden';
     }
     function closeSheet() {
       sheet.classList.remove('open');
       backdrop.classList.remove('open');
-      widget.classList.remove('is-hidden');
       document.body.style.overflow = '';
     }
-    widget.addEventListener('click', openSheet);
-    widget.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(); }
-    });
 
     /* Quick-link tile: render copy for current state and open sheet on tap. */
     if (tile) {
@@ -900,6 +786,7 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(); }
       });
     }
+
     backdrop.addEventListener('click', closeSheet);
     closeBtn.addEventListener('click', closeSheet);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
@@ -910,15 +797,10 @@
       });
     });
 
-    /* --- Feedback popup dismiss --- */
+    /* Feedback popup dismiss */
     if (fbClose && popup) {
-      fbClose.addEventListener('click', () => {
-        popup.classList.add('is-hidden');
-        syncFeedbackState();
-      });
+      fbClose.addEventListener('click', () => popup.classList.add('is-hidden'));
     }
-
-    syncFeedbackState();
   })();
 </script>
 </body>
