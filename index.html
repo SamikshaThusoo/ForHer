@@ -6,333 +6,507 @@
 <title>Habit Health — Home</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..700;1,300..700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --hh-blue:        #2C5BB6;
-    --hh-blue-soft:   #EAF2FB;
-    --hh-orange:      #E37A1A;
-    --hh-peach-bg:    #FDEAD7;
-    --hh-mint:        #DDF1E5;
-    --ink:            #111827;
+    --hh-blue:        #2C7BE5;
+    --hh-blue-deep:   #1F4FA0;
+    --hh-blue-soft:   #E6F1FB;
+    --hh-orange:      #F58A1F;
+    --hh-yellow:      #FFC83D;
+    --hh-green:       #1FA86A;
+    --ink:            #1A1A1A;
     --ink-soft:       #6B7280;
-    --line:           #EEF0F4;
-    --bg:             #FFFFFF;
-    --shell-bg:       #ECEEF2;
+    --line:           #ECEFF3;
+    --shell-bg:       #DEE3EA;
+    --card-bg:        #FFFFFF;
 
-    --fh-plum:        #5B2A4A;
-    --fh-plum-deep:   #3E1B33;
-    --fh-plum-soft:   #8E5378;
-    --fh-rose-deep:   #E8A8B7;
-    --fh-rose-bg:     #FBF3F5;
-    --fh-lavender-bg: #F5F0F6;
+    --fh-plum-1:      #5B2A4A;
+    --fh-plum-2:      #7B3F61;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   html, body {
     font-family: 'DM Sans', -apple-system, sans-serif;
     background: var(--shell-bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
-    line-height: 1.5;
+    line-height: 1.4;
   }
 
   .app {
     max-width: 420px;
     margin: 0 auto;
-    background: var(--bg);
     min-height: 100vh;
+    background: linear-gradient(180deg, #DCEAF8 0%, #F4F7FB 240px, #F4F7FB 100%);
     position: relative;
-    overflow-x: hidden;
-    box-shadow: 0 16px 48px rgba(15, 23, 42, 0.08);
-    padding-bottom: 96px;
+    box-shadow: 0 16px 48px rgba(15, 23, 42, 0.10);
+    padding-bottom: 200px;
   }
 
-  /* TOP BAR */
+  /* ============ HEADER ============ */
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 18px 12px;
-    border-bottom: 1px solid var(--line);
+    padding: 18px 18px 8px;
   }
-  .brand {
-    font-family: 'DM Serif Display', serif;
-    color: var(--hh-blue);
-    font-size: 22px;
-    letter-spacing: 1px;
-    line-height: 1;
+  .user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .brand span { color: var(--hh-orange); }
-  .brand small {
-    display: block;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 9px;
-    letter-spacing: 4px;
-    color: #6B7280;
-    margin-top: 2px;
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--hh-blue);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
   }
-  .top-icons { display: flex; align-items: center; gap: 14px; }
-  .top-icons .ic {
-    width: 28px; height: 28px;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 16px;
+  .user-name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .user-name .chev { font-size: 10px; opacity: 0.6; margin-left: 2px; }
+
+  .top-icons { display: flex; align-items: center; gap: 6px; }
+  .ic-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.65);
+    border: 1px solid rgba(0,0,0,0.04);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
     position: relative;
+    cursor: pointer;
   }
-  .top-icons .badge {
+  .ic-btn .badge {
     position: absolute;
     top: -2px; right: -2px;
-    width: 14px; height: 14px;
-    background: #E45252;
+    width: 16px; height: 16px;
+    background: var(--hh-orange);
     color: #fff;
     border-radius: 50%;
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 700;
     display: flex; align-items: center; justify-content: center;
+    border: 2px solid #DCEAF8;
   }
 
-  /* GREETING + HERO */
-  .greet { font-size: 16px; padding: 16px 18px 8px; }
-  .greet strong { font-weight: 700; }
-
-  .hero {
-    margin: 6px 14px 0;
-    border-radius: 18px;
-    background: linear-gradient(120deg, #FFF4DD 0%, #FFE9C7 100%);
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-    height: 168px;
-  }
-  .hero h2 {
-    font-size: 18px;
-    color: var(--hh-blue);
-    line-height: 1.2;
-    font-weight: 700;
-    max-width: 60%;
-  }
-  .hero h2 em { font-style: normal; color: var(--hh-orange); }
-  .hero p {
-    margin-top: 10px;
-    max-width: 60%;
-    font-size: 11.5px;
-    color: #6B5536;
-  }
-  .hero-illus {
-    position: absolute;
-    right: -10px; bottom: -8px;
-    font-size: 110px;
-    opacity: 0.85;
-  }
-  .hero-dots {
-    position: absolute;
-    left: 20px; bottom: 14px;
-    display: flex; gap: 5px;
-  }
-  .hero-dots i {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--hh-orange);
-    opacity: 0.4;
-  }
-  .hero-dots i:first-child { opacity: 1; }
-
-  /* QUICK TILES */
-  .tiles {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 14px;
-  }
-  .tile {
-    background: var(--hh-blue-soft);
-    border-radius: 16px;
-    padding: 14px 14px 14px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-  }
-  .tile:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15,23,42,0.06); }
-  .tile.peach { background: var(--hh-peach-bg); }
-  .tile-ic {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.7);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .tile-text { line-height: 1.2; flex: 1; }
-  .tile-text strong {
-    display: block;
-    font-weight: 700;
-    color: var(--hh-blue);
-    font-size: 14px;
-  }
-  .tile.peach .tile-text strong { color: #B0561A; }
-  .tile-text small {
-    font-size: 11px;
-    color: var(--ink-soft);
-    font-weight: 500;
-  }
-  .tile-arrow { font-size: 16px; opacity: 0.7; }
-
-  /* WELLNESS RAIL */
-  .section-title {
-    margin: 22px 16px 12px;
-    font-size: 15.5px;
-    font-weight: 700;
-  }
-  .rail {
+  /* ============ SERVICES RAIL ============ */
+  .services {
     display: flex;
     overflow-x: auto;
-    gap: 8px;
-    padding: 0 14px 4px;
+    gap: 4px;
+    padding: 14px 14px 6px;
     scrollbar-width: none;
   }
-  .rail::-webkit-scrollbar { display: none; }
-  .rail-item {
-    flex: 0 0 auto;
-    width: 88px;
+  .services::-webkit-scrollbar { display: none; }
+  .svc {
+    flex: 0 0 76px;
     text-align: center;
     padding: 6px;
+    cursor: pointer;
   }
-  .rail-ic {
-    width: 56px; height: 56px;
-    margin: 0 auto 6px;
-    background: var(--hh-blue-soft);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
+  .svc-ic {
+    font-size: 26px;
     color: var(--hh-blue);
+    margin-bottom: 4px;
   }
-  .rail-item small { font-size: 11.5px; color: var(--ink); font-weight: 500; }
+  .svc-label {
+    font-size: 11.5px;
+    color: var(--ink);
+    font-weight: 500;
+  }
 
-  /* CHALLENGE */
-  .challenge {
-    margin: 14px 14px 0;
+  /* ============ STEPS CARD ============ */
+  .card {
+    background: var(--card-bg);
     border-radius: 18px;
-    background: linear-gradient(150deg, #DDF1E5 0%, #F0F8E0 100%);
-    padding: 16px;
-    position: relative;
+    margin: 10px 14px 0;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
     overflow: hidden;
   }
-  .challenge .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.85);
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 10.5px;
-    color: var(--ink-soft);
-    font-weight: 500;
-    margin-bottom: 12px;
+
+  .steps {
+    padding: 14px 16px 16px;
   }
-  .challenge .pill .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--hh-orange);
-  }
-  .challenge .runners {
-    height: 96px;
-    background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.6) 100%);
-    border-radius: 12px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    padding: 8px;
-    font-size: 32px;
-  }
-  .challenge .leaderboard {
-    margin-top: 10px;
-    background: #fff;
-    border-radius: 14px;
-    padding: 10px 12px;
+  .steps-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 12px;
-    box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+    margin-bottom: 8px;
   }
-  .leaderboard small { color: var(--ink-soft); font-size: 10.5px; }
-  .leaderboard .open {
-    background: var(--hh-peach-bg);
-    color: #B0561A;
-    padding: 6px 12px;
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(43, 123, 229, 0.08);
+    color: var(--hh-blue);
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 5px 10px;
     border-radius: 999px;
+  }
+  .pill.muted {
+    background: #F2F4F7;
+    color: var(--ink-soft);
+  }
+  .goal {
+    text-align: right;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+  .goal strong {
+    display: block;
+    color: var(--hh-orange);
+    font-size: 16px;
     font-weight: 700;
+    line-height: 1.1;
+  }
+  .goal .ico { display: inline-block; margin-right: 2px; }
+
+  .scene {
+    position: relative;
+    height: 130px;
+    background: linear-gradient(180deg, #EAF2FB 0%, #E1F4E5 100%);
+    border-radius: 14px;
+    margin: 6px 0 8px;
+    overflow: hidden;
+  }
+  .scene::before {
+    content: "🌳   🌲   🏙   🌳   🌲";
+    position: absolute;
+    top: 18px; left: 0; right: 0;
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: 8px;
+    opacity: 0.55;
+  }
+  .scene::after {
+    content: "";
+    position: absolute;
+    bottom: 16px; left: 0; right: 0;
+    height: 2px;
+    border-top: 2px dashed rgba(31, 168, 106, 0.4);
+  }
+  .runner {
+    position: absolute;
+    left: 40%;
+    bottom: 18px;
+    font-size: 38px;
+    transform: translateX(-50%);
+  }
+  .scene-bubble {
+    position: absolute;
+    top: 38px; left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 999px;
+    padding: 5px 12px;
     font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    box-shadow: 0 2px 8px rgba(15,23,42,0.08);
+  }
+  .scene-bubble small { font-weight: 500; color: var(--ink-soft); }
+
+  .scene-marks {
+    position: absolute;
+    bottom: 6px; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 14px;
+    font-size: 10.5px;
+    color: var(--hh-green);
+    font-weight: 600;
   }
 
-  /* BOTTOM NAV */
-  .nav {
+  .cta-yellow {
+    width: 100%;
+    background: var(--hh-yellow);
+    color: #2A1A05;
+    border: none;
+    padding: 13px 18px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 200, 61, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.15s ease;
+  }
+  .cta-yellow:active { transform: scale(0.98); }
+
+  /* ============ HEALTH SCORE ============ */
+  .health {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .health-ic {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--hh-blue-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: var(--hh-blue-deep);
+    flex-shrink: 0;
+  }
+  .health-body { flex: 1; min-width: 0; }
+  .health-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .health-bar {
+    height: 6px;
+    background: #EEF1F4;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .health-bar i {
+    display: block;
+    height: 100%;
+    width: 80%;
+    background: linear-gradient(90deg, var(--hh-blue) 0%, var(--hh-green) 100%);
+    border-radius: inherit;
+  }
+  .health-sub {
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+  .health-score {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .health-score small {
+    color: var(--hh-green);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .health-score strong {
+    display: block;
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .health-score em {
+    font-style: normal;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  /* carousel dots */
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 14px 0 18px;
+  }
+  .dots i {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #C7CCD4;
+  }
+  .dots i.active { background: var(--hh-blue-deep); width: 18px; border-radius: 999px; }
+
+  /* ============ QUICK LINKS ============ */
+  .section-title {
+    margin: 8px 18px 10px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .ql-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 0 14px 4px;
+    scrollbar-width: none;
+  }
+  .ql-row::-webkit-scrollbar { display: none; }
+  .ql {
+    flex: 0 0 156px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    cursor: pointer;
+  }
+  .ql-ic {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--hh-blue-soft);
+    color: var(--hh-blue-deep);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .ql-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .ql-sub {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.35;
+  }
+
+  /* ============ BOTTOM NAV ============ */
+  .bottom-bar {
     position: fixed;
-    bottom: 0;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%;
-    max-width: 420px;
-    background: #1B1B22;
-    color: #fff;
-    border-top-left-radius: 22px;
-    border-top-right-radius: 22px;
-    padding: 14px 12px 18px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    align-items: center;
+    width: calc(100% - 24px);
+    max-width: 396px;
+    display: flex;
+    gap: 8px;
     z-index: 50;
+  }
+  .nav-pill {
+    flex: 1;
+    background: #FFFFFF;
+    border-radius: 999px;
+    padding: 10px 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
   }
   .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    color: #fff;
-    font-size: 11px;
+    color: var(--ink-soft);
+    font-size: 10.5px;
     text-decoration: none;
+    cursor: pointer;
+    padding: 4px 0;
+    border-radius: 999px;
   }
-  .nav-item .ic { font-size: 18px; opacity: 0.9; }
-  .nav-item.center { transform: translateY(-18px); }
-  .nav-item.center .ic {
-    width: 48px; height: 48px;
-    border-radius: 50%;
-    background: #fff;
-    color: var(--hh-blue);
-    font-size: 22px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  .nav-item .ic { font-size: 16px; opacity: 0.85; }
+  .nav-item.active {
+    background: var(--hh-blue-soft);
+    color: var(--hh-blue-deep);
+  }
+  .nav-item.active .ic { opacity: 1; }
+
+  .nav-cta {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #F89849 0%, var(--hh-orange) 100%);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(245, 138, 31, 0.35);
+    cursor: pointer;
   }
 
-  /* FOR HER FLOATING WIDGET */
-  .fh-widget {
+  /* ============ FEEDBACK POPUP ============ */
+  .feedback-popup {
     position: fixed;
-    bottom: 90px; /* above bottom nav */
-    right: max(16px, calc(50vw - 194px)); /* hug right edge of 420px column */
+    bottom: 86px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 396px;
+    background: #FFFFFF;
+    border-radius: 999px;
+    padding: 10px 12px 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+    z-index: 55;
+    animation: fbIn 350ms ease-out 600ms backwards;
+  }
+  .feedback-popup.is-hidden { display: none; }
+  @keyframes fbIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .fb-text {
+    font-size: 12.5px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .fb-text .thumb { margin-right: 6px; }
+  .stars {
+    display: flex;
+    gap: 3px;
+    color: #C7CCD4;
+    font-size: 14px;
+  }
+  .fb-close {
+    width: 22px; height: 22px;
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ============ FOR HER FLOATING WIDGET ============ */
+  .fh-widget {
+    --fh-bottom: 95px;
+
+    position: fixed;
+    bottom: var(--fh-bottom);
+    right: max(16px, calc(50vw - 194px));
 
     display: flex;
     align-items: center;
     gap: 10px;
 
-    padding: 12px 16px;
+    padding: 10px 14px 10px 10px;
     border-radius: 999px;
-    isolation: isolate; /* contain ::before stacking */
+    isolation: isolate;
 
     cursor: pointer;
-    z-index: 1000;
+    z-index: 60;
 
-    /* Entry: fade + slide up. `backwards` keeps the from-state
-       visible during the 300ms delay, then yields to base styles
-       so :hover / :active transforms can apply afterwards. */
     animation: fhEntry 400ms ease-out 300ms backwards;
-    transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    transition: bottom 0.3s ease,
+                transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
                 opacity 200ms ease;
-    will-change: transform, opacity;
+    will-change: bottom, transform, opacity;
   }
+  .fh-widget::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--fh-plum-1), var(--fh-plum-2));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.30);
+    z-index: -1;
+    animation: fhBreathe 2.8s ease-in-out 700ms infinite;
+    transition: box-shadow 200ms ease;
+    will-change: transform;
+  }
+
+  /* When the feedback popup is up, lift the widget above it. */
+  body.has-feedback .fh-widget { --fh-bottom: 160px; }
+
+  .fh-widget:hover         { transform: translateY(-2px); }
+  .fh-widget:hover::before { box-shadow: 0 14px 32px rgba(91, 42, 74, 0.38); }
+  .fh-widget:active        { transform: scale(0.96); }
 
   .fh-widget.is-hidden {
     opacity: 0;
@@ -340,28 +514,32 @@
     transform: translateY(8px);
   }
 
-  /* Visual chrome lives on ::before so the breathing animation
-     runs independently of hover-lift / tap-scale on the widget. */
-  .fh-widget::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(135deg, #5B2A4A, #7B3F61);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 24px rgba(91, 42, 74, 0.25);
-    z-index: -1;
-    animation: fhBreathe 2.8s ease-in-out 700ms infinite;
-    transition: box-shadow 200ms ease;
-    will-change: transform;
+  .fh-icon {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
   }
-
-  .fh-widget:hover         { transform: translateY(-2px); }
-  .fh-widget:hover::before { box-shadow: 0 14px 32px rgba(91, 42, 74, 0.35); }
-  .fh-widget:active        { transform: scale(0.96); }
+  .fh-text {
+    color: #FFFFFF;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+  }
+  .fh-arrow {
+    color: #FFFFFF;
+    font-size: 14px;
+    opacity: 0.8;
+    transition: opacity 200ms ease, transform 200ms ease;
+    margin-left: 2px;
+  }
+  .fh-widget:hover .fh-arrow { opacity: 1; transform: translateX(2px); }
 
   @keyframes fhEntry {
-    from { opacity: 0; transform: translateY(24px); }
+    from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   @keyframes fhBreathe {
@@ -369,38 +547,7 @@
     50%      { transform: scale(1.03); }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .fh-widget,
-    .fh-widget::before { animation: none; }
-  }
-
-  .fh-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-  }
-
-  .fh-text {
-    font-weight: 600;
-    color: #FFFFFF;
-    font-size: 14px;
-  }
-
-  .fh-arrow {
-    font-size: 16px;
-    color: #FFFFFF;
-    opacity: 0.8;
-    transition: opacity 200ms ease;
-  }
-  .fh-widget:hover .fh-arrow { opacity: 1; }
-
-  /* BOTTOM SHEET */
+  /* ============ BOTTOM SHEET ============ */
   .sheet-backdrop {
     position: fixed;
     inset: 0;
@@ -419,7 +566,7 @@
     transform: translateX(-50%) translateY(100%);
     width: 100%;
     max-width: 420px;
-    background: linear-gradient(180deg, #FFFFFF 0%, var(--fh-rose-bg) 100%);
+    background: linear-gradient(180deg, #FFFFFF 0%, #FBF3F5 100%);
     border-top-left-radius: 24px;
     border-top-right-radius: 24px;
     padding: 14px 18px 28px;
@@ -438,19 +585,16 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .sheet-head h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    font-weight: 400;
-    line-height: 1.2;
-    color: var(--fh-plum-deep);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--fh-plum-1);
   }
-  .sheet-head h2 em { font-style: italic; color: var(--fh-plum-soft); }
   .sheet-head p {
     font-size: 12.5px;
-    color: #6B5A65;
+    color: var(--ink-soft);
     margin-top: 4px;
   }
   .sheet-close {
@@ -458,7 +602,7 @@
     border-radius: 50%;
     border: 1px solid rgba(91,42,74,0.12);
     background: #fff;
-    color: var(--fh-plum-deep);
+    color: var(--fh-plum-1);
     font-size: 16px;
     cursor: pointer;
   }
@@ -472,48 +616,35 @@
     padding: 14px;
     cursor: pointer;
     text-decoration: none;
-    color: var(--fh-plum-deep);
+    color: var(--fh-plum-1);
     margin-bottom: 10px;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   }
   .opt:last-child { margin-bottom: 0; }
   .opt:hover {
     transform: translateY(-2px);
-    border-color: var(--fh-plum-soft);
+    border-color: var(--fh-plum-2);
     box-shadow: 0 8px 18px rgba(91, 42, 74, 0.12);
   }
   .opt-ic {
     width: 44px; height: 44px;
     border-radius: 12px;
-    background: var(--fh-rose-bg);
-    color: var(--fh-plum);
+    background: #FBF3F5;
+    color: var(--fh-plum-1);
     display: flex; align-items: center; justify-content: center;
     font-size: 20px;
     flex-shrink: 0;
   }
   .opt-body { flex: 1; line-height: 1.25; }
-  .opt-title {
-    font-size: 14.5px;
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-  .opt-sub {
-    font-size: 12px;
-    color: #6B5A65;
-  }
-  .opt-go {
-    color: var(--fh-plum-deep);
-    font-size: 18px;
-    opacity: 0.7;
-  }
+  .opt-title { font-size: 14.5px; font-weight: 600; margin-bottom: 2px; }
+  .opt-sub   { font-size: 12px; color: var(--ink-soft); }
+  .opt-go    { color: var(--fh-plum-1); font-size: 18px; opacity: 0.6; }
 
-  @media (max-width: 360px) {
-    .fh-fab { width: 200px; }
-    .fh-text strong { font-size: 14px; }
-  }
   @media (prefers-reduced-motion: reduce) {
-    .fh-fab { animation: none; }
-    .fh-fab:hover { transform: none; }
+    .fh-widget,
+    .fh-widget::before,
+    .feedback-popup { animation: none; }
+    .fh-widget:hover { transform: none; }
   }
 </style>
 </head>
@@ -521,83 +652,109 @@
 
 <div class="app">
 
-  <!-- TOP BAR -->
+  <!-- HEADER -->
   <header class="topbar">
-    <div class="brand">HA<span>BIT</span><small>HEALTH</small></div>
+    <div class="user">
+      <div class="avatar">👤</div>
+      <span class="user-name">Monish <span class="chev">▾</span></span>
+    </div>
     <div class="top-icons">
-      <span class="ic" title="HC">🟢</span>
-      <span class="ic">🔔</span>
-      <span class="ic">👛</span>
-      <span class="ic">🛒<span class="badge">1</span></span>
+      <span class="ic-btn">🔔</span>
+      <span class="ic-btn">👛</span>
+      <span class="ic-btn">🛒<span class="badge">3</span></span>
     </div>
   </header>
 
-  <!-- GREETING -->
-  <p class="greet">Hi <strong>Prashansa Pimpalkar</strong></p>
-
-  <!-- HERO BANNER -->
-  <div class="hero">
-    <h2>Employer Health Benefits, <em>Just a Click Away!</em></h2>
-    <p>Explore &amp; avail corporate sponsored services today!</p>
-    <div class="hero-illus">👩‍💼</div>
-    <div class="hero-dots"><i></i><i></i><i></i><i></i><i></i></div>
+  <!-- SERVICES RAIL -->
+  <div class="services">
+    <div class="svc"><div class="svc-ic">🔬</div><div class="svc-label">Lab Tests</div></div>
+    <div class="svc"><div class="svc-ic">👨‍⚕️</div><div class="svc-label">Consultancy</div></div>
+    <div class="svc"><div class="svc-ic">🧠</div><div class="svc-label">Wellness</div></div>
+    <div class="svc"><div class="svc-ic">💊</div><div class="svc-label">Medicines</div></div>
+    <div class="svc"><div class="svc-ic">🏥</div><div class="svc-label">Clinic Visit</div></div>
   </div>
 
-  <!-- QUICK TILES -->
-  <div class="tiles">
-    <a class="tile" href="#" aria-label="Health records">
-      <div class="tile-ic">📋</div>
-      <div class="tile-text">
-        <strong>Health records</strong>
-        <small>Health Documents</small>
+  <!-- STEPS CHALLENGE -->
+  <div class="card">
+    <div class="steps">
+      <div class="steps-head">
+        <span class="pill"><span>🔄</span>Last sync: 2 minutes ago</span>
+        <div class="goal"><strong><span class="ico">🎯</span>15,000</strong>Daily Step Goal</div>
       </div>
-      <span class="tile-arrow">›</span>
-    </a>
-    <a class="tile peach" href="#" aria-label="Bookings">
-      <div class="tile-ic">📅</div>
-      <div class="tile-text">
-        <strong>Bookings</strong>
-        <small>Past &amp; Upcoming</small>
+      <div class="scene">
+        <div class="scene-bubble">6000 <small>Steps</small></div>
+        <div class="runner">🏃‍♀️</div>
+        <div class="scene-marks">
+          <span>● 0</span>
+          <span>● 7.5k</span>
+          <span>● 15k</span>
+        </div>
       </div>
-      <span class="tile-arrow">›</span>
-    </a>
+      <button class="cta-yellow" onclick="alert('Get Started')">🚀 Get Started</button>
+    </div>
   </div>
 
-  <!-- WELLNESS RAIL -->
-  <div class="section-title">Extensive Range Of Wellness Solutions</div>
-  <div class="rail">
-    <div class="rail-item"><div class="rail-ic">🧪</div><small>Lab Tests</small></div>
-    <div class="rail-item"><div class="rail-ic">👨‍⚕️</div><small>Doctor Consult</small></div>
-    <div class="rail-item"><div class="rail-ic">💊</div><small>Pharmacy</small></div>
-    <div class="rail-item"><div class="rail-ic">🩺</div><small>Health Checks</small></div>
-    <div class="rail-item"><div class="rail-ic">🧘‍♀️</div><small>Mental Wellness</small></div>
+  <!-- HEALTH SCORE -->
+  <div class="card">
+    <div class="health">
+      <div class="health-ic">❤️</div>
+      <div class="health-body">
+        <div class="health-title">Your Health Score</div>
+        <div class="health-bar"><i></i></div>
+        <div class="health-sub">You are healthier than 75% people</div>
+      </div>
+      <div class="health-score">
+        <small>Excellent</small>
+        <strong>800</strong>
+        <em>/1000</em>
+      </div>
+    </div>
   </div>
 
-  <!-- CHALLENGE -->
-  <div class="section-title">Join a challenge</div>
-  <div class="challenge">
-    <span class="pill"><span class="dot"></span>Last sync: 2 minutes ago</span>
-    <div class="runners">🏃‍♀️ 🏃 🏃‍♂️</div>
-    <div class="leaderboard">
-      <div><strong>6.</strong> You <small>· 10k</small></div>
-      <div><strong>1.</strong> Prashansa <small>· 2k</small></div>
-      <div class="open">Leaderboard ›</div>
+  <div class="dots"><i></i><i class="active"></i><i></i></div>
+
+  <!-- QUICK LINKS -->
+  <div class="section-title">Quick links</div>
+  <div class="ql-row">
+    <div class="ql">
+      <div class="ql-ic">📅</div>
+      <div class="ql-title">My Bookings</div>
+      <div class="ql-sub">View and manage your appointments easily</div>
+    </div>
+    <div class="ql">
+      <div class="ql-ic">📊</div>
+      <div class="ql-title">Smart Report</div>
+      <div class="ql-sub">Understand your health with simple insights.</div>
+    </div>
+    <div class="ql">
+      <div class="ql-ic">📂</div>
+      <div class="ql-title">Health</div>
+      <div class="ql-sub">Track all your records easily.</div>
     </div>
   </div>
 
 </div>
 
-<!-- BOTTOM NAV -->
-<nav class="nav" aria-label="Primary navigation">
-  <a href="#" class="nav-item"><span class="ic">🏠</span>Home</a>
-  <a href="#" class="nav-item"><span class="ic">👟</span>Play</a>
-  <a href="#" class="nav-item center"><span class="ic">✚</span>My Benefits</a>
-  <a href="#" class="nav-item"><span class="ic">👤</span>Profile</a>
-  <a href="#" class="nav-item"><span class="ic">≡</span>Menu</a>
-</nav>
+<!-- FEEDBACK POPUP (above bottom nav) -->
+<div class="feedback-popup" id="feedbackPopup">
+  <span class="fb-text"><span class="thumb">👍</span>Rate your Smart Report</span>
+  <span class="stars">☆ ☆ ☆ ☆ ☆</span>
+  <button class="fb-close" id="fbClose" aria-label="Dismiss">×</button>
+</div>
+
+<!-- BOTTOM NAV (pill + orange CTA) -->
+<div class="bottom-bar">
+  <nav class="nav-pill" aria-label="Primary navigation">
+    <a class="nav-item active" href="#"><span class="ic">🏠</span>Home</a>
+    <a class="nav-item" href="#"><span class="ic">🎯</span>Play</a>
+    <a class="nav-item" href="#"><span class="ic">👤</span>Profile</a>
+    <a class="nav-item" href="#"><span class="ic">≡</span>Menu</a>
+  </nav>
+  <a class="nav-cta" href="#"><span>♡⁺</span>My Benefits</a>
+</div>
 
 <!-- FOR HER FLOATING WIDGET -->
-<div class="fh-widget" onclick="openForHer()">
+<div class="fh-widget" id="fhWidget" role="button" tabindex="0" aria-label="Open For Her">
   <div class="fh-icon">❀</div>
   <div class="fh-text">For Her</div>
   <div class="fh-arrow">→</div>
@@ -609,7 +766,7 @@
   <div class="sheet-handle"></div>
   <div class="sheet-head">
     <div>
-      <h2 id="fhSheetTitle"><em>For Her</em></h2>
+      <h2 id="fhSheetTitle">For Her</h2>
       <p>Choose where you'd like to begin.</p>
     </div>
     <button class="sheet-close" id="sheetClose" aria-label="Close">×</button>
@@ -618,16 +775,16 @@
   <a class="opt" href="cycle.html" data-go="cycle.html">
     <div class="opt-ic">☾</div>
     <div class="opt-body">
-      <div class="opt-title">Track my cycle</div>
+      <div class="opt-title">Track Cycle</div>
       <div class="opt-sub">Daily log &amp; predictions</div>
     </div>
     <span class="opt-go">›</span>
   </a>
 
-  <a class="opt" href="for_her_v4.html" data-go="for_her_v4.html">
+  <a class="opt" href="banner.html" data-go="banner.html">
     <div class="opt-ic">✿</div>
     <div class="opt-body">
-      <div class="opt-title">Check PCOS risk</div>
+      <div class="opt-title">Check PCOS Risk</div>
       <div class="opt-sub">2-min self assessment</div>
     </div>
     <span class="opt-go">›</span>
@@ -636,11 +793,27 @@
 
 <script>
   (function () {
-    const widget   = document.querySelector('.fh-widget');
+    const widget   = document.getElementById('fhWidget');
     const sheet    = document.getElementById('fhSheet');
     const backdrop = document.getElementById('sheetBackdrop');
     const closeBtn = document.getElementById('sheetClose');
+    const popup    = document.getElementById('feedbackPopup');
+    const fbClose  = document.getElementById('fbClose');
 
+    /* --- Adaptive widget position based on feedback popup --- */
+    function syncFeedbackState() {
+      const visible = popup && !popup.classList.contains('is-hidden')
+                            && popup.offsetParent !== null;
+      document.body.classList.toggle('has-feedback', !!visible);
+    }
+
+    /* Detect future show/hide of any element with this class so a
+       host page that reuses the same component will sync too. */
+    new MutationObserver(syncFeedbackState).observe(document.body, {
+      subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'],
+    });
+
+    /* --- Bottom sheet --- */
     function openSheet() {
       sheet.classList.add('open');
       backdrop.classList.add('open');
@@ -653,22 +826,29 @@
       widget.classList.remove('is-hidden');
       document.body.style.overflow = '';
     }
-
-    // Widget tap → show the choice sheet (cycle vs. PCOS).
-    window.openForHer = openSheet;
-
+    widget.addEventListener('click', openSheet);
+    widget.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(); }
+    });
     backdrop.addEventListener('click', closeSheet);
     closeBtn.addEventListener('click', closeSheet);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeSheet();
-    });
-
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
     sheet.querySelectorAll('[data-go]').forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = a.getAttribute('data-go');
       });
     });
+
+    /* --- Feedback popup dismiss --- */
+    if (fbClose && popup) {
+      fbClose.addEventListener('click', () => {
+        popup.classList.add('is-hidden');
+        syncFeedbackState();
+      });
+    }
+
+    syncFeedbackState();
   })();
 </script>
 </body>
