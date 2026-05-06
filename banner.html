@@ -622,6 +622,38 @@
 
   .screen-pad { padding: 8px 24px 24px; }
 
+  /* AHC bridge banner — shown when arriving from ahc.html */
+  .ahc-context-banner {
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 4px 0 14px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, var(--rose-bg) 0%, #F2E6EE 100%);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--plum);
+    border-radius: 12px;
+    color: var(--plum-deep);
+    font-size: 13px;
+    line-height: 1.45;
+    animation: ahcBannerIn 360ms ease-out 80ms backwards;
+  }
+  .ahc-context-banner.is-shown { display: flex; }
+  .ahc-context-banner .ahc-icon {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--plum-deep);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .ahc-context-banner .ahc-text strong { font-weight: 600; }
+  @keyframes ahcBannerIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0);     }
+  }
+
   /* Intro screen */
   .intro-hero {
     text-align: center;
@@ -1744,10 +1776,16 @@
         <div class="brand-mark">❀</div>
         <div class="brand-name">For Her<span class="dot">·</span><span class="tulip">Tulip</span></div>
       </div>
-      <a class="back-btn" href="home.html" title="Back to home">‹</a>
+      <a class="back-btn" id="introBack" href="home.html" title="Back">‹</a>
     </div>
 
     <div class="screen-pad">
+      <div class="ahc-context-banner" id="ahcContextBanner" role="note">
+        <div class="ahc-icon" aria-hidden="true">✦</div>
+        <div class="ahc-text">
+          Based on your recent <strong>health check</strong>, let's understand your risk better.
+        </div>
+      </div>
       <div class="intro-hero">
         <div class="intro-orb">f</div>
         <span class="eyebrow">Hormonal Health Check</span>
@@ -2828,6 +2866,26 @@ function toggleDev() {
 
 // Init
 renderQuestion();
+
+/* ----------------------------------------------------------------
+   Source-aware entry: when the user arrives from ahc.html, surface
+   the contextual banner on the intro screen and rewire the back
+   button to return to the AHC insights page.
+   ---------------------------------------------------------------- */
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const source = params.get("source");
+
+  if (source === "ahc") {
+    const banner    = document.getElementById('ahcContextBanner');
+    const backBtn   = document.getElementById('introBack');
+    if (banner)  banner.classList.add('is-shown');
+    if (backBtn) {
+      backBtn.setAttribute('href', 'ahc.html');
+      backBtn.setAttribute('title', 'Back to your health check');
+    }
+  }
+})();
 </script>
 </body>
 </html>

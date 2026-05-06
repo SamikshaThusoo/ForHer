@@ -932,7 +932,7 @@
 
     <div class="card">
       <div class="card-header">
-        <div class="card-title">Flagged Indicators</div>
+        <div class="card-title">Your Health Check Insights</div>
         <div class="card-meta">AHC · Platinum</div>
       </div>
       <div class="indicator-list">
@@ -963,13 +963,13 @@
     <div class="context-banner">
       <div class="context-icon">✦</div>
       <div class="context-text">
-        A short <strong>check-in about your symptoms</strong> will help us personalise your insights. Takes about 2 minutes.
+        These patterns can sometimes be linked to <strong>hormonal conditions like PCOS</strong>.
       </div>
     </div>
 
     <div class="cta-wrap">
-      <button class="btn" onclick="goTo(2)">
-        Continue Assessment <span class="arrow">→</span>
+      <button class="btn" onclick="goToPCOS()">
+        Understand your PCOS risk <span class="arrow">→</span>
       </button>
     </div>
   </div>
@@ -1101,6 +1101,12 @@
 </div>
 
 <script>
+/* Bridge to the PCOS questionnaire — preserves the AHC source
+   so banner.html can show the contextual banner and route back. */
+function goToPCOS() {
+  window.location.href = "banner.html?source=ahc";
+}
+
 /* =================================================================
    For Her Screening Engine v2
    -----------------------------------------------------------------

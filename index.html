@@ -502,99 +502,6 @@
     flex-shrink: 0;
   }
 
-  /* ============ BOTTOM SHEET ============ */
-  .sheet-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(20, 10, 18, 0.5);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.22s ease, visibility 0.22s ease;
-    z-index: 80;
-  }
-  .sheet-backdrop.open { opacity: 1; visibility: visible; }
-
-  .sheet {
-    position: fixed;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%) translateY(100%);
-    width: 100%;
-    max-width: 420px;
-    background: linear-gradient(180deg, #FFFFFF 0%, #FBF3F5 100%);
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
-    padding: 14px 18px 28px;
-    z-index: 90;
-    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-    box-shadow: 0 -16px 40px rgba(91, 42, 74, 0.18);
-  }
-  .sheet.open { transform: translateX(-50%) translateY(0); }
-  .sheet-handle {
-    width: 38px; height: 4px;
-    background: rgba(91, 42, 74, 0.18);
-    border-radius: 999px;
-    margin: 4px auto 14px;
-  }
-  .sheet-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .sheet-head h2 {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--fh-plum-1);
-  }
-  .sheet-head p {
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    margin-top: 4px;
-  }
-  .sheet-close {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    border: 1px solid rgba(91,42,74,0.12);
-    background: #fff;
-    color: var(--fh-plum-1);
-    font-size: 16px;
-    cursor: pointer;
-  }
-  .opt {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: #fff;
-    border: 1px solid rgba(91, 42, 74, 0.08);
-    border-radius: 16px;
-    padding: 14px;
-    cursor: pointer;
-    text-decoration: none;
-    color: var(--fh-plum-1);
-    margin-bottom: 10px;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  }
-  .opt:last-child { margin-bottom: 0; }
-  .opt:hover {
-    transform: translateY(-2px);
-    border-color: var(--fh-plum-2);
-    box-shadow: 0 8px 18px rgba(91, 42, 74, 0.12);
-  }
-  .opt-ic {
-    width: 44px; height: 44px;
-    border-radius: 12px;
-    background: #FBF3F5;
-    color: var(--fh-plum-1);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-  }
-  .opt-body { flex: 1; line-height: 1.25; }
-  .opt-title { font-size: 14.5px; font-weight: 600; margin-bottom: 2px; }
-  .opt-sub   { font-size: 12px; color: var(--ink-soft); }
-  .opt-go    { color: var(--fh-plum-1); font-size: 18px; opacity: 0.6; }
-
   @media (prefers-reduced-motion: reduce) {
     .feedback-popup,
     .ql.ql-fh::after { animation: none; }
@@ -670,7 +577,8 @@
   <!-- QUICK LINKS -->
   <div class="section-title">Quick links</div>
   <div class="ql-row">
-    <div class="ql ql-fh" id="fhTile" data-state="new" role="button" tabindex="0" aria-label="Open For Her">
+    <div class="ql ql-fh" id="fhTile" data-state="new" role="button" tabindex="0"
+         aria-label="Open For Her" onclick="openForHerFlow()">
       <div class="ql-ic">❀</div>
       <div class="ql-title">For Her</div>
       <div class="ql-sub" data-fh-tile-sub>Track your cycle &amp; check PCOS risk</div>
@@ -712,36 +620,20 @@
   <a class="nav-cta" href="#"><span>♡⁺</span>My Benefits</a>
 </div>
 
-<!-- BOTTOM SHEET -->
-<div class="sheet-backdrop" id="sheetBackdrop"></div>
-<section class="sheet" id="fhSheet" role="dialog" aria-modal="true" aria-labelledby="fhSheetTitle">
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <div>
-      <h2 id="fhSheetTitle">For Her</h2>
-      <p>Choose where you'd like to begin.</p>
-    </div>
-    <button class="sheet-close" id="sheetClose" aria-label="Close">×</button>
-  </div>
+<script>
+  /* For Her tile entry. Replace mock flags with real backend data
+     (e.g. user.hasAHC, user.pcosFlags.length > 0) when wiring up. */
+  function openForHerFlow() {
+    const hasAHC = true;
+    const hasPCOSFlags = true;
 
-  <a class="opt" href="cycle.html" data-go="cycle.html">
-    <div class="opt-ic">☾</div>
-    <div class="opt-body">
-      <div class="opt-title">Track Cycle</div>
-      <div class="opt-sub">Daily log &amp; predictions</div>
-    </div>
-    <span class="opt-go">›</span>
-  </a>
-
-  <a class="opt" href="for_her_v4.html" data-go="for_her_v4.html">
-    <div class="opt-ic">✿</div>
-    <div class="opt-body">
-      <div class="opt-title">Check PCOS Risk</div>
-      <div class="opt-sub">2-min self assessment</div>
-    </div>
-    <span class="opt-go">›</span>
-  </a>
-</section>
+    if (hasAHC && hasPCOSFlags) {
+      window.location.href = "ahc.html?source=forher";
+    } else {
+      window.location.href = "banner.html?source=forher";
+    }
+  }
+</script>
 
 <script>
   /* For Her quick-link tile state. Drive from real user context later.
@@ -756,48 +648,26 @@
   };
 
   (function () {
-    const tile     = document.getElementById('fhTile');
-    const sheet    = document.getElementById('fhSheet');
-    const backdrop = document.getElementById('sheetBackdrop');
-    const closeBtn = document.getElementById('sheetClose');
-    const popup    = document.getElementById('feedbackPopup');
-    const fbClose  = document.getElementById('fbClose');
+    const tile    = document.getElementById('fhTile');
+    const popup   = document.getElementById('feedbackPopup');
+    const fbClose = document.getElementById('fbClose');
 
-    function openSheet() {
-      sheet.classList.add('open');
-      backdrop.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeSheet() {
-      sheet.classList.remove('open');
-      backdrop.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    /* Quick-link tile: render copy for current state and open sheet on tap. */
+    /* Quick-link tile: render state copy and forward keyboard activation
+       to the inline onclick handler for parity with click. */
     if (tile) {
       const sub = tile.querySelector('[data-fh-tile-sub]');
       tile.dataset.state = FH_TILE_STATE;
       if (sub && FH_TILE_COPY[FH_TILE_STATE]) {
         sub.textContent = FH_TILE_COPY[FH_TILE_STATE];
       }
-      tile.addEventListener('click', openSheet);
       tile.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(); }
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (typeof openForHerFlow === 'function') openForHerFlow();
+        }
       });
     }
 
-    backdrop.addEventListener('click', closeSheet);
-    closeBtn.addEventListener('click', closeSheet);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
-    sheet.querySelectorAll('[data-go]').forEach((a) => {
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = a.getAttribute('data-go');
-      });
-    });
-
-    /* Feedback popup dismiss */
     if (fbClose && popup) {
       fbClose.addEventListener('click', () => popup.classList.add('is-hidden'));
     }
