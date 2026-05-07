@@ -2189,20 +2189,12 @@
   /* Phase markers around the ring (Period / Follicular / Ovulation / Luteal) */
   #ringSvg .ring-phase-label {
     font-family: 'DM Sans', sans-serif;
-    font-size: 7.8px;
+    font-size: 8.5px;
     font-weight: 700;
-    letter-spacing: 1.4px;
+    letter-spacing: 1.6px;
     fill: var(--ink-soft);
     pointer-events: none;
-    opacity: 0.78;
-  }
-  #ringSvg .ring-phase-date {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    fill: var(--plum-deep);
-    letter-spacing: 0.2px;
-    pointer-events: none;
+    opacity: 0.82;
   }
 
   /* Today marker — soft pulse anchored at today's cycle-day position */
@@ -4189,7 +4181,7 @@ const RING = {
   cx: 170, cy: 170,
   dotRingR: 138,
   curveOuterR: 122,
-  curveInnerR: 50,
+  curveInnerR: 66, // bigger inner circle so center text fits comfortably
   handleR: 144 // outer radius where the draggable handle sits
 };
 
@@ -4246,7 +4238,7 @@ function buildRingStatic(svg, dimmed) {
     phaseHtml += `<path d="${arcPath(curveOuterR, curveInnerR, seg.from, seg.to)}" fill="${seg.color}" opacity="${dimmed ? 0.3 : 1}"/>`;
   });
 
-  // Smooth, glowing hormone curve via Catmull-Rom-to-Bezier.
+  // Smooth, crisp hormone curve via Catmull-Rom-to-Bezier (no blur filter).
   function curveStroke(fn, color, hormoneKey) {
     const pts = [];
     for (let i = 1; i <= CYCLE_LENGTH; i++) {
@@ -4256,7 +4248,7 @@ function buildRingStatic(svg, dimmed) {
       pts.push(ringPolar(r, a));
     }
     const d = smoothClosedPath(pts);
-    return `<path class="hormone-curve hormone-${hormoneKey}" d="${d}" fill="none" stroke="${color}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#curveGlow)" opacity="${dimmed ? 0.3 : 0.92}"/>`;
+    return `<path class="hormone-curve hormone-${hormoneKey}" d="${d}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity="${dimmed ? 0.3 : 0.92}"/>`;
   }
 
   let dotsHtml = '';
@@ -4273,8 +4265,9 @@ function buildRingStatic(svg, dimmed) {
   }
 
   // Phase markers anchored at the start of each phase (Period D1, Follicular D8,
-  // Ovulation D15, Luteal D22) with dynamically computed calendar dates.
-  const labelR = 168;
+  // Ovulation D15, Luteal D22). No dates — a circular layout can't communicate
+  // upcoming vs past, so dates would only confuse the reader.
+  const labelR = 156;
   const phaseMarkers = [
     { day: 1,  name: 'Period' },
     { day: 8,  name: 'Follicular' },
@@ -4284,13 +4277,10 @@ function buildRingStatic(svg, dimmed) {
   let phaseMarkersHtml = '';
   if (!dimmed) {
     phaseMarkers.forEach(m => {
-      const calDate = getCalendarDateForCycleDay(m.day);
-      if (!calDate) return;
       const a = ringDayToAngle(m.day);
       const p = ringPolar(labelR, a);
       phaseMarkersHtml += `
-        <text class="ring-phase-label" x="${p.x.toFixed(1)}" y="${(p.y - 6).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${m.name.toUpperCase()}</text>
-        <text class="ring-phase-date"  x="${p.x.toFixed(1)}" y="${(p.y + 7).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${formatShortDate(calDate)}</text>
+        <text class="ring-phase-label" x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${m.name.toUpperCase()}</text>
       `;
     });
   }
@@ -4316,16 +4306,9 @@ function buildRingStatic(svg, dimmed) {
   const traceOpacity = dimmed ? 0 : 1;
   svg.innerHTML = `
     <defs>
-      <filter id="curveGlow" x="-25%" y="-25%" width="150%" height="150%">
-        <feGaussianBlur stdDeviation="1.6" result="blur"/>
-        <feMerge>
-          <feMergeNode in="blur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
       <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
-        <stop offset="100%" stop-color="rgba(255,255,255,0.55)"/>
+        <stop offset="0%" stop-color="rgba(255,255,255,0.96)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0.6)"/>
       </radialGradient>
     </defs>
     <g id="ringStaticLayer">
@@ -4426,20 +4409,18 @@ function updateRingDynamic(currentDay, dimmed) {
     <circle class="clock-handle-grip" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="7" fill="white" stroke="${hc}" stroke-width="2.5"/>
   `;
 
-  const calDate = getCalendarDateForCycleDay(currentDay);
-  const dateLine = formatShortDate(calDate);
   const phaseName = (PHASE_CONTENT[phaseOfDay] && PHASE_CONTENT[phaseOfDay].name) || '';
   const todayCycleDay = getCycleDayForDate(today);
   const isToday = todayCycleDay === currentDay;
   const todayBadge = isToday
-    ? `<text x="${cx}" y="${cy - 40}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="8" font-weight="700" letter-spacing="2" fill="#2F7A7A">TODAY</text>`
+    ? `<text x="${cx}" y="${cy - 36}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="8" font-weight="700" letter-spacing="2" fill="#2F7A7A">TODAY</text>`
     : '';
   centerG.innerHTML = `
     ${todayBadge}
-    <text x="${cx}" y="${cy - 24}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.6">DAY ${currentDay}</text>
-    <text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="24" fill="#3E1B33">${dateLine}</text>
-    <text x="${cx}" y="${cy + 20}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9.5" font-weight="700" fill="${hc}" letter-spacing="1.3">${phaseName.toUpperCase()} PHASE</text>
-    <text x="${cx}" y="${cy + 36}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-style="italic" fill="#6B5A65">${dom.phrase}</text>
+    <text x="${cx}" y="${cy - 22}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.6">DAY</text>
+    <text x="${cx}" y="${cy + 6}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="32" fill="#3E1B33">${currentDay}</text>
+    <text x="${cx}" y="${cy + 24}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9.5" font-weight="700" fill="${hc}" letter-spacing="1.3">${phaseName.toUpperCase()} PHASE</text>
+    <text x="${cx}" y="${cy + 38}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-style="italic" fill="#6B5A65">${dom.phrase}</text>
   `;
 }
 
