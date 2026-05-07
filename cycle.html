@@ -2168,6 +2168,26 @@
     transition: transform 0.05s linear;
   }
 
+  /* Cardinal calendar-date labels around the ring */
+  #ringSvg .ring-date-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    fill: var(--plum-deep);
+    letter-spacing: 0.2px;
+    pointer-events: none;
+  }
+
+  #ringSvg .ring-date-hint {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    fill: var(--ink-soft);
+    pointer-events: none;
+    opacity: 0.65;
+  }
+
   /* Hormone trace dots that ride along each curve as the day changes */
   #ringSvg .hormone-trace-dot {
     transition: cx 0.28s cubic-bezier(0.22, 1, 0.36, 1),
@@ -3150,7 +3170,7 @@
           <h3>How your hormones move</h3>
         </div>
         <div class="ring-svg-wrap" id="ringSvgWrap">
-          <svg id="ringSvg" viewBox="0 0 340 340"></svg>
+          <svg id="ringSvg" viewBox="-22 -22 384 384"></svg>
         </div>
         <div class="clock-hint" id="clockHint"><span class="pulse"></span>Drag the bead around the clock to explore any day</div>
         <div class="ring-legend">
@@ -3509,6 +3529,22 @@ function getPredictedNextPeriod(referenceDate) {
   const next = new Date(start);
   next.setDate(start.getDate() + CYCLE_LENGTH);
   return next;
+}
+
+// Calendar date helpers — used by the hormone clock to show dates of month.
+const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function getCalendarDateForCycleDay(cycleDay) {
+  const periodStart = getMostRecentPeriodStart(today);
+  if (!periodStart) return null;
+  const d = new Date(periodStart);
+  d.setDate(periodStart.getDate() + (cycleDay - 1));
+  return d;
+}
+
+function formatShortDate(d) {
+  if (!d) return '';
+  return `${SHORT_MONTHS[d.getMonth()]} ${d.getDate()}`;
 }
 
 function isPredictedPeriodDay(date) {
@@ -4132,6 +4168,26 @@ function buildRingStatic(svg, dimmed) {
     dotsHtml += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${dimmed ? 0.3 : 1}"/>`;
   }
 
+  // Outer cardinal date markers (every 7th cycle day → 4 quadrants).
+  // Only rendered when there's cycle data.
+  const labelR = 168;
+  let dateMarkersHtml = '';
+  if (!dimmed) {
+    [1, 8, 15, 22].forEach(dayN => {
+      const calDate = getCalendarDateForCycleDay(dayN);
+      if (!calDate) return;
+      const a = ringDayToAngle(dayN);
+      const p = ringPolar(labelR, a);
+      const label = formatShortDate(calDate);
+      // Tiny day-of-cycle hint above the date for the cardinal positions.
+      const hintY = p.y - 9;
+      dateMarkersHtml += `
+        <text class="ring-date-label" x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${label}</text>
+        <text class="ring-date-hint" x="${p.x.toFixed(1)}" y="${hintY.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">D${dayN}</text>
+      `;
+    });
+  }
+
   // Static layer + persistent trace dots + overlay containers.
   // Trace dots are persistent SVG circles; updateRingDynamic only mutates
   // their cx/cy so CSS transitions on the geometry attrs animate them
@@ -4146,6 +4202,7 @@ function buildRingStatic(svg, dimmed) {
       ${curveStroke(hProgesterone, '#8E5378')}
       ${curveStroke(hTestosterone, '#2F7A7A')}
       ${dotsHtml}
+      ${dateMarkersHtml}
     </g>
     <g id="hormoneTraceLayer" opacity="${traceOpacity}">
       <circle id="traceDotEstrogen"     class="hormone-trace-dot" cx="${cx}" cy="${cy}" r="4.5" fill="#C76B7A" stroke="white" stroke-width="2"/>
@@ -4224,10 +4281,13 @@ function updateRingDynamic(currentDay, dimmed) {
     <circle class="clock-handle-grip" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="7" fill="white" stroke="${hc}" stroke-width="2.5"/>
   `;
 
+  const calDate = getCalendarDateForCycleDay(currentDay);
+  const dateLine = formatShortDate(calDate);
   centerG.innerHTML = `
-    <text x="${cx}" y="${cy - 8}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">DAY</text>
-    <text x="${cx}" y="${cy + 16}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="32" fill="#3E1B33">${currentDay}</text>
-    <text x="${cx}" y="${cy + 32}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" fill="#6B5A65" font-style="italic">of ${CYCLE_LENGTH}</text>
+    <text x="${cx}" y="${cy - 18}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">DAY</text>
+    <text x="${cx}" y="${cy + 6}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="28" fill="#3E1B33">${currentDay}</text>
+    <text x="${cx}" y="${cy + 24}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="600" fill="#5B2A4A">${dateLine}</text>
+    <text x="${cx}" y="${cy + 38}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="8" fill="#6B5A65" font-style="italic">of ${CYCLE_LENGTH}</text>
   `;
 }
 
