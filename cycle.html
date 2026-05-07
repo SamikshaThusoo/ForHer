@@ -626,6 +626,13 @@
   .cal-day.empty:hover { background: transparent; }
   .cal-day:not(.empty):hover { background: var(--rose-bg); }
 
+  .cal-day.adjacent-month {
+    color: rgba(91, 42, 74, 0.32);
+    font-weight: 400;
+  }
+
+  .cal-day.adjacent-month:hover { background: rgba(244, 212, 220, 0.35); }
+
   /* Period day — uses blood-drop SVG */
   .cal-day.is-period {
     background: var(--phase-menstrual-bg);
@@ -2161,6 +2168,18 @@
     transition: transform 0.05s linear;
   }
 
+  /* Hormone trace dots that ride along each curve as the day changes */
+  #ringSvg .hormone-trace-dot {
+    transition: cx 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                cy 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                r 0.28s ease,
+                opacity 0.3s ease;
+    filter: drop-shadow(0 1px 3px rgba(91, 42, 74, 0.18));
+  }
+  .ring-svg-wrap.dragging #ringSvg .hormone-trace-dot {
+    transition: cx 0.06s linear, cy 0.06s linear;
+  }
+
   .clock-hint {
     text-align: center;
     font-size: 11px;
@@ -2489,6 +2508,40 @@
   .daily-chip.symptom-chip.selected {
     background: linear-gradient(135deg, var(--phase-menstrual) 0%, #A84458 100%);
     border-color: var(--phase-menstrual);
+  }
+
+  .daily-energy-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .daily-energy-dot {
+    flex: 1;
+    height: 12px;
+    border-radius: 6px;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .daily-energy-dot:hover { background: var(--rose-bg); }
+
+  .daily-energy-dot.active {
+    background: linear-gradient(90deg, var(--rose-deep) 0%, var(--gold) 100%);
+    border-color: var(--gold);
+    box-shadow: 0 2px 8px rgba(201, 162, 74, 0.25);
+  }
+
+  .daily-energy-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    padding: 0 2px;
+    font-weight: 500;
   }
 
   .daily-checkin-saved {
@@ -2874,10 +2927,15 @@
 
         <div class="daily-checkin-section">
           <div class="daily-checkin-section-label">Energy</div>
-          <div class="daily-chips" id="dailyEnergyChips">
-            <div class="daily-chip energy-chip" data-energy="low">Low</div>
-            <div class="daily-chip energy-chip" data-energy="balanced">Balanced</div>
-            <div class="daily-chip energy-chip" data-energy="high">High</div>
+          <div class="daily-energy-bar" id="dailyEnergyBar">
+            <div class="daily-energy-dot" data-level="1"></div>
+            <div class="daily-energy-dot" data-level="2"></div>
+            <div class="daily-energy-dot" data-level="3"></div>
+          </div>
+          <div class="daily-energy-labels">
+            <span>Low</span>
+            <span>Balanced</span>
+            <span>High</span>
           </div>
         </div>
 
@@ -3031,8 +3089,8 @@
     </div>
 
     <div class="continue-bar">
-      <button class="btn" onclick="goTo(3)">
-        Log how you feel today <span class="arrow">→</span>
+      <button class="btn" onclick="saveLog()">
+        Save &amp; finish <span class="arrow">→</span>
       </button>
     </div>
   </div>
@@ -3141,86 +3199,8 @@
     <div class="continue-bar">
       <div class="btn-row">
         <button class="btn btn-secondary btn-back-mini" onclick="goTo(1)">‹</button>
-        <button class="btn btn-main" onclick="goTo(3)">
-          Log how you feel <span class="arrow">→</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====================================================
-       SCREEN 3: LOG
-       ==================================================== -->
-  <div class="screen" id="screen3">
-    <div class="hero">
-      <span class="eyebrow" id="logEyebrow">Step 3 · Today's log</span>
-      <h1>How are you <span class="italic">feeling today?</span></h1>
-      <p class="lead">A quick check-in helps us understand your patterns. Log anything you want — even one thing helps.</p>
-    </div>
-
-    <div class="log-wrap stagger-1">
-      <div class="log-card">
-        <div class="log-section" id="periodLogSection">
-          <div class="log-section-label">Period today?</div>
-          <div class="period-toggle-row" id="periodToggleRow" onclick="togglePeriodToday()">
-            <div class="period-toggle-text">
-              <div class="period-toggle-title" id="periodToggleTitle">Not on my period</div>
-              <div class="period-toggle-sub" id="periodToggleSub">Tap to mark today as a period day</div>
-            </div>
-            <div class="period-toggle-switch"></div>
-          </div>
-
-          <div id="flowSection" style="display: none;">
-            <div class="log-section-label" style="margin-top: 12px;">Flow</div>
-            <div class="log-options" id="flowOptions">
-              <div class="log-chip flow-chip" data-flow="light">Light</div>
-              <div class="log-chip flow-chip" data-flow="medium">Medium</div>
-              <div class="log-chip flow-chip" data-flow="heavy">Heavy</div>
-              <div class="log-chip flow-chip" data-flow="spotting">Spotting</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="log-section">
-          <div class="log-section-label">Mood <span class="opt-tag">(optional)</span></div>
-          <div class="log-options" id="moodOptions">
-            <div class="log-chip" data-mood="great"><span class="log-chip-icon">☀</span> Great</div>
-            <div class="log-chip" data-mood="good"><span class="log-chip-icon">◐</span> Good</div>
-            <div class="log-chip" data-mood="meh"><span class="log-chip-icon">◑</span> Meh</div>
-            <div class="log-chip" data-mood="low"><span class="log-chip-icon">◌</span> Low</div>
-            <div class="log-chip" data-mood="anxious"><span class="log-chip-icon">✦</span> Anxious</div>
-          </div>
-        </div>
-
-        <div class="log-section">
-          <div class="log-section-label">Energy <span class="opt-tag">(optional)</span></div>
-          <div class="log-energy" id="energyBar">
-            <div class="log-energy-dot" data-level="1"></div>
-            <div class="log-energy-dot" data-level="2"></div>
-            <div class="log-energy-dot" data-level="3"></div>
-            <div class="log-energy-dot" data-level="4"></div>
-            <div class="log-energy-dot" data-level="5"></div>
-          </div>
-          <div class="log-energy-labels">
-            <span>Drained</span>
-            <span>Buzzing</span>
-          </div>
-        </div>
-
-        <div class="log-section" id="symptomLogSection">
-          <div class="log-section-label">Symptoms <span class="opt-tag">(optional)</span></div>
-          <div class="log-options" id="symptomOptions"></div>
-        </div>
-      </div>
-
-      <div class="nudge-wrap" id="screen3NudgeSlot"></div>
-    </div>
-
-    <div class="continue-bar">
-      <div class="btn-row">
-        <button class="btn btn-secondary btn-back-mini" onclick="goBackFromLog()">‹</button>
-        <button class="btn btn-main" id="saveBtn" onclick="saveLog()" disabled>
-          Save today's entry <span class="arrow">→</span>
+        <button class="btn btn-main" onclick="saveLog()">
+          Save &amp; finish <span class="arrow">→</span>
         </button>
       </div>
     </div>
@@ -3755,37 +3735,6 @@ function customiseForGoal() {
   // 'cycle' and 'explore' share the default copy
 }
 
-function customiseSymptoms() {
-  // Symptom set varies by goal
-  const symptomEl = document.getElementById('symptomOptions');
-  let syms = [];
-
-  if (selectedGoal === 'ttc') {
-    syms = ['Cervical mucus', 'Cramps', 'Bloating', 'Tender breasts', 'Spotting', 'Fatigue', 'Cravings'];
-  } else {
-    syms = ['Cramps', 'Bloating', 'Headache', 'Acne', 'Tender breasts', 'Cravings', 'Fatigue'];
-  }
-
-  symptomEl.innerHTML = syms.map(s =>
-    `<div class="log-chip" data-symptom="${s.toLowerCase().replace(/\s+/g, '_')}">${s}</div>`
-  ).join('');
-
-  // Re-bind handlers since DOM was rewritten
-  document.querySelectorAll('#symptomOptions .log-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const sym = chip.dataset.symptom;
-      if (logState.symptoms.has(sym)) {
-        logState.symptoms.delete(sym);
-        chip.classList.remove('selected');
-      } else {
-        logState.symptoms.add(sym);
-        chip.classList.add('selected');
-      }
-      updateSaveBtn();
-    });
-  });
-}
-
 // =================================================================
 // CALENDAR
 // =================================================================
@@ -3842,20 +3791,19 @@ function renderCalendar() {
   const startDayOfWeek = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
 
-  let html = '';
-  for (let i = 0; i < startDayOfWeek; i++) html += '<div class="cal-day empty"></div>';
+  // Days from previous month spilling into the first row
+  const prevMonthLastDay = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 0).getDate();
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const date = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), d);
+  function buildCellHtml(date, isAdjacent) {
     date.setHours(0, 0, 0, 0);
     const key = dateKey(date);
-
     const isPeriod = periodDays.has(key);
     const isOvulation = isOvulationDay(date);
     const isOvuPeak = isOvulationPeak(date);
     const isPredicted = isPredictedPeriodDay(date);
 
     const classes = ['cal-day'];
+    if (isAdjacent) classes.push('adjacent-month');
     if (isPeriod) classes.push('is-period');
     else if (isPredicted) classes.push('predicted-period');
     if (isOvulation && !isPeriod) classes.push('is-ovulation');
@@ -3864,15 +3812,33 @@ function renderCalendar() {
     if (date.getTime() === selectedDate.getTime()) classes.push('selected');
     if (date > today) classes.push('future');
 
-    // Inner content (number + optional icon)
-    let innerHtml = `${d}`;
+    let innerHtml = `${date.getDate()}`;
     if (isPeriod) {
       innerHtml += `<span class="cal-day-icon"><svg class="blood-drop" viewBox="0 0 10 12"><path d="M5 0 C 5 0, 9 5, 9 8 A 4 4 0 0 1 1 8 C 1 5, 5 0, 5 0 Z" fill="#C76B7A"/></svg></span>`;
     } else if (isOvulation) {
       innerHtml += `<span class="cal-day-icon"><svg class="flower" viewBox="0 0 14 14"><g transform="translate(7,7)"><ellipse cx="0" cy="-3.5" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85"/><ellipse cx="3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(60)"/><ellipse cx="3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(120)"/><ellipse cx="0" cy="3.5" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(180)"/><ellipse cx="-3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(240)"/><ellipse cx="-3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(300)"/><circle r="1.4" fill="#C9A24A"/></g></svg></span>`;
     }
 
-    html += `<div class="${classes.join(' ')}" onclick="handleDayClick('${date.toISOString()}')">${innerHtml}</div>`;
+    return `<div class="${classes.join(' ')}" onclick="handleDayClick('${date.toISOString()}')">${innerHtml}</div>`;
+  }
+
+  let html = '';
+  // Leading days from previous month
+  for (let i = startDayOfWeek - 1; i >= 0; i--) {
+    const d = new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, prevMonthLastDay - i);
+    html += buildCellHtml(d, true);
+  }
+  // Days in current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), d);
+    html += buildCellHtml(date, false);
+  }
+  // Trailing days from next month — fill out to a full final week (7-cell row)
+  const totalCells = startDayOfWeek + daysInMonth;
+  const trailing = (7 - (totalCells % 7)) % 7;
+  for (let i = 1; i <= trailing; i++) {
+    const d = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, i);
+    html += buildCellHtml(d, true);
   }
 
   grid.innerHTML = html;
@@ -4134,7 +4100,11 @@ function buildRingStatic(svg, dimmed) {
     dotsHtml += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${dimmed ? 0.3 : 1}"/>`;
   }
 
-  // Static layer + persistent overlay containers (positioned/styled by JS on each tick)
+  // Static layer + persistent trace dots + overlay containers.
+  // Trace dots are persistent SVG circles; updateRingDynamic only mutates
+  // their cx/cy so CSS transitions on the geometry attrs animate them
+  // along the curves as the day changes.
+  const traceOpacity = dimmed ? 0 : 1;
   svg.innerHTML = `
     <g id="ringStaticLayer">
       ${phaseHtml}
@@ -4144,6 +4114,12 @@ function buildRingStatic(svg, dimmed) {
       ${curveStroke(hProgesterone, '#8E5378')}
       ${curveStroke(hTestosterone, '#2F7A7A')}
       ${dotsHtml}
+    </g>
+    <g id="hormoneTraceLayer" opacity="${traceOpacity}">
+      <circle id="traceDotEstrogen"     class="hormone-trace-dot" cx="${cx}" cy="${cy}" r="4.5" fill="#C76B7A" stroke="white" stroke-width="2"/>
+      <circle id="traceDotProgesterone" class="hormone-trace-dot" cx="${cx}" cy="${cy}" r="4.5" fill="#8E5378" stroke="white" stroke-width="2"/>
+      <circle id="traceDotLh"           class="hormone-trace-dot" cx="${cx}" cy="${cy}" r="4.5" fill="#C9A24A" stroke="white" stroke-width="2"/>
+      <circle id="traceDotTestosterone" class="hormone-trace-dot" cx="${cx}" cy="${cy}" r="4.5" fill="#2F7A7A" stroke="white" stroke-width="2"/>
     </g>
     <g id="clockPointerGroup"></g>
     <g id="clockHighlight"></g>
@@ -4164,6 +4140,8 @@ function updateRingDynamic(currentDay, dimmed) {
     pointerG.innerHTML = '';
     highlightG.innerHTML = '';
     handleG.innerHTML = '';
+    const traceLayer = document.getElementById('hormoneTraceLayer');
+    if (traceLayer) traceLayer.setAttribute('opacity', '0');
     centerG.innerHTML = `
       <text x="${cx}" y="${cy - 4}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">NO</text>
       <text x="${cx}" y="${cy + 14}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="22" fill="#3E1B33" font-style="italic">data yet</text>
@@ -4172,6 +4150,23 @@ function updateRingDynamic(currentDay, dimmed) {
   }
 
   const angle = ringDayToAngle(currentDay);
+
+  // Position the four hormone trace dots on each curve at the current day.
+  const traceLayer = document.getElementById('hormoneTraceLayer');
+  if (traceLayer) traceLayer.setAttribute('opacity', '1');
+  const moveTraceDot = (id, fn) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = fn(currentDay);
+    const r = RING.curveInnerR + 4 + v * (RING.curveOuterR - RING.curveInnerR - 10);
+    const p = ringPolar(r, angle);
+    el.setAttribute('cx', p.x.toFixed(1));
+    el.setAttribute('cy', p.y.toFixed(1));
+  };
+  moveTraceDot('traceDotEstrogen', hEstrogen);
+  moveTraceDot('traceDotProgesterone', hProgesterone);
+  moveTraceDot('traceDotLh', hLh);
+  moveTraceDot('traceDotTestosterone', hTestosterone);
   const phaseOfDay = getPhase(currentDay);
   const handleColors = {
     menstrual: '#C76B7A', follicular: '#C9A24A',
@@ -4381,100 +4376,15 @@ function changePregWeek(delta) {
 }
 
 // =================================================================
-// LOG SCREEN
+// SAVE — uses the live daily check-in state captured on screen 1
 // =================================================================
-
-function togglePeriodToday() {
-  logState.periodToday = !logState.periodToday;
-  const row = document.getElementById('periodToggleRow');
-  const title = document.getElementById('periodToggleTitle');
-  const sub = document.getElementById('periodToggleSub');
-  const flowSection = document.getElementById('flowSection');
-
-  row.classList.toggle('on', logState.periodToday);
-  if (logState.periodToday) {
-    title.textContent = 'On my period today';
-    sub.textContent = 'Tap to remove';
-    flowSection.style.display = 'block';
-    // Also auto-add today to periodDays
-    periodDays.add(dateKey(today));
-  } else {
-    title.textContent = 'Not on my period';
-    sub.textContent = 'Tap to mark today as a period day';
-    flowSection.style.display = 'none';
-    logState.flow = null;
-    document.querySelectorAll('#flowOptions .flow-chip').forEach(c => c.classList.remove('selected'));
-    // Remove today from periodDays
-    periodDays.delete(dateKey(today));
-  }
-  updateSaveBtn();
-}
-
-function setupLog() {
-  document.querySelectorAll('#moodOptions .log-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const mood = chip.dataset.mood;
-      if (logState.mood === mood) {
-        logState.mood = null;
-        chip.classList.remove('selected');
-      } else {
-        document.querySelectorAll('#moodOptions .log-chip').forEach(c => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        logState.mood = mood;
-      }
-      updateSaveBtn();
-    });
-  });
-
-  document.querySelectorAll('#energyBar .log-energy-dot').forEach(dot => {
-    dot.addEventListener('click', () => {
-      const level = parseInt(dot.dataset.level, 10);
-      if (logState.energy === level) {
-        logState.energy = null;
-        document.querySelectorAll('#energyBar .log-energy-dot').forEach(d => d.classList.remove('active'));
-      } else {
-        logState.energy = level;
-        document.querySelectorAll('#energyBar .log-energy-dot').forEach(d => {
-          const dl = parseInt(d.dataset.level, 10);
-          d.classList.toggle('active', dl <= level);
-        });
-      }
-      updateSaveBtn();
-    });
-  });
-
-  document.querySelectorAll('#flowOptions .flow-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const flow = chip.dataset.flow;
-      if (logState.flow === flow) {
-        logState.flow = null;
-        chip.classList.remove('selected');
-      } else {
-        document.querySelectorAll('#flowOptions .flow-chip').forEach(c => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        logState.flow = flow;
-      }
-      updateSaveBtn();
-    });
-  });
-}
-
-function updateSaveBtn() {
-  const hasSomething =
-    logState.periodToday ||
-    logState.mood !== null ||
-    logState.energy !== null ||
-    logState.symptoms.size > 0;
-  document.getElementById('saveBtn').disabled = !hasSomething;
-}
-
 function saveLog() {
   const cycleDay = getCycleDayForDate(today);
   const phase = getPhase(cycleDay);
 
-  const moodLabels = {
-    great: '☀ Great', good: '◐ Good', meh: '◑ Meh',
-    low: '◌ Low', anxious: '✦ Anxious'
+  const moodLabelsFromCheckin = {
+    happy: '☀ Happy', calm: '◐ Calm', emotional: '◌ Emotional',
+    irritated: '◑ Irritated', motivated: '✦ Motivated', anxious: '✦ Anxious'
   };
   const energyLabels = ['', 'Drained', 'Low', 'Steady', 'High', 'Buzzing'];
   const goalLabels = {
@@ -4482,10 +4392,8 @@ function saveLog() {
     explore: 'Just exploring'
   };
 
-  // Goal row
   document.getElementById('summaryGoal').textContent = goalLabels[selectedGoal] || '—';
 
-  // Phase row (hide for pregnant)
   if (selectedGoal === 'pregnant') {
     document.getElementById('summaryPhaseRow').style.display = 'none';
   } else {
@@ -4497,17 +4405,17 @@ function saveLog() {
     }
   }
 
-  if (logState.periodToday) {
+  // Period row — surface only if today is logged as a period day.
+  if (periodDays.has(dateKey(today))) {
     document.getElementById('summaryPeriodRow').style.display = 'flex';
-    const flowLabel = logState.flow ? logState.flow.charAt(0).toUpperCase() + logState.flow.slice(1) : 'Yes';
-    document.getElementById('summaryPeriod').textContent = flowLabel;
+    document.getElementById('summaryPeriod').textContent = 'Yes';
   } else {
     document.getElementById('summaryPeriodRow').style.display = 'none';
   }
 
-  if (logState.mood) {
+  if (dailyCheckIn.mood) {
     document.getElementById('summaryMoodRow').style.display = 'flex';
-    document.getElementById('summaryMood').textContent = moodLabels[logState.mood];
+    document.getElementById('summaryMood').textContent = moodLabelsFromCheckin[dailyCheckIn.mood] || dailyCheckIn.mood;
   } else {
     document.getElementById('summaryMoodRow').style.display = 'none';
   }
@@ -4519,9 +4427,9 @@ function saveLog() {
     document.getElementById('summaryEnergyRow').style.display = 'none';
   }
 
-  if (logState.symptoms.size > 0) {
+  if (dailyCheckIn.symptoms.size > 0) {
     document.getElementById('summarySymptomsRow').style.display = 'flex';
-    document.getElementById('summarySymptoms').textContent = [...logState.symptoms]
+    document.getElementById('summarySymptoms').textContent = [...dailyCheckIn.symptoms]
       .map(s => s.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
       .join(', ');
   } else {
@@ -4529,12 +4437,6 @@ function saveLog() {
   }
 
   goTo(4);
-}
-
-function goBackFromLog() {
-  // Pregnant goal skips Screen 2, so go back to Screen 1p
-  if (selectedGoal === 'pregnant') goTo('1p');
-  else goTo(2);
 }
 
 // =================================================================
@@ -4593,26 +4495,39 @@ function bindDailyCheckin() {
   if (dailyCheckinBound) return;
   dailyCheckinBound = true;
 
-  // Mood + Energy: single-select (toggleable)
-  ['dailyMoodChips', 'dailyEnergyChips'].forEach(id => {
-    document.querySelectorAll('#' + id + ' .daily-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const wasSelected = chip.classList.contains('selected');
-        document.querySelectorAll('#' + id + ' .daily-chip').forEach(c => c.classList.remove('selected'));
-        if (id === 'dailyMoodChips') {
-          dailyCheckIn.mood = wasSelected ? null : chip.dataset.mood;
-          if (!wasSelected) chip.classList.add('selected');
-          // Bridge to logState so the Save log screen prefills.
-          const moodMap = { happy: 'great', calm: 'good', emotional: 'low', irritated: 'anxious', motivated: 'great', anxious: 'anxious' };
-          logState.mood = dailyCheckIn.mood ? (moodMap[dailyCheckIn.mood] || 'good') : null;
-        } else {
-          dailyCheckIn.energy = wasSelected ? null : chip.dataset.energy;
-          if (!wasSelected) chip.classList.add('selected');
-          const energyMap = { low: 1, balanced: 3, high: 5 };
-          logState.energy = dailyCheckIn.energy ? energyMap[dailyCheckIn.energy] : null;
-        }
-        flashCheckinSaved();
-      });
+  // Mood: single-select chips (toggleable)
+  document.querySelectorAll('#dailyMoodChips .daily-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const wasSelected = chip.classList.contains('selected');
+      document.querySelectorAll('#dailyMoodChips .daily-chip').forEach(c => c.classList.remove('selected'));
+      dailyCheckIn.mood = wasSelected ? null : chip.dataset.mood;
+      if (!wasSelected) chip.classList.add('selected');
+      flashCheckinSaved();
+    });
+  });
+
+  // Energy: 3-segment bar (low → balanced → high)
+  const energyMap = { 1: 'low', 2: 'balanced', 3: 'high' };
+  const energyToLogLevel = { low: 1, balanced: 3, high: 5 };
+  document.querySelectorAll('#dailyEnergyBar .daily-energy-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      const level = parseInt(dot.dataset.level, 10);
+      const dots = document.querySelectorAll('#dailyEnergyBar .daily-energy-dot');
+      const currentLogLevel = energyToLogLevel[dailyCheckIn.energy];
+      // Tapping the same active level deselects.
+      if (currentLogLevel && currentLogLevel === energyToLogLevel[energyMap[level]]) {
+        dailyCheckIn.energy = null;
+        logState.energy = null;
+        dots.forEach(d => d.classList.remove('active'));
+      } else {
+        dailyCheckIn.energy = energyMap[level];
+        logState.energy = energyToLogLevel[dailyCheckIn.energy];
+        dots.forEach(d => {
+          const dl = parseInt(d.dataset.level, 10);
+          d.classList.toggle('active', dl <= level);
+        });
+      }
+      flashCheckinSaved();
     });
   });
 
@@ -4786,16 +4701,6 @@ function goTo(n) {
     updatePregScreen();
   }
   if (n === 2) { invalidateRingStatic(); updateScreen2(); }
-  if (n === 3) {
-    customiseSymptoms();
-    renderNudges('screen3NudgeSlot');
-    // Hide period section for pregnant goal
-    if (selectedGoal === 'pregnant') {
-      document.getElementById('periodLogSection').style.display = 'none';
-    } else {
-      document.getElementById('periodLogSection').style.display = 'block';
-    }
-  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -4807,11 +4712,11 @@ function updateStepper(n) {
   }
   stepper.classList.remove('hidden');
 
-  // Map: 1, 1p → step 1; 2 → step 2; 3 → step 3
+  // 3-step model: (1) cycle/calendar, (2) hormone rhythm, (3) saved.
+  // Pregnancy ('1p') maps to step 1 too — that flow goes 1p → 4 (saved).
   let activeStep = 1;
   if (n === 2) activeStep = 2;
-  else if (n === 3) activeStep = 3;
-  else if (n === 4) activeStep = 4;
+  else if (n === 4) activeStep = 3;
 
   document.querySelectorAll('.step-bar').forEach((bar, i) => {
     bar.classList.remove('active', 'complete');
@@ -4826,18 +4731,15 @@ function updateStepper(n) {
 }
 
 function restart() {
-  document.querySelectorAll('.log-chip.selected').forEach(c => c.classList.remove('selected'));
-  document.querySelectorAll('.log-energy-dot.active').forEach(d => d.classList.remove('active'));
-  document.getElementById('periodToggleRow').classList.remove('on');
-  document.getElementById('periodToggleTitle').textContent = 'Not on my period';
-  document.getElementById('periodToggleSub').textContent = 'Tap to mark today as a period day';
-  document.getElementById('flowSection').style.display = 'none';
-  logState.periodToday = false;
-  logState.flow = null;
+  // Clear daily check-in selections so the next session starts fresh.
+  document.querySelectorAll('.daily-chip.selected').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.daily-energy-dot.active').forEach(d => d.classList.remove('active'));
+  dailyCheckIn.mood = null;
+  dailyCheckIn.energy = null;
+  dailyCheckIn.symptoms.clear();
   logState.mood = null;
   logState.energy = null;
   logState.symptoms.clear();
-  document.getElementById('saveBtn').disabled = true;
 
   document.querySelectorAll('.goal-card.selected').forEach(c => c.classList.remove('selected'));
   document.getElementById('goalContinueBtn').disabled = true;
@@ -4858,7 +4760,6 @@ function showToast(msg) {
 }
 
 // Init
-setupLog();
 setupOnboardingChips();
 </script>
 </body>
