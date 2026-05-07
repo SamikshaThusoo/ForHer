@@ -1824,10 +1824,18 @@
     font-size: 13px;
     font-weight: 500;
     box-shadow: var(--shadow-lg);
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
     z-index: 100;
     max-width: 340px;
     text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  #toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
   }
 
   .swap-flash { animation: swapFlash 0.5s ease; }
@@ -4842,10 +4850,10 @@ let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.style.transform = 'translateX(-50%) translateY(0)';
+  t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
-    t.style.transform = 'translateX(-50%) translateY(120%)';
+    t.classList.remove('show');
   }, 2200);
 }
 
