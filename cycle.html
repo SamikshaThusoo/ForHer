@@ -1028,6 +1028,24 @@
     overflow: hidden;
     margin-bottom: 16px;
     box-shadow: 0 12px 32px rgba(47, 122, 122, 0.25);
+    transition: background 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Trimester-aware tints. T1 fresh teal · T2 warm rose-gold · T3 deep plum */
+  .preg-hero-card.trimester-1 {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-soft) 60%, #B5DCD7 100%);
+    box-shadow: 0 12px 32px rgba(47, 122, 122, 0.28);
+  }
+
+  .preg-hero-card.trimester-2 {
+    background: linear-gradient(135deg, #B85C76 0%, #D4869C 45%, #E8C282 100%);
+    box-shadow: 0 12px 32px rgba(184, 92, 118, 0.32);
+  }
+
+  .preg-hero-card.trimester-3 {
+    background: linear-gradient(135deg, #4A2240 0%, #7E4569 50%, #B287A0 100%);
+    box-shadow: 0 14px 34px rgba(74, 34, 64, 0.38);
   }
 
   .preg-hero-card::before {
@@ -4435,6 +4453,14 @@ function updatePregScreen() {
   document.getElementById('pregHeroWeek').textContent = pregWeek;
   document.getElementById('pregHeroWeekLabel').textContent = pregWeek === 1 ? 'week' : 'weeks';
   document.getElementById('pregTrimester').textContent = getTrimester(pregWeek);
+
+  // Tint the hero card to match the trimester.
+  const heroCard = document.querySelector('.preg-hero-card');
+  if (heroCard) {
+    const tri = pregWeek <= 13 ? 1 : (pregWeek <= 27 ? 2 : 3);
+    heroCard.classList.remove('trimester-1', 'trimester-2', 'trimester-3');
+    heroCard.classList.add('trimester-' + tri);
+  }
 
   const pct = Math.min(100, (pregWeek / 40) * 100);
   document.getElementById('pregProgressFill').style.width = pct + '%';
