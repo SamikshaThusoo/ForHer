@@ -2186,8 +2186,17 @@
     transition: transform 0.05s linear;
   }
 
-  /* Cardinal calendar-date labels around the ring */
-  #ringSvg .ring-date-label {
+  /* Phase markers around the ring (Period / Follicular / Ovulation / Luteal) */
+  #ringSvg .ring-phase-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 7.8px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    fill: var(--ink-soft);
+    pointer-events: none;
+    opacity: 0.78;
+  }
+  #ringSvg .ring-phase-date {
     font-family: 'DM Sans', sans-serif;
     font-size: 10px;
     font-weight: 600;
@@ -2196,14 +2205,42 @@
     pointer-events: none;
   }
 
-  #ringSvg .ring-date-hint {
+  /* Today marker — soft pulse anchored at today's cycle-day position */
+  #ringSvg .today-pulse-outer {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: todayRing 2.4s ease-in-out infinite;
+  }
+  #ringSvg .today-pulse-inner {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: todayDot 2.4s ease-in-out infinite;
+  }
+  @keyframes todayRing {
+    0%, 100% { stroke-opacity: 0.4; transform: scale(1); }
+    50%      { stroke-opacity: 0.9; transform: scale(1.18); }
+  }
+  @keyframes todayDot {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; }
+  }
+  #ringSvg .today-marker-label {
     font-family: 'DM Sans', sans-serif;
     font-size: 7.5px;
-    font-weight: 600;
-    letter-spacing: 1.2px;
-    fill: var(--ink-soft);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    fill: var(--plum-deep);
     pointer-events: none;
-    opacity: 0.65;
+  }
+
+  /* Hormone curves — gentle breathing animation */
+  #ringSvg #hormoneCurves {
+    animation: hormoneBreathe 4.5s ease-in-out infinite;
+  }
+  @keyframes hormoneBreathe {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; }
   }
 
   /* Hormone trace dots that ride along each curve as the day changes */
@@ -2212,10 +2249,19 @@
                 cy 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                 r 0.28s ease,
                 opacity 0.3s ease;
-    filter: drop-shadow(0 1px 3px rgba(91, 42, 74, 0.18));
+    filter: drop-shadow(0 1px 3px rgba(91, 42, 74, 0.22));
   }
   .ring-svg-wrap.dragging #ringSvg .hormone-trace-dot {
     transition: cx 0.06s linear, cy 0.06s linear;
+  }
+  #ringSvg .hormone-trace-dot.dominant {
+    animation: tracePulse 1.9s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @keyframes tracePulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.28); }
   }
 
   .clock-hint {
@@ -3878,6 +3924,36 @@ function describeHormones(day) {
   return `${top.k} is leading${second.v > 0.45 ? `, with ${second.k.toLowerCase()} also active` : ''}.`;
 }
 
+// Returns "Estrogen peaking" / "Progesterone rising" / etc. for the center text.
+function dominantHormoneInfo(day) {
+  const ranked = [
+    { k: 'Estrogen', id: 'Estrogen', v: hEstrogen(day) },
+    { k: 'Progesterone', id: 'Prog', v: hProgesterone(day) },
+    { k: 'LH', id: 'LH', v: hLh(day) },
+    { k: 'Testosterone', id: 'Test', v: hTestosterone(day) }
+  ].sort((a, b) => b.v - a.v);
+  const top = ranked[0];
+  const verb = top.v > 0.7 ? 'peaking' : (top.v > 0.4 ? 'rising' : 'easing');
+  return { name: top.k, traceId: 'traceDot' + top.id, phrase: `${top.k} ${verb}` };
+}
+
+// Closed smooth path via Catmull-Rom → cubic Bezier conversion.
+function smoothClosedPath(points) {
+  const N = points.length;
+  if (N < 3) return '';
+  const get = (i) => points[((i % N) + N) % N];
+  let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+  for (let i = 0; i < N; i++) {
+    const p0 = get(i - 1), p1 = get(i), p2 = get(i + 1), p3 = get(i + 2);
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  return d + ' Z';
+}
+
 function renderCalendar() {
   const grid = document.getElementById('calGrid');
   const monthEl = document.getElementById('calMonth');
@@ -4170,20 +4246,17 @@ function buildRingStatic(svg, dimmed) {
     phaseHtml += `<path d="${arcPath(curveOuterR, curveInnerR, seg.from, seg.to)}" fill="${seg.color}" opacity="${dimmed ? 0.3 : 1}"/>`;
   });
 
-  function curveStroke(fn, color) {
-    let d = '';
+  // Smooth, glowing hormone curve via Catmull-Rom-to-Bezier.
+  function curveStroke(fn, color, hormoneKey) {
+    const pts = [];
     for (let i = 1; i <= CYCLE_LENGTH; i++) {
       const v = fn(i);
       const r = curveInnerR + 4 + v * (curveOuterR - curveInnerR - 10);
       const a = ringDayToAngle(i);
-      const p = ringPolar(r, a);
-      d += (i === 1 ? 'M' : 'L') + ` ${p.x.toFixed(1)} ${p.y.toFixed(1)} `;
+      pts.push(ringPolar(r, a));
     }
-    const v0 = fn(1);
-    const r0 = curveInnerR + 4 + v0 * (curveOuterR - curveInnerR - 10);
-    const p0 = ringPolar(r0, ringDayToAngle(1));
-    d += `L ${p0.x.toFixed(1)} ${p0.y.toFixed(1)}`;
-    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${dimmed ? 0.3 : 0.85}"/>`;
+    const d = smoothClosedPath(pts);
+    return `<path class="hormone-curve hormone-${hormoneKey}" d="${d}" fill="none" stroke="${color}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#curveGlow)" opacity="${dimmed ? 0.3 : 0.92}"/>`;
   }
 
   let dotsHtml = '';
@@ -4199,24 +4272,41 @@ function buildRingStatic(svg, dimmed) {
     dotsHtml += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${dimmed ? 0.3 : 1}"/>`;
   }
 
-  // Outer cardinal date markers (every 7th cycle day → 4 quadrants).
-  // Only rendered when there's cycle data.
+  // Phase markers anchored at the start of each phase (Period D1, Follicular D8,
+  // Ovulation D15, Luteal D22) with dynamically computed calendar dates.
   const labelR = 168;
-  let dateMarkersHtml = '';
+  const phaseMarkers = [
+    { day: 1,  name: 'Period' },
+    { day: 8,  name: 'Follicular' },
+    { day: 15, name: 'Ovulation' },
+    { day: 22, name: 'Luteal' }
+  ];
+  let phaseMarkersHtml = '';
   if (!dimmed) {
-    [1, 8, 15, 22].forEach(dayN => {
-      const calDate = getCalendarDateForCycleDay(dayN);
+    phaseMarkers.forEach(m => {
+      const calDate = getCalendarDateForCycleDay(m.day);
       if (!calDate) return;
-      const a = ringDayToAngle(dayN);
+      const a = ringDayToAngle(m.day);
       const p = ringPolar(labelR, a);
-      const label = formatShortDate(calDate);
-      // Tiny day-of-cycle hint above the date for the cardinal positions.
-      const hintY = p.y - 9;
-      dateMarkersHtml += `
-        <text class="ring-date-label" x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${label}</text>
-        <text class="ring-date-hint" x="${p.x.toFixed(1)}" y="${hintY.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">D${dayN}</text>
+      phaseMarkersHtml += `
+        <text class="ring-phase-label" x="${p.x.toFixed(1)}" y="${(p.y - 6).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${m.name.toUpperCase()}</text>
+        <text class="ring-phase-date"  x="${p.x.toFixed(1)}" y="${(p.y + 7).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${formatShortDate(calDate)}</text>
       `;
     });
+  }
+
+  // Today marker — a soft pulsing ring at today's cycle-day position.
+  const todayCycleDay = getCycleDayForDate(today);
+  let todayMarkerHtml = '';
+  if (!dimmed && todayCycleDay) {
+    const tA = ringDayToAngle(todayCycleDay);
+    const tP = ringPolar(RING.dotRingR, tA);
+    const tLabel = ringPolar(RING.dotRingR + 16, tA);
+    todayMarkerHtml = `
+      <circle class="today-pulse-outer" cx="${tP.x.toFixed(1)}" cy="${tP.y.toFixed(1)}" r="9" fill="none" stroke="#3E1B33" stroke-width="1.4"/>
+      <circle class="today-pulse-inner" cx="${tP.x.toFixed(1)}" cy="${tP.y.toFixed(1)}" r="5"  fill="#3E1B33" opacity="0.85"/>
+      <text class="today-marker-label" x="${tLabel.x.toFixed(1)}" y="${tLabel.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">Today</text>
+    `;
   }
 
   // Static layer + persistent trace dots + overlay containers.
@@ -4225,15 +4315,31 @@ function buildRingStatic(svg, dimmed) {
   // along the curves as the day changes.
   const traceOpacity = dimmed ? 0 : 1;
   svg.innerHTML = `
+    <defs>
+      <filter id="curveGlow" x="-25%" y="-25%" width="150%" height="150%">
+        <feGaussianBlur stdDeviation="1.6" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0.55)"/>
+      </radialGradient>
+    </defs>
     <g id="ringStaticLayer">
       ${phaseHtml}
-      <circle cx="${cx}" cy="${cy}" r="${curveInnerR}" fill="rgba(255,255,255,0.7)" stroke="rgba(91,42,74,0.08)" stroke-width="1"/>
-      ${curveStroke(hEstrogen, '#C76B7A')}
-      ${curveStroke(hLh, '#C9A24A')}
-      ${curveStroke(hProgesterone, '#8E5378')}
-      ${curveStroke(hTestosterone, '#2F7A7A')}
+      <circle cx="${cx}" cy="${cy}" r="${curveInnerR}" fill="url(#centerGlow)" stroke="rgba(91,42,74,0.08)" stroke-width="1"/>
+      <g id="hormoneCurves">
+        ${curveStroke(hEstrogen, '#C76B7A', 'estrogen')}
+        ${curveStroke(hLh, '#C9A24A', 'lh')}
+        ${curveStroke(hProgesterone, '#8E5378', 'progesterone')}
+        ${curveStroke(hTestosterone, '#2F7A7A', 'testosterone')}
+      </g>
       ${dotsHtml}
-      ${dateMarkersHtml}
+      ${todayMarkerHtml}
+      ${phaseMarkersHtml}
     </g>
     <g id="hormoneTraceLayer" opacity="${traceOpacity}">
       <circle id="traceDotEstrogen"     class="hormone-trace-dot" cx="${cx}" cy="${cy}" r="4.5" fill="#C76B7A" stroke="white" stroke-width="2"/>
@@ -4287,6 +4393,14 @@ function updateRingDynamic(currentDay, dimmed) {
   moveTraceDot('traceDotProgesterone', hProgesterone);
   moveTraceDot('traceDotLh', hLh);
   moveTraceDot('traceDotTestosterone', hTestosterone);
+
+  // Pulse the dominant hormone's trace dot.
+  const dom = dominantHormoneInfo(currentDay);
+  ['traceDotEstrogen', 'traceDotProgesterone', 'traceDotLh', 'traceDotTestosterone'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('dominant', id === dom.traceId);
+  });
+
   const phaseOfDay = getPhase(currentDay);
   const handleColors = {
     menstrual: '#C76B7A', follicular: '#C9A24A',
@@ -4314,11 +4428,18 @@ function updateRingDynamic(currentDay, dimmed) {
 
   const calDate = getCalendarDateForCycleDay(currentDay);
   const dateLine = formatShortDate(calDate);
+  const phaseName = (PHASE_CONTENT[phaseOfDay] && PHASE_CONTENT[phaseOfDay].name) || '';
+  const todayCycleDay = getCycleDayForDate(today);
+  const isToday = todayCycleDay === currentDay;
+  const todayBadge = isToday
+    ? `<text x="${cx}" y="${cy - 40}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="8" font-weight="700" letter-spacing="2" fill="#2F7A7A">TODAY</text>`
+    : '';
   centerG.innerHTML = `
-    <text x="${cx}" y="${cy - 18}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">DAY</text>
-    <text x="${cx}" y="${cy + 6}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="28" fill="#3E1B33">${currentDay}</text>
-    <text x="${cx}" y="${cy + 24}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" font-weight="600" fill="#5B2A4A">${dateLine}</text>
-    <text x="${cx}" y="${cy + 38}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="8" fill="#6B5A65" font-style="italic">of ${CYCLE_LENGTH}</text>
+    ${todayBadge}
+    <text x="${cx}" y="${cy - 24}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.6">DAY ${currentDay}</text>
+    <text x="${cx}" y="${cy + 2}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="24" fill="#3E1B33">${dateLine}</text>
+    <text x="${cx}" y="${cy + 20}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9.5" font-weight="700" fill="${hc}" letter-spacing="1.3">${phaseName.toUpperCase()} PHASE</text>
+    <text x="${cx}" y="${cy + 36}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-style="italic" fill="#6B5A65">${dom.phrase}</text>
   `;
 }
 
