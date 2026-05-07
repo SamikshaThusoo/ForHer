@@ -1838,6 +1838,519 @@
     0% { opacity: 0.4; transform: translateY(4px); }
     100% { opacity: 1; transform: translateY(0); }
   }
+
+  /* ============================================
+     ONBOARDING SHEET (first-time period setup)
+     ============================================ */
+  .onb-sheet {
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 22px 22px 28px;
+  }
+
+  .onb-eyebrow {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--plum-soft);
+    background: var(--rose-bg);
+    padding: 5px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+
+  .onb-sheet h3 { margin-bottom: 4px; }
+  .onb-sheet .sheet-sub { margin-bottom: 16px; }
+
+  .onb-q-block { margin-bottom: 18px; }
+
+  .onb-q-label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .onb-q-label .opt-tag {
+    font-weight: 400;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.3px;
+    text-transform: none;
+  }
+
+  .onb-date-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--cream);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    transition: all 0.2s ease;
+  }
+
+  .onb-date-row:focus-within {
+    border-color: var(--plum-soft);
+    background: white;
+    box-shadow: 0 4px 14px rgba(91, 42, 74, 0.08);
+  }
+
+  .onb-date-row .calendar-icon {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--rose-bg) 0%, var(--rose) 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--plum);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .onb-date-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .onb-date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.55;
+    filter: invert(20%) sepia(30%) saturate(800%) hue-rotate(280deg);
+  }
+
+  .onb-chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .onb-chip {
+    flex: 1 1 auto;
+    min-width: 64px;
+    padding: 10px 12px;
+    background: var(--cream);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    user-select: none;
+  }
+
+  .onb-chip:hover {
+    border-color: var(--plum-soft);
+    background: var(--rose-bg);
+  }
+
+  .onb-chip.selected {
+    background: linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
+    color: white;
+    border-color: var(--plum);
+    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.22);
+    transform: translateY(-1px);
+  }
+
+  .onb-chip-mini {
+    padding: 8px 14px;
+    font-size: 12px;
+    flex: 0 1 auto;
+  }
+
+  .onb-cta-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .onb-skip {
+    flex: 0 0 84px;
+    background: white;
+    color: var(--ink-soft);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 0;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .onb-skip:hover { color: var(--plum-deep); border-color: var(--plum-soft); }
+
+  .onb-cta {
+    flex: 1;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, var(--plum-deep) 0%, var(--plum) 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 18px rgba(91, 42, 74, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .onb-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(91, 42, 74, 0.3); }
+  .onb-cta:active { transform: translateY(0) scale(0.98); }
+  .onb-cta:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: var(--shadow-sm); }
+
+  /* ============================================
+     LOG PERIOD CTA (replaces Browse/Log toggle)
+     ============================================ */
+  .log-period-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+
+  .log-period-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: linear-gradient(135deg, var(--phase-menstrual-bg) 0%, var(--rose-bg) 100%);
+    border: 1.5px solid rgba(199, 107, 122, 0.35);
+    border-radius: 22px;
+    color: var(--phase-menstrual);
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .log-period-btn:hover {
+    background: var(--phase-menstrual);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(199, 107, 122, 0.3);
+  }
+
+  .log-period-btn .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  /* ============================================
+     DAY INSIGHT SHEET (calendar tap popover)
+     ============================================ */
+  .day-sheet { padding: 22px 22px 26px; }
+
+  .day-sheet-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .day-sheet-date {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--plum-deep);
+    line-height: 1.2;
+  }
+
+  .day-sheet-date em { font-style: italic; color: var(--plum-soft); }
+
+  .day-sheet-day-of {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    letter-spacing: 0.3px;
+  }
+
+  .day-sheet-pill {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .day-sheet-pill.phase-menstrual { background: var(--phase-menstrual-bg); color: var(--phase-menstrual); }
+  .day-sheet-pill.phase-follicular { background: var(--phase-follicular-bg); color: var(--phase-follicular); }
+  .day-sheet-pill.phase-ovulation { background: var(--phase-ovulation-bg); color: var(--phase-ovulation); }
+  .day-sheet-pill.phase-luteal { background: var(--phase-luteal-bg); color: var(--phase-luteal); }
+  .day-sheet-pill.phase-unknown { background: var(--cream); color: var(--ink-soft); }
+
+  .day-sheet-hormones {
+    background: linear-gradient(135deg, var(--cream) 0%, var(--rose-bg) 100%);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: var(--plum-deep);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    border: 1px solid rgba(234, 223, 227, 0.7);
+    font-style: italic;
+  }
+
+  .day-sheet-rows .today-row { padding: 10px 0; }
+
+  .day-sheet-cta {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    background: white;
+    color: var(--plum-deep);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .day-sheet-cta:hover { background: var(--rose-bg); border-color: var(--rose-deep); color: var(--phase-menstrual); }
+
+  /* ============================================
+     HORMONAL CLOCK — DRAGGABLE HANDLE + DYNAMIC INSIGHTS
+     ============================================ */
+  .ring-svg-wrap { position: relative; touch-action: none; }
+  .ring-svg-wrap svg { user-select: none; -webkit-user-select: none; }
+
+  #ringSvg .clock-handle-grip {
+    cursor: grab;
+    transition: r 0.18s ease, filter 0.18s ease;
+  }
+
+  #ringSvg .clock-handle-grip:active { cursor: grabbing; }
+  .ring-svg-wrap.dragging #ringSvg .clock-handle-grip { filter: drop-shadow(0 4px 10px rgba(91, 42, 74, 0.35)); }
+
+  .clock-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: -6px;
+    margin-bottom: 6px;
+    opacity: 0.85;
+  }
+
+  .clock-hint .pulse {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--phase-ovulation);
+    margin-right: 6px;
+    vertical-align: 1px;
+    animation: hintPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* Dynamic insight grid driven by clock drag */
+  .clock-insight-card {
+    background: white;
+    border-radius: 22px;
+    padding: 18px 18px 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.6);
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: border-color 0.4s ease;
+  }
+
+  .clock-insight-card.phase-menstrual { border-color: rgba(199, 107, 122, 0.3); }
+  .clock-insight-card.phase-follicular { border-color: rgba(201, 162, 74, 0.3); }
+  .clock-insight-card.phase-ovulation { border-color: rgba(47, 122, 122, 0.3); }
+  .clock-insight-card.phase-luteal { border-color: rgba(142, 83, 120, 0.3); }
+
+  .clock-insight-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 10px;
+  }
+
+  .clock-insight-day-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 12px;
+    background: var(--cream);
+    color: var(--plum-deep);
+    border: 1px solid var(--line);
+  }
+
+  .clock-insight-day-pill .day-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--plum);
+    margin-left: 2px;
+  }
+
+  .clock-insight-phase-tag {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 12px;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .clock-insight-phase-tag.phase-menstrual { background: var(--phase-menstrual-bg); color: var(--phase-menstrual); }
+  .clock-insight-phase-tag.phase-follicular { background: var(--phase-follicular-bg); color: var(--phase-follicular); }
+  .clock-insight-phase-tag.phase-ovulation { background: var(--phase-ovulation-bg); color: var(--phase-ovulation); }
+  .clock-insight-phase-tag.phase-luteal { background: var(--phase-luteal-bg); color: var(--phase-luteal); }
+
+  .clock-insight-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--plum-deep);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .clock-insight-headline em { font-style: italic; color: var(--plum-soft); }
+
+  .clock-insight-blurb {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+
+  .clock-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .clock-grid-tile {
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 12px 10px;
+    transition: all 0.4s ease;
+  }
+
+  .clock-grid-tile.full { grid-column: 1 / -1; }
+
+  .clock-grid-tile-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .clock-grid-tile-icon {
+    width: 18px; height: 18px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+
+  .clock-grid-tile-icon.work { background: var(--gold-bg); color: var(--gold); }
+  .clock-grid-tile-icon.emotion { background: var(--rose-bg); color: var(--plum); }
+  .clock-grid-tile-icon.body { background: var(--teal-bg); color: var(--teal); }
+  .clock-grid-tile-icon.wellness { background: var(--lavender-bg); color: var(--plum-soft); }
+
+  .clock-grid-tile-text {
+    font-size: 12.5px;
+    color: var(--plum-deep);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .clock-hormone-bars {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, var(--cream) 0%, var(--rose-bg) 100%);
+    border-radius: 14px;
+    border: 1px solid rgba(234, 223, 227, 0.7);
+  }
+
+  .clock-hormone-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .clock-hormone-bar-label {
+    width: 78px;
+    font-weight: 600;
+    color: var(--plum-deep);
+    flex-shrink: 0;
+  }
+
+  .clock-hormone-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(91, 42, 74, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .clock-hormone-bar-fill {
+    position: absolute;
+    inset: 0;
+    width: 0%;
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .clock-hormone-bar-fill.estrogen { background: linear-gradient(90deg, #E8A8B7 0%, #C76B7A 100%); }
+  .clock-hormone-bar-fill.lh { background: linear-gradient(90deg, #E8D4A0 0%, #C9A24A 100%); }
+  .clock-hormone-bar-fill.progesterone { background: linear-gradient(90deg, #C9A6BC 0%, #8E5378 100%); }
+  .clock-hormone-bar-fill.testosterone { background: linear-gradient(90deg, #8FC4C4 0%, #2F7A7A 100%); }
+
+  .clock-hormone-bar-value {
+    font-size: 10px;
+    color: var(--ink-soft);
+    width: 28px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
 </style>
 </head>
 <body>
@@ -1952,13 +2465,9 @@
           </div>
         </div>
 
-        <!-- Mode toggle: Browse vs Log -->
-        <div class="cal-mode-toggle">
-          <button class="cal-mode-btn active" id="modeBrowseBtn" onclick="setCalMode('browse')">
-            <span class="icon-mini">◐</span> Browse
-          </button>
-          <button class="cal-mode-btn" id="modeLogBtn" onclick="setCalMode('log')">
-            <span class="icon-mini">●</span> Log period
+        <div class="log-period-bar">
+          <button class="log-period-btn" id="logPeriodBtn" onclick="openOnboarding(true)">
+            <span class="dot"></span> Log period
           </button>
         </div>
 
@@ -1974,7 +2483,7 @@
 
         <div class="cal-grid" id="calGrid"></div>
 
-        <div class="cal-helper" id="calHelper">Tap any date to log it as a period day. We'll predict your next cycle automatically.</div>
+        <div class="cal-helper" id="calHelper">Tap any date to see your phase, hormones, and a recommendation for that day.</div>
 
         <div class="cal-legend">
           <div class="cal-legend-item">
@@ -2158,9 +2667,10 @@
           <span class="ring-eyebrow">28-day cycle</span>
           <h3>How your hormones move</h3>
         </div>
-        <div class="ring-svg-wrap">
+        <div class="ring-svg-wrap" id="ringSvgWrap">
           <svg id="ringSvg" viewBox="0 0 340 340"></svg>
         </div>
+        <div class="clock-hint" id="clockHint"><span class="pulse"></span>Drag the bead around the clock to explore any day</div>
         <div class="ring-legend">
           <div class="ring-legend-item">
             <span class="ring-legend-line" style="background: #C76B7A"></span>Estrogen
@@ -2171,10 +2681,64 @@
           <div class="ring-legend-item">
             <span class="ring-legend-line" style="background: #8E5378"></span>Progesterone
           </div>
+          <div class="ring-legend-item">
+            <span class="ring-legend-line" style="background: #2F7A7A"></span>Testosterone
+          </div>
         </div>
       </div>
 
-      <div class="insight-card stagger-3">
+      <div class="clock-insight-card stagger-3 phase-luteal" id="clockInsightCard">
+        <div class="clock-insight-head">
+          <span class="clock-insight-day-pill">Day <span class="day-num" id="clockDayNum">—</span></span>
+          <span class="clock-insight-phase-tag phase-luteal" id="clockPhaseTag">—</span>
+        </div>
+        <div class="clock-insight-headline" id="clockHeadline">—</div>
+        <p class="clock-insight-blurb" id="clockBlurb">—</p>
+
+        <div class="clock-hormone-bars">
+          <div class="clock-hormone-bar">
+            <span class="clock-hormone-bar-label">Estrogen</span>
+            <span class="clock-hormone-bar-track"><span class="clock-hormone-bar-fill estrogen" id="barEstrogen"></span></span>
+            <span class="clock-hormone-bar-value" id="valEstrogen">—</span>
+          </div>
+          <div class="clock-hormone-bar">
+            <span class="clock-hormone-bar-label">Progesterone</span>
+            <span class="clock-hormone-bar-track"><span class="clock-hormone-bar-fill progesterone" id="barProg"></span></span>
+            <span class="clock-hormone-bar-value" id="valProg">—</span>
+          </div>
+          <div class="clock-hormone-bar">
+            <span class="clock-hormone-bar-label">LH</span>
+            <span class="clock-hormone-bar-track"><span class="clock-hormone-bar-fill lh" id="barLH"></span></span>
+            <span class="clock-hormone-bar-value" id="valLH">—</span>
+          </div>
+          <div class="clock-hormone-bar">
+            <span class="clock-hormone-bar-label">Testosterone</span>
+            <span class="clock-hormone-bar-track"><span class="clock-hormone-bar-fill testosterone" id="barTest"></span></span>
+            <span class="clock-hormone-bar-value" id="valTest">—</span>
+          </div>
+        </div>
+
+        <div class="clock-grid">
+          <div class="clock-grid-tile">
+            <div class="clock-grid-tile-label"><span class="clock-grid-tile-icon emotion">❤</span>Emotion</div>
+            <div class="clock-grid-tile-text" id="clockEmotion">—</div>
+          </div>
+          <div class="clock-grid-tile">
+            <div class="clock-grid-tile-label"><span class="clock-grid-tile-icon body">❋</span>Body</div>
+            <div class="clock-grid-tile-text" id="clockBody">—</div>
+          </div>
+          <div class="clock-grid-tile">
+            <div class="clock-grid-tile-label"><span class="clock-grid-tile-icon work">⌘</span>Work</div>
+            <div class="clock-grid-tile-text" id="clockWork">—</div>
+          </div>
+          <div class="clock-grid-tile">
+            <div class="clock-grid-tile-label"><span class="clock-grid-tile-icon wellness">✦</span>Wellness</div>
+            <div class="clock-grid-tile-text" id="clockWellness">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-card stagger-3" style="display: none;">
         <h4 id="insightHeadline">What this means <em>today</em></h4>
         <p id="insightText">—</p>
       </div>
@@ -2350,6 +2914,110 @@
   <button class="sheet-cancel" onclick="closeSync()">Not right now</button>
 </div>
 
+<!-- ONBOARDING SHEET -->
+<div class="sheet-backdrop" id="onbBackdrop" onclick="closeOnboarding()"></div>
+<div class="sheet onb-sheet" id="onbSheet">
+  <div class="sheet-handle"></div>
+  <span class="onb-eyebrow">Quick setup</span>
+  <h3>Let's set your <em>cycle</em> up</h3>
+  <p class="sheet-sub">Two quick taps. We'll predict the rest and tailor your daily insights.</p>
+
+  <div class="onb-q-block">
+    <div class="onb-q-label">When did your last period start?</div>
+    <div class="onb-date-row">
+      <span class="calendar-icon">☾</span>
+      <input type="date" class="onb-date-input" id="onbDate" />
+    </div>
+  </div>
+
+  <div class="onb-q-block">
+    <div class="onb-q-label">How long does your period usually last?</div>
+    <div class="onb-chip-row" id="onbDurationChips">
+      <div class="onb-chip" data-duration="3">3 days</div>
+      <div class="onb-chip selected" data-duration="4">4 days</div>
+      <div class="onb-chip" data-duration="5">5 days</div>
+      <div class="onb-chip" data-duration="6">6+ days</div>
+    </div>
+  </div>
+
+  <div class="onb-q-block">
+    <div class="onb-q-label">How have you been feeling lately? <span class="opt-tag">optional</span></div>
+    <div style="font-size: 11px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px;">Mood</div>
+    <div class="onb-chip-row" id="onbMoodChips">
+      <div class="onb-chip onb-chip-mini" data-mood="happy">Happy</div>
+      <div class="onb-chip onb-chip-mini" data-mood="emotional">Emotional</div>
+      <div class="onb-chip onb-chip-mini" data-mood="irritated">Irritated</div>
+      <div class="onb-chip onb-chip-mini" data-mood="calm">Calm</div>
+      <div class="onb-chip onb-chip-mini" data-mood="anxious">Anxious</div>
+      <div class="onb-chip onb-chip-mini" data-mood="motivated">Motivated</div>
+    </div>
+  </div>
+
+  <div class="onb-q-block">
+    <div style="font-size: 11px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px;">Energy</div>
+    <div class="onb-chip-row" id="onbEnergyChips">
+      <div class="onb-chip onb-chip-mini" data-energy="low">Low</div>
+      <div class="onb-chip onb-chip-mini" data-energy="balanced">Balanced</div>
+      <div class="onb-chip onb-chip-mini" data-energy="high">High</div>
+    </div>
+  </div>
+
+  <div class="onb-q-block">
+    <div style="font-size: 11px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px;">Symptoms</div>
+    <div class="onb-chip-row" id="onbSymptomChips">
+      <div class="onb-chip onb-chip-mini" data-symptom="cramps">Cramps</div>
+      <div class="onb-chip onb-chip-mini" data-symptom="acne">Acne</div>
+      <div class="onb-chip onb-chip-mini" data-symptom="bloating">Bloating</div>
+      <div class="onb-chip onb-chip-mini" data-symptom="headache">Headache</div>
+      <div class="onb-chip onb-chip-mini" data-symptom="cravings">Cravings</div>
+      <div class="onb-chip onb-chip-mini" data-symptom="fatigue">Fatigue</div>
+    </div>
+  </div>
+
+  <div class="onb-cta-row">
+    <button class="onb-skip" onclick="closeOnboarding()">Later</button>
+    <button class="onb-cta" id="onbCta" onclick="saveOnboarding()">Start tracking <span class="arrow">→</span></button>
+  </div>
+</div>
+
+<!-- DAY INSIGHT SHEET (calendar tap) -->
+<div class="sheet-backdrop" id="daySheetBackdrop" onclick="closeDaySheet()"></div>
+<div class="sheet day-sheet" id="daySheet">
+  <div class="sheet-handle"></div>
+  <div class="day-sheet-head">
+    <div>
+      <div class="day-sheet-date" id="daySheetDate">—</div>
+      <div class="day-sheet-day-of" id="daySheetDayOf">—</div>
+    </div>
+    <span class="day-sheet-pill phase-unknown" id="daySheetPill">—</span>
+  </div>
+  <div class="day-sheet-hormones" id="daySheetHormones">—</div>
+  <div class="day-sheet-rows">
+    <div class="today-row">
+      <div class="today-row-icon emotion">❤</div>
+      <div class="today-row-content">
+        <div class="today-row-label">Emotion</div>
+        <div class="today-row-text" id="daySheetEmotion">—</div>
+      </div>
+    </div>
+    <div class="today-row">
+      <div class="today-row-icon body">❋</div>
+      <div class="today-row-content">
+        <div class="today-row-label">Body</div>
+        <div class="today-row-text" id="daySheetBody">—</div>
+      </div>
+    </div>
+    <div class="today-row">
+      <div class="today-row-icon work">⌘</div>
+      <div class="today-row-content">
+        <div class="today-row-label">Work</div>
+        <div class="today-row-text" id="daySheetWork">—</div>
+      </div>
+    </div>
+  </div>
+  <button class="day-sheet-cta" onclick="closeDaySheet()">Close</button>
+</div>
+
 <script>
 const CYCLE_LENGTH = 28;
 const PERIOD_LENGTH = 5;
@@ -2362,8 +3030,10 @@ let selectedDate = new Date(today);
 let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 let currentScreen = 0;
 let selectedGoal = null;
-let calMode = 'browse'; // 'browse' or 'log'
 let pregWeek = 12;
+let selectedClockDay = 1; // currently focused day on the hormonal clock
+let onboardingShown = false; // ensure first-time sheet only auto-opens once
+let onbDuration = 4; // default selection in onboarding
 
 // User-logged period dates (no pre-seeding!)
 const periodDays = new Set(); // ISO date strings (YYYY-MM-DD)
@@ -2496,6 +3166,7 @@ const PHASE_CONTENT = {
     work: 'Take a lighter approach. Prioritise reflection, internal work, and quiet focus.',
     emotion: 'Be kind to yourself. This is a natural reset — let things settle.',
     body: 'Warm meals, gentle stretches, iron-rich foods. Skip intense workouts if you feel low.',
+    wellness: 'Slow movement and a warm shower will land softly today.',
     insight: 'Both estrogen and progesterone are at their lowest, which is why energy and mood may dip. This is not weakness — it is a designed pause. Honour it.'
   },
   follicular: {
@@ -2506,6 +3177,7 @@ const PHASE_CONTENT = {
     work: 'A great time to start new projects, brainstorm, or take on something challenging.',
     emotion: 'Open, curious, optimistic. Channel this momentum into something meaningful.',
     body: 'Strength training, cardio, and trying something new will feel especially good.',
+    wellness: 'Add five minutes of fresh air — your body will use it well right now.',
     insight: 'Rising estrogen sharpens your focus, lifts your mood, and improves verbal fluency. Use this window — it is your launch pad for anything new.'
   },
   ovulation: {
@@ -2516,6 +3188,7 @@ const PHASE_CONTENT = {
     work: 'Great day to lead meetings, pitch ideas, negotiate, or have important conversations.',
     emotion: 'Confident, magnetic, expressive. Lean into connection — say yes to plans.',
     body: 'High-intensity workouts feel effortless. Hydrate well and fuel with protein.',
+    wellness: 'Hydrate deeply — your body is moving fast and burning bright.',
     insight: 'The LH surge triggers ovulation. Estrogen at peak makes you more articulate, perceptive, and energised. This is the social and creative high point of your cycle.'
   },
   luteal: {
@@ -2526,9 +3199,57 @@ const PHASE_CONTENT = {
     work: 'Focus on deep work, organising, finishing tasks, and closing open loops.',
     emotion: 'Stay in tune with your emotions today. Boundaries help — say no when needed.',
     body: 'Magnesium-rich foods, walks over runs, and earlier sleep will support you.',
+    wellness: 'Take small breaks today. Hydration and an earlier wind-down go further than caffeine.',
     insight: 'Progesterone dominates this phase — it is calming but also sensitises you to stress. The pre-period mood shifts are real and biological. Soft routines help.'
   }
 };
+
+// =================================================================
+// PER-DAY CONTENT (used by hormone clock + calendar tap popover)
+// Tone: supportive, intelligent, modern, non-judgmental, emotionally aware.
+// =================================================================
+
+const DAY_PACK = {
+  // Menstrual — days 1-5
+  1: { headline: "Day one. <em>Begin again.</em>", emotion: "Tender and inward. Cancel what isn't essential.", body: "Cramps are real — heat, magnesium, and slow stretches help.", work: "Reschedule heavy meetings if you can. Notes-taking and quiet review fit best.", wellness: "A long shower, warm food, and an earlier bedtime today." },
+  2: { headline: "Quiet reset day", emotion: "Low energy is a signal, not a flaw. Move at half-speed.", body: "Iron-rich food and warmth. Skip HIIT — try a gentle walk.", work: "Solo focus work over collaboration. Defer decisions if you can.", wellness: "Two minutes of breathwork can soften everything else." },
+  3: { headline: "Soft focus settling in", emotion: "Slightly more steady. Reflection comes easily today.", body: "Hydration and a short walk will lift the heaviness.", work: "Best for review, journaling, planning the week ahead.", wellness: "Limit screens an hour before bed for cleaner sleep." },
+  4: { headline: "Energy is starting to return", emotion: "Calmer mood. You may want connection again.", body: "Light strength or yin yoga will feel good.", work: "Re-engage with planning and small wins — not big launches.", wellness: "Get sunlight in the first hour of waking." },
+  5: { headline: "Edge of a fresh phase", emotion: "Optimism is creeping back in.", body: "Energy is climbing — you can move a little more today.", work: "Good day to draft, sketch, organise priorities for the week.", wellness: "Add protein to breakfast — it stabilises the rebuild." },
+
+  // Follicular — days 6-13
+  6: { headline: "Fresh chapter, <em>fresh ideas</em>", emotion: "Open, curious, optimistic.", body: "Strength training feels strong today.", work: "Great for new projects and creative thinking.", wellness: "Try one new thing this week — your brain wants novelty." },
+  7: { headline: "Momentum is building", emotion: "Sociable and motivated.", body: "Cardio and dance will land especially well.", work: "Brainstorm, ideate, draft anything new.", wellness: "Add leafy greens — your liver is working hard right now." },
+  8: { headline: "Clear-headed and capable", emotion: "Quietly confident. Ideas connect easily.", body: "Energy is climbing — push your workouts a little.", work: "Tackle the project you've been avoiding.", wellness: "Consistent sleep matters — protect your routine." },
+  9: { headline: "Rising estrogen, rising you", emotion: "Sharper focus and a brighter mood.", body: "Cravings should ease. You may need less coffee.", work: "Excellent for analytical and verbal work.", wellness: "Schedule something joyful into the next few days." },
+  10: { headline: "Buzzing with possibility", emotion: "Open, optimistic, expressive.", body: "Skin glows. Workouts feel effortless.", work: "Pitch, present, learn — your brain absorbs fast.", wellness: "Limit alcohol — it dulls this clarity quickly." },
+  11: { headline: "Confidence is gathering", emotion: "Magnetic and articulate. People feel it.", body: "Push through a strong workout if you have one in you.", work: "Negotiations and difficult conversations land well now.", wellness: "Hydrate — you are running hot in the best way." },
+  12: { headline: "On the edge of <em>peak</em>", emotion: "Open and connected. Say yes to plans.", body: "Cervical mucus may shift — fertility window opening.", work: "Lead the room. Ask for what you want.", wellness: "Sleep matters here — hormones move fast on rest." },
+  13: { headline: "Pre-ovulation peak", emotion: "Sociable and bright. Communication is at its best.", body: "Energy peaks; muscles recover faster.", work: "Big meetings, hard conversations, ambitious asks.", wellness: "Protein and hydration fuel this surge." },
+
+  // Ovulation — days 14-16
+  14: { headline: "<em>Ovulation</em> — peak energy", emotion: "Confident, expressive, magnetic.", body: "LH is surging. You may notice a small temperature lift.", work: "The day to lead, pitch, present, or close a deal.", wellness: "Schedule something that lights you up — you'll remember it." },
+  15: { headline: "Still in the bright window", emotion: "Open and warm. Connection feels easy.", body: "Workouts are powerful but listen for fatigue.", work: "Wrap collaborative work — push decisions through today.", wellness: "Add healthy fats — they support the hormone shift ahead." },
+  16: { headline: "Beginning the gentle descent", emotion: "Mood softens slightly. Still socially strong.", body: "You may feel a small dip in energy late in the day.", work: "Finish what you started this week. Avoid new big asks.", wellness: "An earlier bedtime tonight will pay off tomorrow." },
+
+  // Luteal — days 17-28
+  17: { headline: "Progesterone takes the lead", emotion: "Steady and inward. Focus deepens.", body: "Cravings may begin. Choose protein over sugar.", work: "Excellent for deep work, editing, organising.", wellness: "Keep magnesium-rich foods on hand this week." },
+  18: { headline: "Quiet productivity day", emotion: "Calm and methodical. Avoid overcommitment.", body: "Walks beat runs. Sleep needs may rise.", work: "Tackle long lists — your patience is high.", wellness: "Cut caffeine after lunch for cleaner sleep." },
+  19: { headline: "Inward but capable", emotion: "Slightly more sensitive — that's biology, not weakness.", body: "Bloating may start. Lower the salt today.", work: "Solo work over group work right now.", wellness: "A walk outside resets more than scrolling." },
+  20: { headline: "Settle into the slower rhythm", emotion: "Steadier, but less tolerant of noise.", body: "Hydrate and stretch — back tension may rise.", work: "Boundaries today. Block your calendar where you can.", wellness: "Soothing rituals help — herbal tea, journaling, music." },
+  21: { headline: "Quiet competence", emotion: "Reflective. Good day to revisit what matters.", body: "Energy is stable but lower. Don't push through.", work: "Closing loops, finishing edits, tying up details.", wellness: "Magnesium tonight may ease cramps later in the week." },
+  22: { headline: "Mid-luteal grounding", emotion: "Take care of the small irritations before they build.", body: "Bloating, breast tenderness can begin. Loose layers help.", work: "Plan rather than push. Avoid stacking back-to-back calls.", wellness: "Skip alcohol if you can — it spikes PMS sensitivity." },
+  23: { headline: "Sensitivity is real", emotion: "You may feel emotions closer to the surface.", body: "Cravings peak around now — protein steadies you.", work: "Heads-down focus over high-stakes presenting.", wellness: "Five slow breaths before reactive emails." },
+  24: { headline: "Pre-period gentle slowdown", emotion: "Lower threshold for stress. Smaller days are wins.", body: "Sleep need may rise. Don't fight it.", work: "Avoid big decisions if you can defer them.", wellness: "Add iron-rich foods — restock for the week ahead." },
+  25: { headline: "Slow and steady", emotion: "Quiet mood. Be honest about your bandwidth.", body: "Gentle yoga or walks beat intense workouts.", work: "Wrap and document — leave a clean handover.", wellness: "An earlier bedtime tonight is a gift to tomorrow." },
+  26: { headline: "Listening to the body", emotion: "Acknowledge what you feel without fixing it.", body: "Cramps may pre-emptively start. Heat helps.", work: "Lighter day where possible. Skip stretch goals.", wellness: "Hydrate well — symptoms ease with simple care." },
+  27: { headline: "Soft landing approaching", emotion: "Be patient with yourself today.", body: "Lower energy is normal. Don't override it.", work: "Reflection over output. Note what you learned.", wellness: "Quiet evening. Set tomorrow up gently." },
+  28: { headline: "End of cycle. <em>Almost a reset.</em>", emotion: "Slight tenderness. A fresh chapter is right behind it.", body: "Symptoms may peak — short walks and warm food help.", work: "Finish lightly. Tomorrow is a soft restart.", wellness: "Run a warm shower tonight and call it early." }
+};
+
+function getDayPack(day) {
+  return DAY_PACK[day] || DAY_PACK[1];
+}
 
 // =================================================================
 // PREGNANCY CONTENT (week-by-week)
@@ -2688,21 +3409,44 @@ function customiseSymptoms() {
 // CALENDAR
 // =================================================================
 
-function setCalMode(mode) {
-  calMode = mode;
-  document.getElementById('modeBrowseBtn').classList.toggle('active', mode === 'browse');
-  document.getElementById('modeLogBtn').classList.toggle('active', mode === 'log');
-  const helper = document.getElementById('calHelper');
-  if (mode === 'log') {
-    helper.textContent = 'Tap a date to log it as a period day. Tap again to remove.';
-    helper.classList.remove('dim');
-  } else {
-    helper.textContent = periodDays.size === 0
-      ? 'Switch to "Log period" mode to mark your last period dates.'
-      : 'Browsing mode. Tap dates to view phase details.';
-    helper.classList.toggle('dim', periodDays.size > 0);
-  }
-  renderCalendar();
+// Hormone level functions (0..1) — shared by ring + bars + day-sheet copy.
+function hEstrogen(d) {
+  if (d <= 5) return 0.1 + 0.05 * d;
+  if (d <= 13) return 0.3 + 0.55 * ((d - 5) / 8);
+  if (d <= 14) return 0.85;
+  if (d <= 16) return 0.85 - 0.4 * ((d - 14) / 2);
+  if (d <= 22) return 0.45 + 0.15 * Math.sin(((d - 16) / 6) * Math.PI);
+  return Math.max(0.1, 0.45 - 0.4 * ((d - 22) / 6));
+}
+function hLh(d) {
+  if (d < 12) return 0.15;
+  if (d < 14) return 0.15 + 0.7 * ((d - 12) / 2);
+  if (d <= 15) return Math.max(0.15, 0.85 - 0.55 * ((d - 14)));
+  return 0.15;
+}
+function hProgesterone(d) {
+  if (d <= 14) return 0.08;
+  if (d <= 22) return 0.08 + 0.7 * ((d - 14) / 8);
+  return Math.max(0.08, 0.78 - 0.65 * ((d - 22) / 6));
+}
+function hTestosterone(d) {
+  // Subtle peak around ovulation (days 12-15), low elsewhere.
+  if (d <= 8) return 0.18;
+  if (d <= 12) return 0.18 + 0.32 * ((d - 8) / 4);
+  if (d <= 15) return 0.5 + 0.15 * Math.sin(((d - 12) / 3) * Math.PI);
+  return Math.max(0.18, 0.5 - 0.32 * ((d - 15) / 13));
+}
+
+function describeHormones(day) {
+  const e = hEstrogen(day), p = hProgesterone(day), l = hLh(day), t = hTestosterone(day);
+  const ranked = [
+    { k: 'Estrogen', v: e },
+    { k: 'Progesterone', v: p },
+    { k: 'LH', v: l },
+    { k: 'Testosterone', v: t }
+  ].sort((a, b) => b.v - a.v);
+  const top = ranked[0], second = ranked[1];
+  return `${top.k} is leading${second.v > 0.45 ? `, with ${second.k.toLowerCase()} also active` : ''}.`;
 }
 
 function renderCalendar() {
@@ -2731,14 +3475,13 @@ function renderCalendar() {
     const isPredicted = isPredictedPeriodDay(date);
 
     const classes = ['cal-day'];
-    if (calMode === 'log') classes.push('log-mode');
     if (isPeriod) classes.push('is-period');
     else if (isPredicted) classes.push('predicted-period');
     if (isOvulation && !isPeriod) classes.push('is-ovulation');
     if (isOvuPeak && !isPeriod) classes.push('is-ovulation-peak');
     if (date.getTime() === today.getTime()) classes.push('today');
-    if (date.getTime() === selectedDate.getTime() && calMode === 'browse') classes.push('selected');
-    if (date > today && calMode === 'browse') classes.push('future');
+    if (date.getTime() === selectedDate.getTime()) classes.push('selected');
+    if (date > today) classes.push('future');
 
     // Inner content (number + optional icon)
     let innerHtml = `${d}`;
@@ -2758,22 +3501,50 @@ function handleDayClick(isoString) {
   const date = new Date(isoString);
   date.setHours(0, 0, 0, 0);
 
-  if (calMode === 'log') {
-    // Toggle period day
-    const key = dateKey(date);
-    if (periodDays.has(key)) {
-      periodDays.delete(key);
-    } else {
-      periodDays.add(key);
-    }
-    renderCalendar();
-    updatePhaseAndToday(date);
+  selectedDate = date;
+  renderCalendar();
+  updatePhaseAndToday(date);
+  openDaySheet(date);
+}
+
+// =================================================================
+// DAY INSIGHT SHEET (calendar tap)
+// =================================================================
+function openDaySheet(date) {
+  const cycleDay = getCycleDayForDate(date);
+  const phase = getPhase(cycleDay);
+  const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+  document.getElementById('daySheetDate').textContent = date.toLocaleDateString('en-US', opts);
+
+  if (!phase) {
+    document.getElementById('daySheetDayOf').textContent = 'Log your last period to see this day in context';
+    const pill = document.getElementById('daySheetPill');
+    pill.className = 'day-sheet-pill phase-unknown';
+    pill.textContent = 'No data';
+    document.getElementById('daySheetHormones').textContent = 'Once you log your period start, we can show you what is happening hormonally on any day.';
+    document.getElementById('daySheetEmotion').textContent = '—';
+    document.getElementById('daySheetBody').textContent = '—';
+    document.getElementById('daySheetWork').textContent = '—';
   } else {
-    // Browse mode — just select
-    selectedDate = date;
-    renderCalendar();
-    updatePhaseAndToday(date);
+    const pack = getDayPack(cycleDay);
+    const phaseContent = PHASE_CONTENT[phase];
+    document.getElementById('daySheetDayOf').textContent = `Day ${cycleDay} of ${CYCLE_LENGTH} · ${phaseContent.name} phase`;
+    const pill = document.getElementById('daySheetPill');
+    pill.className = 'day-sheet-pill phase-' + phase;
+    pill.textContent = phaseContent.name;
+    document.getElementById('daySheetHormones').textContent = describeHormones(cycleDay);
+    document.getElementById('daySheetEmotion').textContent = pack.emotion;
+    document.getElementById('daySheetBody').textContent = pack.body;
+    document.getElementById('daySheetWork').textContent = pack.work;
   }
+
+  document.getElementById('daySheetBackdrop').classList.add('open');
+  document.getElementById('daySheet').classList.add('open');
+}
+
+function closeDaySheet() {
+  document.getElementById('daySheetBackdrop').classList.remove('open');
+  document.getElementById('daySheet').classList.remove('open');
 }
 
 function changeMonth(delta) {
@@ -2844,16 +3615,17 @@ function updateScreen2() {
   const phase = getPhase(cycleDay);
 
   if (!phase) {
-    // No data — show prompt
     document.getElementById('countdownLabel').textContent = 'No cycle data yet';
     document.getElementById('countdownNumber').innerHTML = `Log your <em>period</em>`;
-    document.getElementById('countdownSub').textContent = "Go back and tap dates on the calendar to mark when you had your last period.";
+    document.getElementById('countdownSub').textContent = "Go back and tap 'Log period' on the calendar — we'll do the rest.";
     document.getElementById('insightText').textContent = "Once you log your period dates, we'll show you exactly where you are in your cycle and what your hormones are doing.";
-    renderHormoneRing(1, true); // dimmed mode
+    document.getElementById('clockHint').style.display = 'none';
+    selectedClockDay = 1;
+    renderHormoneRing(1, true);
+    renderClockInsight(1, true);
     return;
   }
 
-  const content = PHASE_CONTENT[phase];
   const isOvulationFocus = (selectedGoal === 'ttc');
 
   if (cycleDay <= PERIOD_LENGTH) {
@@ -2880,43 +3652,35 @@ function updateScreen2() {
     document.getElementById('countdownSub').textContent = sub;
   }
 
-  document.getElementById('insightText').textContent = content.insight;
+  document.getElementById('clockHint').style.display = '';
+  selectedClockDay = cycleDay;
   renderHormoneRing(cycleDay, false);
+  renderClockInsight(cycleDay, false);
+  bindClockDrag();
   renderNudges('screen2NudgeSlot');
+}
+
+// Shared geometry for the hormone ring (so drag handlers can use it).
+const RING = {
+  cx: 170, cy: 170,
+  dotRingR: 138,
+  curveOuterR: 122,
+  curveInnerR: 50,
+  handleR: 144 // outer radius where the draggable handle sits
+};
+
+function ringDayToAngle(d) { return -90 + ((d - 1) / CYCLE_LENGTH) * 360; }
+function ringPolar(r, angleDeg) {
+  const rad = angleDeg * Math.PI / 180;
+  return { x: RING.cx + r * Math.cos(rad), y: RING.cy + r * Math.sin(rad) };
 }
 
 function renderHormoneRing(currentDay, dimmed) {
   const svg = document.getElementById('ringSvg');
-  const cx = 170, cy = 170;
-  const dotRingR = 138;
-  const curveOuterR = 122;
-  const curveInnerR = 50;
-
-  function dayToAngle(d) { return -90 + ((d - 1) / CYCLE_LENGTH) * 360; }
-  function polar(r, angleDeg) {
-    const rad = angleDeg * Math.PI / 180;
-    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-  }
-
-  function estrogen(d) {
-    if (d <= 5) return 0.1 + 0.05 * d;
-    if (d <= 13) return 0.3 + 0.55 * ((d - 5) / 8);
-    if (d <= 14) return 0.85;
-    if (d <= 16) return 0.85 - 0.4 * ((d - 14) / 2);
-    if (d <= 22) return 0.45 + 0.15 * Math.sin(((d - 16) / 6) * Math.PI);
-    return Math.max(0.1, 0.45 - 0.4 * ((d - 22) / 6));
-  }
-  function lh(d) {
-    if (d < 12) return 0.15;
-    if (d < 14) return 0.15 + 0.7 * ((d - 12) / 2);
-    if (d <= 15) return 0.85 - 0.55 * ((d - 14));
-    return 0.15;
-  }
-  function progesterone(d) {
-    if (d <= 14) return 0.08;
-    if (d <= 22) return 0.08 + 0.7 * ((d - 14) / 8);
-    return Math.max(0.08, 0.78 - 0.65 * ((d - 22) / 6));
-  }
+  const cx = RING.cx, cy = RING.cy;
+  const dotRingR = RING.dotRingR;
+  const curveOuterR = RING.curveOuterR;
+  const curveInnerR = RING.curveInnerR;
 
   const phaseSegs = [
     { from: 1, to: PERIOD_LENGTH, color: 'rgba(199, 107, 122, 0.12)' },
@@ -2926,12 +3690,12 @@ function renderHormoneRing(currentDay, dimmed) {
   ];
 
   function arcPath(rOuter, rInner, fromDay, toDay) {
-    const a1 = dayToAngle(fromDay);
-    const a2 = dayToAngle(toDay);
-    const p1 = polar(rOuter, a1);
-    const p2 = polar(rOuter, a2);
-    const p3 = polar(rInner, a2);
-    const p4 = polar(rInner, a1);
+    const a1 = ringDayToAngle(fromDay);
+    const a2 = ringDayToAngle(toDay);
+    const p1 = ringPolar(rOuter, a1);
+    const p2 = ringPolar(rOuter, a2);
+    const p3 = ringPolar(rInner, a2);
+    const p4 = ringPolar(rInner, a1);
     const largeArc = Math.abs(a2 - a1) > 180 ? 1 : 0;
     return `M ${p1.x} ${p1.y} A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2.x} ${p2.y} L ${p3.x} ${p3.y} A ${rInner} ${rInner} 0 ${largeArc} 0 ${p4.x} ${p4.y} Z`;
   }
@@ -2946,38 +3710,56 @@ function renderHormoneRing(currentDay, dimmed) {
     for (let i = 1; i <= CYCLE_LENGTH; i++) {
       const v = fn(i);
       const r = curveInnerR + 4 + v * (curveOuterR - curveInnerR - 10);
-      const a = dayToAngle(i);
-      const p = polar(r, a);
+      const a = ringDayToAngle(i);
+      const p = ringPolar(r, a);
       d += (i === 1 ? 'M' : 'L') + ` ${p.x.toFixed(1)} ${p.y.toFixed(1)} `;
     }
     const v0 = fn(1);
     const r0 = curveInnerR + 4 + v0 * (curveOuterR - curveInnerR - 10);
-    const p0 = polar(r0, dayToAngle(1));
+    const p0 = ringPolar(r0, ringDayToAngle(1));
     d += `L ${p0.x.toFixed(1)} ${p0.y.toFixed(1)}`;
     return `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${dimmed ? 0.3 : 0.85}"/>`;
   }
 
   let dotsHtml = '';
   for (let d = 1; d <= CYCLE_LENGTH; d++) {
-    const phase = getPhase(d);
-    const angle = dayToAngle(d);
-    const p = polar(dotRingR, angle);
+    const phaseOf = getPhase(d);
+    const angle = ringDayToAngle(d);
+    const p = ringPolar(dotRingR, angle);
     const isCurrent = !dimmed && d === currentDay;
     let fill, r;
-    if (phase === 'menstrual') { fill = '#C76B7A'; r = isCurrent ? 5.5 : 3.2; }
-    else if (phase === 'ovulation') { fill = '#2F7A7A'; r = isCurrent ? 5.5 : 3.2; }
-    else if (phase === 'follicular') { fill = '#E8D4A0'; r = isCurrent ? 5.5 : 2.8; }
+    if (phaseOf === 'menstrual') { fill = '#C76B7A'; r = isCurrent ? 5.5 : 3.2; }
+    else if (phaseOf === 'ovulation') { fill = '#2F7A7A'; r = isCurrent ? 5.5 : 3.2; }
+    else if (phaseOf === 'follicular') { fill = '#E8D4A0'; r = isCurrent ? 5.5 : 2.8; }
     else { fill = '#C9A6BC'; r = isCurrent ? 5.5 : 2.8; }
     dotsHtml += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${dimmed ? 0.3 : 1}"${isCurrent ? ' stroke="#3E1B33" stroke-width="2"' : ''}/>`;
   }
 
   let pointer = '';
+  let handleHtml = '';
   let cycleDayLabel = '';
   if (!dimmed) {
-    const currentAngle = dayToAngle(currentDay);
-    const pInner = polar(curveInnerR + 6, currentAngle);
-    const pOuter = polar(dotRingR - 8, currentAngle);
+    const currentAngle = ringDayToAngle(currentDay);
+    const pInner = ringPolar(curveInnerR + 6, currentAngle);
+    const pOuter = ringPolar(dotRingR - 8, currentAngle);
     pointer = `<line x1="${pInner.x.toFixed(1)}" y1="${pInner.y.toFixed(1)}" x2="${pOuter.x.toFixed(1)}" y2="${pOuter.y.toFixed(1)}" stroke="#3E1B33" stroke-width="1.2" opacity="0.5" stroke-dasharray="2 3"/>`;
+
+    // Draggable handle — soft halo + grip dot at outer ring radius
+    const handlePos = ringPolar(RING.handleR, currentAngle);
+    const phaseOfDay = getPhase(currentDay);
+    const handleColors = {
+      menstrual: '#C76B7A',
+      follicular: '#C9A24A',
+      ovulation: '#2F7A7A',
+      luteal: '#8E5378'
+    };
+    const hc = handleColors[phaseOfDay] || '#5B2A4A';
+    handleHtml = `
+      <circle class="clock-handle-halo" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="14" fill="${hc}" fill-opacity="0.18"/>
+      <circle class="clock-handle-halo" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="10" fill="${hc}" fill-opacity="0.32"/>
+      <circle class="clock-handle-grip" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="7" fill="white" stroke="${hc}" stroke-width="2.5"/>
+    `;
+
     cycleDayLabel = `
       <text x="${cx}" y="${cy - 8}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">DAY</text>
       <text x="${cx}" y="${cy + 16}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="32" fill="#3E1B33">${currentDay}</text>
@@ -2993,13 +3775,133 @@ function renderHormoneRing(currentDay, dimmed) {
   svg.innerHTML = `
     ${phaseHtml}
     <circle cx="${cx}" cy="${cy}" r="${curveInnerR}" fill="rgba(255,255,255,0.7)" stroke="rgba(91,42,74,0.08)" stroke-width="1"/>
-    ${curveStroke(estrogen, '#C76B7A')}
-    ${curveStroke(lh, '#C9A24A')}
-    ${curveStroke(progesterone, '#8E5378')}
+    ${curveStroke(hEstrogen, '#C76B7A')}
+    ${curveStroke(hLh, '#C9A24A')}
+    ${curveStroke(hProgesterone, '#8E5378')}
+    ${curveStroke(hTestosterone, '#2F7A7A')}
     ${pointer}
     ${dotsHtml}
+    ${handleHtml}
     ${cycleDayLabel}
   `;
+}
+
+// =================================================================
+// CLOCK DRAG — pointer events on the SVG move the day handle
+// =================================================================
+function bindClockDrag() {
+  const wrap = document.getElementById('ringSvgWrap');
+  const svg = document.getElementById('ringSvg');
+  if (!wrap || wrap.dataset.dragBound === '1') return;
+  wrap.dataset.dragBound = '1';
+
+  let dragging = false;
+
+  function pointToDay(clientX, clientY) {
+    const rect = svg.getBoundingClientRect();
+    // SVG viewBox is 0..340; map screen coords to SVG coords.
+    const sx = ((clientX - rect.left) / rect.width) * 340;
+    const sy = ((clientY - rect.top) / rect.height) * 340;
+    const dx = sx - RING.cx;
+    const dy = sy - RING.cy;
+    let angleDeg = Math.atan2(dy, dx) * 180 / Math.PI; // -180..180, 0=right
+    // Day 1 is at -90deg (top). Convert.
+    let rel = angleDeg + 90; // 0 at top, -180..180
+    if (rel < 0) rel += 360;
+    let day = Math.round((rel / 360) * CYCLE_LENGTH) + 1;
+    if (day < 1) day = 1;
+    if (day > CYCLE_LENGTH) day = day - CYCLE_LENGTH;
+    return day;
+  }
+
+  function onPointerDown(e) {
+    if (getCycleDayForDate(today) === null) return; // no data — disable drag
+    dragging = true;
+    wrap.classList.add('dragging');
+    svg.setPointerCapture && svg.setPointerCapture(e.pointerId);
+    onPointerMove(e);
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+    const day = pointToDay(e.clientX, e.clientY);
+    if (day !== selectedClockDay) {
+      selectedClockDay = day;
+      renderHormoneRing(day, false);
+      renderClockInsight(day, false);
+    }
+  }
+
+  function onPointerUp(e) {
+    if (!dragging) return;
+    dragging = false;
+    wrap.classList.remove('dragging');
+    try { svg.releasePointerCapture && svg.releasePointerCapture(e.pointerId); } catch (_) {}
+  }
+
+  svg.addEventListener('pointerdown', onPointerDown);
+  svg.addEventListener('pointermove', onPointerMove);
+  svg.addEventListener('pointerup', onPointerUp);
+  svg.addEventListener('pointercancel', onPointerUp);
+  svg.addEventListener('pointerleave', onPointerUp);
+}
+
+function renderClockInsight(day, dimmed) {
+  const card = document.getElementById('clockInsightCard');
+  const dayNumEl = document.getElementById('clockDayNum');
+  const phaseTagEl = document.getElementById('clockPhaseTag');
+  const headlineEl = document.getElementById('clockHeadline');
+  const blurbEl = document.getElementById('clockBlurb');
+
+  if (dimmed) {
+    card.className = 'clock-insight-card stagger-3 phase-luteal';
+    dayNumEl.textContent = '—';
+    phaseTagEl.className = 'clock-insight-phase-tag phase-luteal';
+    phaseTagEl.textContent = 'No data';
+    headlineEl.innerHTML = 'Log your <em>last period</em>';
+    blurbEl.textContent = 'Once you set your last period start, this clock becomes interactive — drag it to explore any day of your cycle.';
+    ['Estrogen','Prog','LH','Test'].forEach(k => {
+      document.getElementById('bar' + k).style.width = '0%';
+      document.getElementById('val' + k).textContent = '—';
+    });
+    document.getElementById('clockEmotion').textContent = '—';
+    document.getElementById('clockBody').textContent = '—';
+    document.getElementById('clockWork').textContent = '—';
+    document.getElementById('clockWellness').textContent = '—';
+    return;
+  }
+
+  const phase = getPhase(day);
+  const pack = getDayPack(day);
+  const phaseContent = PHASE_CONTENT[phase];
+
+  card.className = 'clock-insight-card stagger-3 phase-' + phase;
+  dayNumEl.textContent = day;
+  phaseTagEl.className = 'clock-insight-phase-tag phase-' + phase;
+  phaseTagEl.textContent = phaseContent.name;
+  headlineEl.innerHTML = pack.headline;
+  blurbEl.textContent = describeHormones(day);
+
+  const e = hEstrogen(day), p = hProgesterone(day), l = hLh(day), t = hTestosterone(day);
+  const setBar = (id, val) => { document.getElementById(id).style.width = (val * 100).toFixed(0) + '%'; };
+  setBar('barEstrogen', e); setBar('barProg', p); setBar('barLH', l); setBar('barTest', t);
+  document.getElementById('valEstrogen').textContent = Math.round(e * 100);
+  document.getElementById('valProg').textContent = Math.round(p * 100);
+  document.getElementById('valLH').textContent = Math.round(l * 100);
+  document.getElementById('valTest').textContent = Math.round(t * 100);
+
+  const swap = (id, text) => {
+    const el = document.getElementById(id);
+    el.classList.remove('swap-flash');
+    void el.offsetWidth;
+    el.textContent = text;
+    el.classList.add('swap-flash');
+  };
+  swap('clockEmotion', pack.emotion);
+  swap('clockBody', pack.body);
+  swap('clockWork', pack.work);
+  swap('clockWellness', phaseContent.wellness);
 }
 
 // =================================================================
@@ -3237,6 +4139,93 @@ function renderNudges(slotId) {
 }
 
 // =================================================================
+// ONBOARDING SHEET
+// =================================================================
+function setupOnboardingChips() {
+  // Duration (single select, default to 4)
+  document.querySelectorAll('#onbDurationChips .onb-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#onbDurationChips .onb-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      onbDuration = parseInt(chip.dataset.duration, 10);
+    });
+  });
+  // Mood / Energy (single select)
+  ['onbMoodChips', 'onbEnergyChips'].forEach(id => {
+    document.querySelectorAll('#' + id + ' .onb-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const wasSelected = chip.classList.contains('selected');
+        document.querySelectorAll('#' + id + ' .onb-chip').forEach(c => c.classList.remove('selected'));
+        if (!wasSelected) chip.classList.add('selected');
+      });
+    });
+  });
+  // Symptoms (multi-select)
+  document.querySelectorAll('#onbSymptomChips .onb-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+  });
+}
+
+function openOnboarding(force) {
+  // Default the date input to ~7 days ago if empty
+  const dateEl = document.getElementById('onbDate');
+  if (!dateEl.value) {
+    const def = new Date(today);
+    def.setDate(today.getDate() - 7);
+    dateEl.value = dateKey(def);
+  }
+  // Constrain max date to today
+  dateEl.max = dateKey(today);
+
+  document.getElementById('onbBackdrop').classList.add('open');
+  document.getElementById('onbSheet').classList.add('open');
+  if (force) onboardingShown = true;
+}
+
+function closeOnboarding() {
+  document.getElementById('onbBackdrop').classList.remove('open');
+  document.getElementById('onbSheet').classList.remove('open');
+}
+
+function saveOnboarding() {
+  const dateEl = document.getElementById('onbDate');
+  if (!dateEl.value) {
+    showToast('Pick the date your last period started.');
+    return;
+  }
+  const startDate = dateFromKey(dateEl.value);
+  startDate.setHours(0, 0, 0, 0);
+
+  // Cap duration at 6 (chip "6+")
+  const dur = Math.max(1, Math.min(8, onbDuration || 4));
+  for (let i = 0; i < dur; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    if (d <= today) periodDays.add(dateKey(d));
+  }
+
+  // Pre-fill log state from chips (carried into Today's log screen).
+  const moodChip = document.querySelector('#onbMoodChips .onb-chip.selected');
+  const energyChip = document.querySelector('#onbEnergyChips .onb-chip.selected');
+  const onbMoodToLog = { happy: 'great', emotional: 'low', irritated: 'anxious', calm: 'good', anxious: 'anxious', motivated: 'great' };
+  const onbEnergyToLog = { low: 1, balanced: 3, high: 5 };
+  if (moodChip) logState.mood = onbMoodToLog[moodChip.dataset.mood] || 'good';
+  if (energyChip) logState.energy = onbEnergyToLog[energyChip.dataset.energy] || 3;
+  document.querySelectorAll('#onbSymptomChips .onb-chip.selected').forEach(c => {
+    logState.symptoms.add(c.dataset.symptom);
+  });
+
+  // Pivot the calendar view to the month of the period start so the user sees it.
+  viewMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  selectedDate = new Date(today);
+
+  closeOnboarding();
+  renderCalendar();
+  updatePhaseAndToday(today);
+  showToast('You are all set. Tap any date to explore.');
+}
+
+// =================================================================
 // SYNC
 // =================================================================
 
@@ -3299,6 +4288,11 @@ function goTo(n) {
   if (n === 1) {
     renderCalendar();
     updatePhaseAndToday(selectedDate);
+    // First-time users with no data get the onboarding sheet automatically
+    if (periodDays.size === 0 && !onboardingShown && selectedGoal !== 'pregnant') {
+      onboardingShown = true;
+      setTimeout(() => openOnboarding(false), 350);
+    }
   }
   if (n === '1p') {
     updatePregScreen();
@@ -3377,6 +4371,7 @@ function showToast(msg) {
 
 // Init
 setupLog();
+setupOnboardingChips();
 </script>
 </body>
 </html>
