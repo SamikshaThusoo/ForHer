@@ -319,6 +319,290 @@
   }
   .dots i.active { background: var(--hh-blue-deep); width: 18px; border-radius: 999px; }
 
+  /* ============ FOR HER ENGAGEMENT CARD ============ */
+  .fh-engage-wrap { padding: 0 14px 14px; }
+
+  .fh-engage {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    padding: 18px 18px 16px;
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(244, 212, 220, 0.55) 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBF3F5 55%, #F5F0F6 100%);
+    border: 1px solid rgba(91, 42, 74, 0.12);
+    box-shadow: 0 8px 22px rgba(91, 42, 74, 0.08), 0 1px 3px rgba(91, 42, 74, 0.04);
+    color: #3E1B33;
+    animation: fhEngageIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes fhEngageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Subtle shimmer drifting across every few seconds */
+  .fh-engage::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -60%;
+    width: 55%; height: 100%;
+    background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.42) 50%, transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    animation: fhEngageShimmer 8s ease-in-out 2.5s infinite;
+  }
+  @keyframes fhEngageShimmer {
+    0%, 80%, 100% { left: -60%; }
+    90%           { left: 130%; }
+  }
+
+  .fh-engage-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .fh-engage-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .fh-engage-mark {
+    width: 30px; height: 30px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--fh-plum-1) 0%, #C97A8E 100%);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(91, 42, 74, 0.22);
+  }
+
+  .fh-engage-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fh-plum-1);
+    letter-spacing: 0.2px;
+  }
+
+  /* Cycle-day mini progress pill */
+  .fh-engage-cycle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(91, 42, 74, 0.06);
+    border: 1px solid rgba(91, 42, 74, 0.1);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--fh-plum-1);
+    letter-spacing: 0.2px;
+  }
+  .fh-engage-cycle .fh-engage-cycle-bar {
+    width: 38px;
+    height: 4px;
+    background: rgba(91, 42, 74, 0.12);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .fh-engage-cycle .fh-engage-cycle-bar i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #C76B7A 0%, #8E5378 100%);
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .fh-engage-headline {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.32;
+    color: #3E1B33;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .fh-engage-headline em { font-style: italic; color: #8E5378; font-weight: 600; }
+
+  .fh-engage-sub {
+    font-size: 12.5px;
+    color: #6B5A65;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .fh-engage-section-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: #6B5A65;
+    margin: 6px 0 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .fh-engage-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 8px;
+  }
+
+  .fh-engage-chip {
+    padding: 7px 11px;
+    background: rgba(255,255,255,0.85);
+    border: 1.5px solid rgba(91, 42, 74, 0.12);
+    border-radius: 18px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #3E1B33;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.2s ease;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .fh-engage-chip:hover {
+    transform: translateY(-1px);
+    border-color: rgba(91, 42, 74, 0.25);
+  }
+  .fh-engage-chip:active { transform: scale(0.96); }
+  .fh-engage-chip.selected {
+    background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
+    color: #fff;
+    border-color: var(--fh-plum-1);
+    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.22);
+    animation: fhChipPulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes fhChipPulse {
+    0% { transform: scale(0.9); }
+    60% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  /* Energy: mini 3-segment bar (Low / Balanced / High) */
+  .fh-engage-energy {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin: 4px 0 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .fh-engage-energy-dot {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(91, 42, 74, 0.08);
+    border: 1px solid rgba(91, 42, 74, 0.1);
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.15s ease;
+  }
+  .fh-engage-energy-dot:hover { transform: translateY(-1px); }
+  .fh-engage-energy-dot.active {
+    background: linear-gradient(90deg, #E8A8B7 0%, #C9A24A 100%);
+    border-color: transparent;
+  }
+  .fh-engage-energy-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9.5px;
+    color: #8E5378;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    margin-bottom: 4px;
+  }
+
+  .fh-engage-saved {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
+    padding: 4px 10px;
+    background: rgba(47, 122, 122, 0.1);
+    color: #2F7A7A;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    opacity: 0;
+    transform: translateY(2px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    position: relative;
+    z-index: 1;
+  }
+  .fh-engage-saved.show { opacity: 1; transform: translateY(0); }
+  .fh-engage-saved::before {
+    content: "✓";
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #2F7A7A;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+  }
+
+  /* State 1 — first time CTA */
+  .fh-engage-cta {
+    width: 100%;
+    margin-top: 4px;
+    padding: 11px 14px;
+    background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(91, 42, 74, 0.22);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .fh-engage-cta:hover  { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(91, 42, 74, 0.26); }
+  .fh-engage-cta:active { transform: translateY(0) scale(0.98); }
+  .fh-engage-cta .arrow { transition: transform 0.2s ease; }
+  .fh-engage-cta:hover .arrow { transform: translateX(3px); }
+
+  .fh-engage-bullets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .fh-engage-bullet {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fh-plum-1);
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(91, 42, 74, 0.1);
+    padding: 4px 9px;
+    border-radius: 999px;
+  }
+
   /* ============ QUICK LINKS ============ */
   .section-title {
     margin: 8px 18px 10px;
@@ -621,6 +905,13 @@
 
   <div class="dots"><i></i><i class="active"></i><i></i></div>
 
+  <!-- FOR HER ENGAGEMENT CARD (state-driven) -->
+  <div class="fh-engage-wrap">
+    <div class="fh-engage" id="fhEngageCard" role="region" aria-label="For Her daily companion">
+      <!-- Markup is rendered by renderForHerEngageCard() based on stored state -->
+    </div>
+  </div>
+
   <!-- QUICK LINKS -->
   <div class="section-title">Quick links</div>
   <div class="ql-row">
@@ -764,6 +1055,237 @@
       });
     }
 
+  })();
+</script>
+
+<script>
+  /* ============================================================
+     FOR HER ENGAGEMENT CARD
+     Reads the cycle snapshot persisted by cycle.html and renders one of
+     two states inline on the homepage:
+       - State 1 (no data)     → discovery prompt + Start tracking CTA
+       - State 2 (has data)    → personalised daily companion with inline
+                                  mood + energy logging
+     Inline edits are written back to the same localStorage key so they
+     stay in sync next time the user opens cycle.html.
+     ============================================================ */
+  (function () {
+    const FH_KEY = 'forher.cycle.v1';
+    const CYCLE_LENGTH = 28;
+    const PERIOD_LENGTH = 5;
+    const card = document.getElementById('fhEngageCard');
+    if (!card) return;
+
+    const MOODS = [
+      { id: 'happy',     emoji: '🙂', label: 'Happy' },
+      { id: 'calm',      emoji: '😌', label: 'Calm' },
+      { id: 'emotional', emoji: '🥺', label: 'Emotional' },
+      { id: 'irritated', emoji: '😖', label: 'Irritated' },
+      { id: 'motivated', emoji: '⚡', label: 'Motivated' },
+      { id: 'anxious',   emoji: '😰', label: 'Anxious' }
+    ];
+
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(FH_KEY)) || null; }
+      catch (_) { return null; }
+    }
+
+    function saveCheckIn(patch) {
+      const s = loadState() || {};
+      const today = todayKey();
+      s.lastCheckIn = Object.assign(
+        { date: today, mood: null, energy: null, symptoms: [] },
+        s.lastCheckIn && s.lastCheckIn.date === today ? s.lastCheckIn : { date: today },
+        patch
+      );
+      s.updatedAt = new Date().toISOString();
+      try { localStorage.setItem(FH_KEY, JSON.stringify(s)); } catch (_) {}
+    }
+
+    function todayKey() {
+      const d = new Date(); d.setHours(0,0,0,0);
+      return d.toISOString().split('T')[0];
+    }
+
+    function daysBetween(aIso, bIso) {
+      const a = new Date(aIso + 'T00:00:00');
+      const b = new Date(bIso + 'T00:00:00');
+      return Math.floor((b - a) / 86400000);
+    }
+
+    function getCycleDay(state) {
+      if (!state || !state.periodDays || !state.periodDays.length) return null;
+      // Most recent period start = first day of the latest contiguous run.
+      const sorted = [...state.periodDays].sort();
+      const starts = [];
+      for (let i = 0; i < sorted.length; i++) {
+        if (i === 0 || daysBetween(sorted[i - 1], sorted[i]) > 1) starts.push(sorted[i]);
+      }
+      const today = todayKey();
+      let lastStart = null;
+      for (const s of starts) { if (s <= today) lastStart = s; else break; }
+      if (!lastStart) return null;
+      const diff = daysBetween(lastStart, today);
+      return ((diff % CYCLE_LENGTH) + CYCLE_LENGTH) % CYCLE_LENGTH + 1;
+    }
+
+    function getPhase(day) {
+      if (!day) return null;
+      if (day <= PERIOD_LENGTH) return 'menstrual';
+      if (day <= 13) return 'follicular';
+      if (day <= 16) return 'ovulation';
+      return 'luteal';
+    }
+
+    const PHASE_COPY = {
+      menstrual: {
+        name: 'Menstrual phase',
+        headline: "Your body is in <em>restoration</em> mode",
+        sub: 'Gentle movement, hydration, and warm meals will land softly today.'
+      },
+      follicular: {
+        name: 'Follicular phase',
+        headline: "Motivation and clarity may <em>rise</em>",
+        sub: 'A great window for new ideas and challenging projects.'
+      },
+      ovulation: {
+        name: 'Ovulation phase',
+        headline: "Energy may feel <em>elevated</em> today",
+        sub: 'Great day for presentations, collaboration, and conversations that matter.'
+      },
+      luteal: {
+        name: 'Luteal phase',
+        headline: "Slow down where you <em>can</em> today",
+        sub: 'Bloating, cravings, or fatigue may rise — small breaks help.'
+      }
+    };
+
+    function renderState1() {
+      card.innerHTML = `
+        <div class="fh-engage-head">
+          <div class="fh-engage-brand">
+            <div class="fh-engage-mark">❀</div>
+            <div class="fh-engage-title">For Her</div>
+          </div>
+        </div>
+        <div class="fh-engage-headline">Understand your cycle &amp; <em>hormonal rhythm</em></div>
+        <p class="fh-engage-sub">A premium, gynae-led daily companion for cycle, fertility, and pre-conception care.</p>
+        <div class="fh-engage-bullets">
+          <span class="fh-engage-bullet">Period tracking</span>
+          <span class="fh-engage-bullet">PCOS risk</span>
+          <span class="fh-engage-bullet">Daily insights</span>
+        </div>
+        <button class="fh-engage-cta" type="button" onclick="window.location.href='cycle.html'">
+          Start tracking <span class="arrow">→</span>
+        </button>
+      `;
+    }
+
+    function renderState2(state) {
+      const day = getCycleDay(state);
+      const phase = getPhase(day);
+      const copy = PHASE_COPY[phase] || PHASE_COPY.follicular;
+      const pct = day ? Math.min(100, (day / CYCLE_LENGTH) * 100) : 0;
+      const todays = state.lastCheckIn && state.lastCheckIn.date === todayKey() ? state.lastCheckIn : null;
+      const selectedMood = todays ? todays.mood : null;
+      const selectedEnergy = todays ? todays.energy : null;
+
+      const moodChips = MOODS.map(m => `
+        <button class="fh-engage-chip mood-chip ${selectedMood === m.id ? 'selected' : ''}"
+                data-mood="${m.id}" type="button" aria-label="${m.label}">
+          <span>${m.emoji}</span>${m.label}
+        </button>
+      `).join('');
+
+      const energyDots = [1,2,3,4,5,6,7,8,9,10].map(lvl => `
+        <div class="fh-engage-energy-dot ${selectedEnergy && lvl <= selectedEnergy ? 'active' : ''}" data-level="${lvl}"></div>
+      `).join('');
+
+      card.innerHTML = `
+        <div class="fh-engage-head">
+          <div class="fh-engage-brand">
+            <div class="fh-engage-mark">❀</div>
+            <div class="fh-engage-title">For Her</div>
+          </div>
+          <div class="fh-engage-cycle">
+            Day ${day}/${CYCLE_LENGTH}
+            <span class="fh-engage-cycle-bar"><i style="width:${pct.toFixed(0)}%"></i></span>
+          </div>
+        </div>
+        <div class="fh-engage-headline">${copy.headline}</div>
+        <p class="fh-engage-sub">${copy.sub}</p>
+
+        <div class="fh-engage-section-label">Mood</div>
+        <div class="fh-engage-chips" id="fhEngageMoodChips">${moodChips}</div>
+
+        <div class="fh-engage-section-label">Energy</div>
+        <div class="fh-engage-energy" id="fhEngageEnergyBar">${energyDots}</div>
+        <div class="fh-engage-energy-labels"><span>Low</span><span>Balanced</span><span>High</span></div>
+
+        <div class="fh-engage-saved" id="fhEngageSaved">Saved</div>
+      `;
+
+      // Mood chip handlers
+      card.querySelectorAll('.mood-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const moodId = chip.dataset.mood;
+          const wasSelected = chip.classList.contains('selected');
+          card.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
+          if (!wasSelected) chip.classList.add('selected');
+          saveCheckIn({ mood: wasSelected ? null : moodId });
+          flashSaved();
+        });
+      });
+
+      // Energy bar handlers
+      const dots = card.querySelectorAll('.fh-engage-energy-dot');
+      dots.forEach(dot => {
+        dot.addEventListener('click', () => {
+          const level = parseInt(dot.dataset.level, 10);
+          const current = (loadState() && loadState().lastCheckIn && loadState().lastCheckIn.date === todayKey())
+            ? (loadState().lastCheckIn.energy || null) : null;
+          const newLevel = current === level ? null : level;
+          dots.forEach(d => {
+            const dl = parseInt(d.dataset.level, 10);
+            d.classList.toggle('active', newLevel != null && dl <= newLevel);
+          });
+          saveCheckIn({ energy: newLevel });
+          flashSaved();
+        });
+      });
+    }
+
+    let savedTimer = null;
+    function flashSaved() {
+      const el = card.querySelector('#fhEngageSaved');
+      if (!el) return;
+      el.classList.add('show');
+      clearTimeout(savedTimer);
+      savedTimer = setTimeout(() => el.classList.remove('show'), 1600);
+    }
+
+    function render() {
+      const state = loadState();
+      if (state && state.hasData) renderState2(state);
+      else renderState1();
+      // Mirror state into the existing Quick Links tile so its sub-copy stays
+      // current without changing the discovery entry point.
+      const tile = document.getElementById('fhTile');
+      const tileSub = tile && tile.querySelector('[data-fh-tile-sub]');
+      if (tile && tileSub && state && state.hasData) {
+        const day = getCycleDay(state);
+        const phase = getPhase(day);
+        const copy = PHASE_COPY[phase];
+        if (day && copy) {
+          tile.dataset.state = 'returning';
+          tileSub.textContent = `Day ${day} • ${copy.name}`;
+        }
+      }
+    }
+
+    render();
+    // Re-render if storage changes from another tab (e.g., cycle.html in another tab).
+    window.addEventListener('storage', (e) => { if (e.key === FH_KEY) render(); });
   })();
 </script>
 </body>

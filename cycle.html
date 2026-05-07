@@ -4812,6 +4812,8 @@ function flashCheckinSaved() {
   el.classList.add('show');
   clearTimeout(dailyCheckinSavedTimer);
   dailyCheckinSavedTimer = setTimeout(() => el.classList.remove('show'), 1800);
+  // Mirror the latest check-in state to localStorage for the homepage card.
+  persistCycleState();
 }
 
 // =================================================================
@@ -4875,6 +4877,51 @@ function saveOnboarding() {
   updatePhaseAndToday(today);
   // Reveal the lightweight daily check-in once cycle data exists.
   revealDailyCheckIn();
+  persistCycleState();
+}
+
+// =================================================================
+// LOCAL PERSISTENCE
+// Writes a compact snapshot of cycle state so the For Her homepage card
+// (index.html) can render personalised content for returning users.
+// =================================================================
+const FH_STORAGE_KEY = 'forher.cycle.v1';
+
+function persistCycleState() {
+  try {
+    const sortedDays = [...periodDays].sort();
+    const snapshot = {
+      hasData: periodDays.size > 0,
+      periodDays: sortedDays,
+      mostRecentPeriodStart: sortedDays[0] || null,
+      cycleLength: CYCLE_LENGTH,
+      periodLength: PERIOD_LENGTH,
+      goal: selectedGoal || 'cycle',
+      pregWeek: selectedGoal === 'pregnant' ? pregWeek : null,
+      lastCheckIn: {
+        date: dateKey(today),
+        mood: dailyCheckIn.mood,
+        energy: dailyCheckIn.energy,
+        symptoms: [...dailyCheckIn.symptoms]
+      },
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(FH_STORAGE_KEY, JSON.stringify(snapshot));
+  } catch (_) { /* localStorage may be unavailable in private mode */ }
+}
+
+function hydrateCycleState() {
+  try {
+    const raw = localStorage.getItem(FH_STORAGE_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (Array.isArray(s.periodDays)) s.periodDays.forEach(k => periodDays.add(k));
+    if (s.lastCheckIn && s.lastCheckIn.date === dateKey(today)) {
+      if (s.lastCheckIn.mood) dailyCheckIn.mood = s.lastCheckIn.mood;
+      if (s.lastCheckIn.energy) dailyCheckIn.energy = s.lastCheckIn.energy;
+      (s.lastCheckIn.symptoms || []).forEach(sym => dailyCheckIn.symptoms.add(sym));
+    }
+  } catch (_) {}
 }
 
 // =================================================================
@@ -5017,6 +5064,7 @@ function showToast(msg) {
 }
 
 // Init
+hydrateCycleState();
 setupOnboardingChips();
 </script>
 </body>
