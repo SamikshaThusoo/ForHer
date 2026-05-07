@@ -457,53 +457,7 @@
     cursor: pointer;
   }
 
-  /* ============ FEEDBACK POPUP ============ */
-  .feedback-popup {
-    position: fixed;
-    bottom: 86px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 24px);
-    max-width: 396px;
-    background: #FFFFFF;
-    border-radius: 999px;
-    padding: 10px 12px 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
-    z-index: 55;
-    animation: fbIn 350ms ease-out 600ms backwards;
-  }
-  .feedback-popup.is-hidden { display: none; }
-  @keyframes fbIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-  }
-  .fb-text {
-    font-size: 12.5px;
-    font-weight: 600;
-    flex: 1;
-  }
-  .fb-text .thumb { margin-right: 6px; }
-  .stars {
-    display: flex;
-    gap: 3px;
-    color: #C7CCD4;
-    font-size: 14px;
-  }
-  .fb-close {
-    width: 22px; height: 22px;
-    border: none;
-    background: transparent;
-    color: var(--ink-soft);
-    font-size: 16px;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .feedback-popup,
     .ql.ql-fh::after { animation: none; }
     .ql.ql-fh:hover { transform: none; }
   }
@@ -695,13 +649,6 @@
 
 </div>
 
-<!-- FEEDBACK POPUP (above bottom nav) -->
-<div class="feedback-popup" id="feedbackPopup">
-  <span class="fb-text"><span class="thumb">👍</span>Rate your Smart Report</span>
-  <span class="stars">☆ ☆ ☆ ☆ ☆</span>
-  <button class="fb-close" id="fbClose" aria-label="Dismiss">×</button>
-</div>
-
 <!-- BOTTOM NAV (pill + orange CTA) -->
 <div class="bottom-bar">
   <nav class="nav-pill" aria-label="Primary navigation">
@@ -782,8 +729,6 @@
     const sheet    = document.getElementById('fhSheet');
     const backdrop = document.getElementById('sheetBackdrop');
     const closeBtn = document.getElementById('sheetClose');
-    const popup    = document.getElementById('feedbackPopup');
-    const fbClose  = document.getElementById('fbClose');
 
     function closeSheet() {
       sheet.classList.remove('open');
@@ -819,9 +764,6 @@
       });
     }
 
-    if (fbClose && popup) {
-      fbClose.addEventListener('click', () => popup.classList.add('is-hidden'));
-    }
   })();
 </script>
 </body>

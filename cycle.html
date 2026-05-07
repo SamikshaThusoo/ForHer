@@ -249,7 +249,6 @@
   .goal-card[data-goal="cycle"]::after { background: radial-gradient(circle, rgba(232, 168, 183, 0.5) 0%, transparent 70%); }
   .goal-card[data-goal="ttc"]::after { background: radial-gradient(circle, rgba(201, 162, 74, 0.45) 0%, transparent 70%); }
   .goal-card[data-goal="pregnant"]::after { background: radial-gradient(circle, rgba(143, 196, 196, 0.45) 0%, transparent 70%); }
-  .goal-card[data-goal="perimenopause"]::after { background: radial-gradient(circle, rgba(142, 83, 120, 0.4) 0%, transparent 70%); }
   .goal-card[data-goal="explore"]::after { background: radial-gradient(circle, rgba(201, 166, 188, 0.4) 0%, transparent 70%); }
 
   .goal-icon {
@@ -269,7 +268,6 @@
   .goal-card[data-goal="cycle"] .goal-icon { background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%); }
   .goal-card[data-goal="ttc"] .goal-icon { background: linear-gradient(135deg, var(--gold-soft) 0%, var(--gold) 100%); }
   .goal-card[data-goal="pregnant"] .goal-icon { background: linear-gradient(135deg, var(--teal-soft) 0%, var(--teal) 100%); }
-  .goal-card[data-goal="perimenopause"] .goal-icon { background: linear-gradient(135deg, var(--plum-soft) 0%, var(--plum) 100%); }
   .goal-card[data-goal="explore"] .goal-icon { background: linear-gradient(135deg, #C9A6BC 0%, #8E5378 100%); }
 
   .goal-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
@@ -2136,11 +2134,24 @@
 
   #ringSvg .clock-handle-grip {
     cursor: grab;
-    transition: r 0.18s ease, filter 0.18s ease;
+    transition: r 0.18s ease, filter 0.18s ease, stroke 0.4s ease;
   }
 
   #ringSvg .clock-handle-grip:active { cursor: grabbing; }
   .ring-svg-wrap.dragging #ringSvg .clock-handle-grip { filter: drop-shadow(0 4px 10px rgba(91, 42, 74, 0.35)); }
+
+  #ringSvg #clockHandleGroup,
+  #ringSvg #clockPointerGroup,
+  #ringSvg #clockHighlight {
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-box: fill-box;
+  }
+
+  .ring-svg-wrap.dragging #ringSvg #clockHandleGroup,
+  .ring-svg-wrap.dragging #ringSvg #clockPointerGroup,
+  .ring-svg-wrap.dragging #ringSvg #clockHighlight {
+    transition: transform 0.05s linear;
+  }
 
   .clock-hint {
     text-align: center;
@@ -2351,6 +2362,303 @@
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
+
+  /* ============================================
+     DAILY CHECK-IN CARD (screen 1, after onboarding)
+     ============================================ */
+  .daily-checkin-wrap { padding: 0 20px 14px; }
+
+  .daily-checkin-card {
+    background: white;
+    border-radius: 22px;
+    padding: 18px 20px 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.6);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .daily-checkin-card::before {
+    content: "";
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 168, 183, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .daily-checkin-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .daily-checkin-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: var(--plum-deep);
+    line-height: 1.25;
+    letter-spacing: -0.1px;
+  }
+  .daily-checkin-title em { font-style: italic; color: var(--plum-soft); }
+
+  .daily-checkin-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-bg);
+    padding: 4px 9px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .daily-checkin-sub {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .daily-checkin-section { margin-top: 12px; position: relative; z-index: 1; }
+  .daily-checkin-section:first-of-type { margin-top: 0; }
+
+  .daily-checkin-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .daily-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .daily-chip {
+    padding: 7px 12px;
+    background: var(--cream);
+    border: 1.5px solid var(--line);
+    border-radius: 18px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--plum-deep);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .daily-chip:hover {
+    border-color: var(--plum-soft);
+    background: var(--rose-bg);
+    transform: translateY(-1px);
+  }
+
+  .daily-chip.selected {
+    background: linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
+    color: white;
+    border-color: var(--plum);
+    box-shadow: 0 3px 10px rgba(91, 42, 74, 0.18);
+  }
+
+  .daily-chip.energy-chip.selected {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--rose-deep) 100%);
+    border-color: var(--gold);
+  }
+
+  .daily-chip.symptom-chip.selected {
+    background: linear-gradient(135deg, var(--phase-menstrual) 0%, #A84458 100%);
+    border-color: var(--phase-menstrual);
+  }
+
+  .daily-checkin-saved {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, var(--teal-bg) 0%, var(--rose-bg) 100%);
+    border-radius: 12px;
+    font-size: 11.5px;
+    color: var(--teal);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .daily-checkin-saved.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .daily-checkin-saved::before {
+    content: "✓";
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ============================================
+     PREGNANCY WELLNESS CARDS
+     ============================================ */
+  .preg-wellness-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .preg-wellness-card {
+    background: white;
+    border-radius: 18px;
+    padding: 14px 14px 13px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(234, 223, 227, 0.6);
+    transition: all 0.25s ease;
+  }
+
+  .preg-wellness-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .preg-wellness-icon {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .preg-wellness-icon.emotion { background: var(--rose-bg); color: var(--plum); }
+  .preg-wellness-icon.hydration { background: var(--teal-bg); color: var(--teal); }
+  .preg-wellness-icon.movement { background: var(--gold-bg); color: var(--gold); }
+  .preg-wellness-icon.nutrition { background: var(--lavender-bg); color: var(--plum-soft); }
+
+  .preg-wellness-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+  }
+
+  .preg-wellness-text {
+    font-size: 12px;
+    color: var(--plum-deep);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  /* ============================================
+     TTC PRE-CONCEPTION INTRO CARD
+     ============================================ */
+  .ttc-intro-card {
+    background: linear-gradient(135deg, #5B2A4A 0%, #8E5378 55%, #C97A8E 100%);
+    border-radius: 22px;
+    padding: 22px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 14px;
+    box-shadow: 0 12px 30px rgba(91, 42, 74, 0.25);
+  }
+
+  .ttc-intro-card::before {
+    content: "";
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .ttc-intro-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ttc-intro-tag::before { content: "❀"; font-size: 11px; }
+
+  .ttc-intro-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1.22;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ttc-intro-title em { font-style: italic; opacity: 0.9; }
+
+  .ttc-intro-sub {
+    font-size: 13px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ttc-intro-bullets {
+    display: grid;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ttc-intro-bullet {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.45;
+  }
+
+  .ttc-intro-bullet::before {
+    content: "✦";
+    color: var(--gold-soft);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
@@ -2409,16 +2717,7 @@
         <div class="goal-radio"></div>
       </div>
 
-      <div class="goal-card stagger-4" data-goal="perimenopause" onclick="selectGoal('perimenopause')">
-        <div class="goal-icon">◐</div>
-        <div class="goal-body">
-          <div class="goal-title">Navigating <em>perimenopause</em></div>
-          <div class="goal-desc">Understand changing cycles, symptoms, and what helps.</div>
-        </div>
-        <div class="goal-radio"></div>
-      </div>
-
-      <div class="goal-card stagger-5" data-goal="explore" onclick="selectGoal('explore')">
+      <div class="goal-card stagger-4" data-goal="explore" onclick="selectGoal('explore')">
         <div class="goal-icon">❋</div>
         <div class="goal-body">
           <div class="goal-title">Just <em>exploring</em></div>
@@ -2453,6 +2752,21 @@
         <span class="sync-btn-sub">·</span>
         <span class="sync-btn-sub">iOS / Android</span>
       </button>
+    </div>
+
+    <!-- TTC Pre-Conception intro (visible only for TTC goal) -->
+    <div class="hero" id="ttcIntroWrap" style="display: none; padding-top: 0;">
+      <div class="ttc-intro-card">
+        <span class="ttc-intro-tag">Tulip Pre-Conception Program</span>
+        <h2 class="ttc-intro-title">A gentle, expert-guided <em>start</em> to your conception journey</h2>
+        <p class="ttc-intro-sub">Time your fertile window with confidence. Backed by gynae-led care, nutrition support, and wellness check-ins.</p>
+        <div class="ttc-intro-bullets">
+          <div class="ttc-intro-bullet">Personalised ovulation tracking</div>
+          <div class="ttc-intro-bullet">Pre-conception nutrition and supplement plan</div>
+          <div class="ttc-intro-bullet">Hormone health and stress check-ins</div>
+          <div class="ttc-intro-bullet">Direct access to fertility specialists</div>
+        </div>
+      </div>
     </div>
 
     <div class="calendar-wrap stagger-2">
@@ -2529,6 +2843,52 @@
       </div>
     </div>
 
+    <!-- Lightweight daily check-in (revealed once cycle data exists) -->
+    <div class="daily-checkin-wrap stagger-4" id="dailyCheckinWrap" style="display: none;">
+      <div class="daily-checkin-card">
+        <div class="daily-checkin-head">
+          <div class="daily-checkin-title">A quick <em>check-in</em></div>
+          <span class="daily-checkin-tag">Today</span>
+        </div>
+        <p class="daily-checkin-sub">Optional — but the more you log, the more we can tailor each day. No streaks, no pressure.</p>
+
+        <div class="daily-checkin-section">
+          <div class="daily-checkin-section-label">Mood</div>
+          <div class="daily-chips" id="dailyMoodChips">
+            <div class="daily-chip" data-mood="happy">Happy</div>
+            <div class="daily-chip" data-mood="calm">Calm</div>
+            <div class="daily-chip" data-mood="emotional">Emotional</div>
+            <div class="daily-chip" data-mood="irritated">Irritated</div>
+            <div class="daily-chip" data-mood="motivated">Motivated</div>
+            <div class="daily-chip" data-mood="anxious">Anxious</div>
+          </div>
+        </div>
+
+        <div class="daily-checkin-section">
+          <div class="daily-checkin-section-label">Energy</div>
+          <div class="daily-chips" id="dailyEnergyChips">
+            <div class="daily-chip energy-chip" data-energy="low">Low</div>
+            <div class="daily-chip energy-chip" data-energy="balanced">Balanced</div>
+            <div class="daily-chip energy-chip" data-energy="high">High</div>
+          </div>
+        </div>
+
+        <div class="daily-checkin-section">
+          <div class="daily-checkin-section-label">Symptoms</div>
+          <div class="daily-chips" id="dailySymptomChips">
+            <div class="daily-chip symptom-chip" data-symptom="cramps">Cramps</div>
+            <div class="daily-chip symptom-chip" data-symptom="acne">Acne</div>
+            <div class="daily-chip symptom-chip" data-symptom="bloating">Bloating</div>
+            <div class="daily-chip symptom-chip" data-symptom="headache">Headache</div>
+            <div class="daily-chip symptom-chip" data-symptom="fatigue">Fatigue</div>
+            <div class="daily-chip symptom-chip" data-symptom="cravings">Cravings</div>
+          </div>
+        </div>
+
+        <div class="daily-checkin-saved" id="dailyCheckinSaved">Saved for today</div>
+      </div>
+    </div>
+
     <div class="today-wrap stagger-4" id="todayWrap" style="display: none;">
       <div class="section-label" id="todayLabel">For today</div>
       <div class="today-card">
@@ -2571,13 +2931,13 @@
   </div>
 
   <!-- ====================================================
-       SCREEN 1P: PREGNANCY (parallel to screen 1 for pregnant goal)
+       SCREEN 1P: PREGNANCY (Tulip Pregnancy Plan — no cycle tracking)
        ==================================================== -->
   <div class="screen" id="screen1p">
     <div class="hero">
-      <span class="eyebrow" style="background: var(--teal-bg); color: var(--teal);">Pregnancy tracker</span>
-      <h1>Your <span class="italic">pregnancy week</span></h1>
-      <p class="lead">Track your week, your baby's growth, and what to expect.</p>
+      <span class="eyebrow" style="background: var(--teal-bg); color: var(--teal);">Tulip Pregnancy Plan</span>
+      <h1>Care that grows <span class="italic">with you</span></h1>
+      <p class="lead">Track your week, your baby's growth, and the gentle support your body needs.</p>
     </div>
 
     <div class="week-picker-wrap stagger-1">
@@ -2621,6 +2981,30 @@
       <div class="preg-insight-card stagger-4">
         <h4 id="pregInsightTitle">What's happening <em>this week</em></h4>
         <p id="pregInsightBody">—</p>
+      </div>
+
+      <div class="section-label" style="padding-left: 4px;">Daily wellness</div>
+      <div class="preg-wellness-grid stagger-4">
+        <div class="preg-wellness-card">
+          <div class="preg-wellness-icon emotion">❤</div>
+          <div class="preg-wellness-label">Emotional</div>
+          <div class="preg-wellness-text" id="pregWellEmotion">—</div>
+        </div>
+        <div class="preg-wellness-card">
+          <div class="preg-wellness-icon hydration">◐</div>
+          <div class="preg-wellness-label">Hydration</div>
+          <div class="preg-wellness-text" id="pregWellHydration">—</div>
+        </div>
+        <div class="preg-wellness-card">
+          <div class="preg-wellness-icon movement">❋</div>
+          <div class="preg-wellness-label">Movement</div>
+          <div class="preg-wellness-text" id="pregWellMovement">—</div>
+        </div>
+        <div class="preg-wellness-card">
+          <div class="preg-wellness-icon nutrition">✦</div>
+          <div class="preg-wellness-label">Nutrition</div>
+          <div class="preg-wellness-text" id="pregWellNutrition">—</div>
+        </div>
       </div>
 
       <div class="preg-checklist stagger-5">
@@ -2940,40 +3324,6 @@
     </div>
   </div>
 
-  <div class="onb-q-block">
-    <div class="onb-q-label">How have you been feeling lately? <span class="opt-tag">optional</span></div>
-    <div style="font-size: 11px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px;">Mood</div>
-    <div class="onb-chip-row" id="onbMoodChips">
-      <div class="onb-chip onb-chip-mini" data-mood="happy">Happy</div>
-      <div class="onb-chip onb-chip-mini" data-mood="emotional">Emotional</div>
-      <div class="onb-chip onb-chip-mini" data-mood="irritated">Irritated</div>
-      <div class="onb-chip onb-chip-mini" data-mood="calm">Calm</div>
-      <div class="onb-chip onb-chip-mini" data-mood="anxious">Anxious</div>
-      <div class="onb-chip onb-chip-mini" data-mood="motivated">Motivated</div>
-    </div>
-  </div>
-
-  <div class="onb-q-block">
-    <div style="font-size: 11px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px;">Energy</div>
-    <div class="onb-chip-row" id="onbEnergyChips">
-      <div class="onb-chip onb-chip-mini" data-energy="low">Low</div>
-      <div class="onb-chip onb-chip-mini" data-energy="balanced">Balanced</div>
-      <div class="onb-chip onb-chip-mini" data-energy="high">High</div>
-    </div>
-  </div>
-
-  <div class="onb-q-block">
-    <div style="font-size: 11px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px;">Symptoms</div>
-    <div class="onb-chip-row" id="onbSymptomChips">
-      <div class="onb-chip onb-chip-mini" data-symptom="cramps">Cramps</div>
-      <div class="onb-chip onb-chip-mini" data-symptom="acne">Acne</div>
-      <div class="onb-chip onb-chip-mini" data-symptom="bloating">Bloating</div>
-      <div class="onb-chip onb-chip-mini" data-symptom="headache">Headache</div>
-      <div class="onb-chip onb-chip-mini" data-symptom="cravings">Cravings</div>
-      <div class="onb-chip onb-chip-mini" data-symptom="fatigue">Fatigue</div>
-    </div>
-  </div>
-
   <div class="onb-cta-row">
     <button class="onb-skip" onclick="closeOnboarding()">Later</button>
     <button class="onb-cta" id="onbCta" onclick="saveOnboarding()">Start tracking <span class="arrow">→</span></button>
@@ -3005,6 +3355,13 @@
       <div class="today-row-content">
         <div class="today-row-label">Body</div>
         <div class="today-row-text" id="daySheetBody">—</div>
+      </div>
+    </div>
+    <div class="today-row" id="daySheetPhysicalRow">
+      <div class="today-row-icon body" style="background: var(--lavender-bg); color: var(--plum-soft);">✦</div>
+      <div class="today-row-content">
+        <div class="today-row-label">Physical signals</div>
+        <div class="today-row-text" id="daySheetPhysical">—</div>
       </div>
     </div>
     <div class="today-row">
@@ -3160,47 +3517,47 @@ function isPredictedPeriodDay(date) {
 const PHASE_CONTENT = {
   menstrual: {
     name: 'Menstrual', italic: 'phase',
-    blurb: 'Your body is shedding the uterine lining. Energy is naturally lower — rest is productive.',
+    blurb: 'Your body is shedding the uterine lining. Cramps and lower energy are real — heat, hydration, and rest help.',
     headline: "You're in your <em>menstrual</em> phase",
     hormone: 'Estrogen and progesterone are at their lowest — gentle pace, deep rest.',
     work: 'Take a lighter approach. Prioritise reflection, internal work, and quiet focus.',
     emotion: 'Be kind to yourself. This is a natural reset — let things settle.',
     body: 'Warm meals, gentle stretches, iron-rich foods. Skip intense workouts if you feel low.',
-    wellness: 'Slow movement and a warm shower will land softly today.',
-    insight: 'Both estrogen and progesterone are at their lowest, which is why energy and mood may dip. This is not weakness — it is a designed pause. Honour it.'
+    wellness: 'Slow movement, a warm shower, and an earlier bedtime will land softly today.',
+    insight: 'Both estrogen and progesterone are at their lowest, which is why energy and mood may dip. Cramps, fatigue, and disturbed sleep are physical realities — not weakness. Honour the pause.'
   },
   follicular: {
     name: 'Follicular', italic: 'phase',
-    blurb: 'Estrogen is rising. Energy returns, ideas flow, and your mood lifts naturally.',
+    blurb: 'Estrogen is rising. Skin clears, digestion sharpens, and energy returns.',
     headline: "You're in your <em>follicular</em> phase",
     hormone: 'Estrogen is climbing — creativity and curiosity peak in this phase.',
     work: 'A great time to start new projects, brainstorm, or take on something challenging.',
     emotion: 'Open, curious, optimistic. Channel this momentum into something meaningful.',
-    body: 'Strength training, cardio, and trying something new will feel especially good.',
+    body: 'Strength training, cardio, and trying something new will feel especially good. Bloating is low and sleep deepens.',
     wellness: 'Add five minutes of fresh air — your body will use it well right now.',
-    insight: 'Rising estrogen sharpens your focus, lifts your mood, and improves verbal fluency. Use this window — it is your launch pad for anything new.'
+    insight: 'Rising estrogen sharpens focus, lifts mood, and improves skin and digestion. Use this window — it is your launch pad for anything new.'
   },
   ovulation: {
     name: 'Ovulation', italic: 'phase',
-    blurb: 'Estrogen peaks and LH surges. You are at your most social and confident.',
+    blurb: 'Estrogen peaks and LH surges. Skin glows and energy is at its highest.',
     headline: "You're in your <em>ovulation</em> phase",
     hormone: 'Estrogen high, LH surging — communication and confidence peak.',
     work: 'Great day to lead meetings, pitch ideas, negotiate, or have important conversations.',
     emotion: 'Confident, magnetic, expressive. Lean into connection — say yes to plans.',
-    body: 'High-intensity workouts feel effortless. Hydrate well and fuel with protein.',
+    body: 'High-intensity workouts feel effortless. Slight breast tenderness and a small temperature lift are normal.',
     wellness: 'Hydrate deeply — your body is moving fast and burning bright.',
-    insight: 'The LH surge triggers ovulation. Estrogen at peak makes you more articulate, perceptive, and energised. This is the social and creative high point of your cycle.'
+    insight: 'The LH surge triggers ovulation. Estrogen at peak makes you more articulate, perceptive, and energised. Skin is at its clearest. This is the social and physical high point of your cycle.'
   },
   luteal: {
     name: 'Luteal', italic: 'phase',
-    blurb: 'Progesterone rises. Focus deepens, but sensitivity to stress can rise too.',
+    blurb: 'Progesterone rises. Bloating, water retention, cravings, and mood shifts can build — gentle care goes far.',
     headline: "You're in your <em>luteal</em> phase",
-    hormone: 'Progesterone is rising — focus deepens, but emotions may feel closer to the surface.',
+    hormone: 'Progesterone is rising — focus deepens, but bloating, breast tenderness, and acne may build.',
     work: 'Focus on deep work, organising, finishing tasks, and closing open loops.',
     emotion: 'Stay in tune with your emotions today. Boundaries help — say no when needed.',
-    body: 'Magnesium-rich foods, walks over runs, and earlier sleep will support you.',
+    body: 'Magnesium-rich foods, walks over runs, lighter meals, and earlier sleep will support you. Reduce salt to ease bloating.',
     wellness: 'Take small breaks today. Hydration and an earlier wind-down go further than caffeine.',
-    insight: 'Progesterone dominates this phase — it is calming but also sensitises you to stress. The pre-period mood shifts are real and biological. Soft routines help.'
+    insight: 'Progesterone dominates this phase — it is calming but also slows digestion (hence bloating), causes water retention, and can trigger acne and headaches. Pre-period mood shifts are biological. Soft routines, hydration, and magnesium help.'
   }
 };
 
@@ -3210,41 +3567,41 @@ const PHASE_CONTENT = {
 // =================================================================
 
 const DAY_PACK = {
-  // Menstrual — days 1-5
-  1: { headline: "Day one. <em>Begin again.</em>", emotion: "Tender and inward. Cancel what isn't essential.", body: "Cramps are real — heat, magnesium, and slow stretches help.", work: "Reschedule heavy meetings if you can. Notes-taking and quiet review fit best.", wellness: "A long shower, warm food, and an earlier bedtime today." },
-  2: { headline: "Quiet reset day", emotion: "Low energy is a signal, not a flaw. Move at half-speed.", body: "Iron-rich food and warmth. Skip HIIT — try a gentle walk.", work: "Solo focus work over collaboration. Defer decisions if you can.", wellness: "Two minutes of breathwork can soften everything else." },
-  3: { headline: "Soft focus settling in", emotion: "Slightly more steady. Reflection comes easily today.", body: "Hydration and a short walk will lift the heaviness.", work: "Best for review, journaling, planning the week ahead.", wellness: "Limit screens an hour before bed for cleaner sleep." },
-  4: { headline: "Energy is starting to return", emotion: "Calmer mood. You may want connection again.", body: "Light strength or yin yoga will feel good.", work: "Re-engage with planning and small wins — not big launches.", wellness: "Get sunlight in the first hour of waking." },
-  5: { headline: "Edge of a fresh phase", emotion: "Optimism is creeping back in.", body: "Energy is climbing — you can move a little more today.", work: "Good day to draft, sketch, organise priorities for the week.", wellness: "Add protein to breakfast — it stabilises the rebuild." },
+  // ============ Menstrual — days 1-5 ============
+  1: { headline: "Day one. <em>Begin again.</em>", emotion: "Tender and inward. Cancel what isn't essential.", body: "Cramps and lower-back tension peak today. Heat, magnesium, and slow stretches help.", physical: "Cramps · low energy · bloating may ease as flow starts.", work: "Reschedule heavy meetings if you can. Notes-taking and quiet review fit best.", wellness: "A long warm shower, iron-rich food, and an earlier bedtime tonight." },
+  2: { headline: "Quiet reset day", emotion: "Low energy is a signal, not a flaw. Move at half-speed.", body: "Cramps soften but fatigue is real. Skip HIIT — try a gentle walk and pelvic stretches.", physical: "Fatigue · cramps easing · skin still calm.", work: "Solo focus work over collaboration. Defer decisions if you can.", wellness: "Two minutes of breathwork can soften everything else." },
+  3: { headline: "Soft focus settling in", emotion: "Slightly more steady. Reflection comes easily today.", body: "Heaviness lifts. Hydrate well — water flushes lingering bloat.", physical: "Energy returning · clearer skin · digestion settling.", work: "Best for review, journaling, planning the week ahead.", wellness: "Limit screens an hour before bed for cleaner sleep tonight." },
+  4: { headline: "Energy is starting to return", emotion: "Calmer mood. You may want connection again.", body: "Light strength or yin yoga will feel good. Joints feel less stiff.", physical: "Mild fatigue · digestion improving · sleep deepens.", work: "Re-engage with planning and small wins — not big launches.", wellness: "Get sunlight in the first hour of waking — it resets your rhythm." },
+  5: { headline: "Edge of a fresh phase", emotion: "Optimism is creeping back in.", body: "Energy is climbing — you can move a little more today.", physical: "Skin clearing · cramps gone · steady digestion.", work: "Good day to draft, sketch, organise priorities for the week.", wellness: "Add protein to breakfast — it stabilises the rebuild." },
 
-  // Follicular — days 6-13
-  6: { headline: "Fresh chapter, <em>fresh ideas</em>", emotion: "Open, curious, optimistic.", body: "Strength training feels strong today.", work: "Great for new projects and creative thinking.", wellness: "Try one new thing this week — your brain wants novelty." },
-  7: { headline: "Momentum is building", emotion: "Sociable and motivated.", body: "Cardio and dance will land especially well.", work: "Brainstorm, ideate, draft anything new.", wellness: "Add leafy greens — your liver is working hard right now." },
-  8: { headline: "Clear-headed and capable", emotion: "Quietly confident. Ideas connect easily.", body: "Energy is climbing — push your workouts a little.", work: "Tackle the project you've been avoiding.", wellness: "Consistent sleep matters — protect your routine." },
-  9: { headline: "Rising estrogen, rising you", emotion: "Sharper focus and a brighter mood.", body: "Cravings should ease. You may need less coffee.", work: "Excellent for analytical and verbal work.", wellness: "Schedule something joyful into the next few days." },
-  10: { headline: "Buzzing with possibility", emotion: "Open, optimistic, expressive.", body: "Skin glows. Workouts feel effortless.", work: "Pitch, present, learn — your brain absorbs fast.", wellness: "Limit alcohol — it dulls this clarity quickly." },
-  11: { headline: "Confidence is gathering", emotion: "Magnetic and articulate. People feel it.", body: "Push through a strong workout if you have one in you.", work: "Negotiations and difficult conversations land well now.", wellness: "Hydrate — you are running hot in the best way." },
-  12: { headline: "On the edge of <em>peak</em>", emotion: "Open and connected. Say yes to plans.", body: "Cervical mucus may shift — fertility window opening.", work: "Lead the room. Ask for what you want.", wellness: "Sleep matters here — hormones move fast on rest." },
-  13: { headline: "Pre-ovulation peak", emotion: "Sociable and bright. Communication is at its best.", body: "Energy peaks; muscles recover faster.", work: "Big meetings, hard conversations, ambitious asks.", wellness: "Protein and hydration fuel this surge." },
+  // ============ Follicular — days 6-13 ============
+  6: { headline: "Fresh chapter, <em>fresh ideas</em>", emotion: "Open, curious, optimistic.", body: "Strength training feels strong today. No bloating, low water retention.", physical: "Clear skin · strong digestion · easy sleep.", work: "Great for new projects and creative thinking.", wellness: "Try one new thing this week — your brain wants novelty." },
+  7: { headline: "Momentum is building", emotion: "Sociable and motivated.", body: "Cardio and dance land well. Recovery is fast.", physical: "Glowing skin · stable mood · solid energy.", work: "Brainstorm, ideate, draft anything new.", wellness: "Add leafy greens — your liver is working hard right now." },
+  8: { headline: "Clear-headed and capable", emotion: "Quietly confident. Ideas connect easily.", body: "Energy is climbing — push your workouts a little. Joints feel mobile.", physical: "Bright skin · low bloating · clean sleep.", work: "Tackle the project you've been avoiding.", wellness: "Consistent sleep matters — protect your routine." },
+  9: { headline: "Rising estrogen, rising you", emotion: "Sharper focus and a brighter mood.", body: "Cravings should ease. You may need less coffee.", physical: "Skin clear · digestion sharp · steady energy.", work: "Excellent for analytical and verbal work.", wellness: "Schedule something joyful into the next few days." },
+  10: { headline: "Buzzing with possibility", emotion: "Open, optimistic, expressive.", body: "Skin glows. Workouts feel effortless. Recovery is quick.", physical: "Peak skin clarity · low water retention · easy mornings.", work: "Pitch, present, learn — your brain absorbs fast.", wellness: "Limit alcohol — it dulls this clarity quickly." },
+  11: { headline: "Confidence is gathering", emotion: "Magnetic and articulate. People feel it.", body: "Push through a strong workout if you have one in you. Body feels light.", physical: "Strong digestion · clear skin · well-slept.", work: "Negotiations and difficult conversations land well now.", wellness: "Hydrate — you are running hot in the best way." },
+  12: { headline: "On the edge of <em>peak</em>", emotion: "Open and connected. Say yes to plans.", body: "Cervical mucus may shift — fertility window opening. Slight increase in libido is normal.", physical: "Bright skin · solid sleep · subtle hormonal warmth.", work: "Lead the room. Ask for what you want.", wellness: "Sleep matters here — hormones move fast on rest." },
+  13: { headline: "Pre-ovulation peak", emotion: "Sociable and bright. Communication is at its best.", body: "Energy peaks; muscles recover faster. Slight ovulation cramp possible on one side.", physical: "Glowing skin · clear digestion · low fatigue.", work: "Big meetings, hard conversations, ambitious asks.", wellness: "Protein and hydration fuel this surge." },
 
-  // Ovulation — days 14-16
-  14: { headline: "<em>Ovulation</em> — peak energy", emotion: "Confident, expressive, magnetic.", body: "LH is surging. You may notice a small temperature lift.", work: "The day to lead, pitch, present, or close a deal.", wellness: "Schedule something that lights you up — you'll remember it." },
-  15: { headline: "Still in the bright window", emotion: "Open and warm. Connection feels easy.", body: "Workouts are powerful but listen for fatigue.", work: "Wrap collaborative work — push decisions through today.", wellness: "Add healthy fats — they support the hormone shift ahead." },
-  16: { headline: "Beginning the gentle descent", emotion: "Mood softens slightly. Still socially strong.", body: "You may feel a small dip in energy late in the day.", work: "Finish what you started this week. Avoid new big asks.", wellness: "An earlier bedtime tonight will pay off tomorrow." },
+  // ============ Ovulation — days 14-16 ============
+  14: { headline: "<em>Ovulation</em> — peak energy", emotion: "Confident, expressive, magnetic.", body: "LH is surging. You may notice a small temperature lift, mild ovulation twinge, or fuller breasts.", physical: "Slight breast tenderness · peak skin · sharp focus.", work: "The day to lead, pitch, present, or close a deal.", wellness: "Schedule something that lights you up — you'll remember it." },
+  15: { headline: "Still in the bright window", emotion: "Open and warm. Connection feels easy.", body: "Workouts are powerful but listen for fatigue. Body warms slightly post-ovulation.", physical: "Mild breast tenderness · subtle warmth · steady sleep.", work: "Wrap collaborative work — push decisions through today.", wellness: "Add healthy fats — they support the hormone shift ahead." },
+  16: { headline: "Beginning the gentle descent", emotion: "Mood softens slightly. Still socially strong.", body: "You may feel a small dip in energy late in the day. Slight afternoon sleepiness is normal.", physical: "Subtle breast soreness · skin still bright · sleep stable.", work: "Finish what you started this week. Avoid new big asks.", wellness: "An earlier bedtime tonight will pay off tomorrow." },
 
-  // Luteal — days 17-28
-  17: { headline: "Progesterone takes the lead", emotion: "Steady and inward. Focus deepens.", body: "Cravings may begin. Choose protein over sugar.", work: "Excellent for deep work, editing, organising.", wellness: "Keep magnesium-rich foods on hand this week." },
-  18: { headline: "Quiet productivity day", emotion: "Calm and methodical. Avoid overcommitment.", body: "Walks beat runs. Sleep needs may rise.", work: "Tackle long lists — your patience is high.", wellness: "Cut caffeine after lunch for cleaner sleep." },
-  19: { headline: "Inward but capable", emotion: "Slightly more sensitive — that's biology, not weakness.", body: "Bloating may start. Lower the salt today.", work: "Solo work over group work right now.", wellness: "A walk outside resets more than scrolling." },
-  20: { headline: "Settle into the slower rhythm", emotion: "Steadier, but less tolerant of noise.", body: "Hydrate and stretch — back tension may rise.", work: "Boundaries today. Block your calendar where you can.", wellness: "Soothing rituals help — herbal tea, journaling, music." },
-  21: { headline: "Quiet competence", emotion: "Reflective. Good day to revisit what matters.", body: "Energy is stable but lower. Don't push through.", work: "Closing loops, finishing edits, tying up details.", wellness: "Magnesium tonight may ease cramps later in the week." },
-  22: { headline: "Mid-luteal grounding", emotion: "Take care of the small irritations before they build.", body: "Bloating, breast tenderness can begin. Loose layers help.", work: "Plan rather than push. Avoid stacking back-to-back calls.", wellness: "Skip alcohol if you can — it spikes PMS sensitivity." },
-  23: { headline: "Sensitivity is real", emotion: "You may feel emotions closer to the surface.", body: "Cravings peak around now — protein steadies you.", work: "Heads-down focus over high-stakes presenting.", wellness: "Five slow breaths before reactive emails." },
-  24: { headline: "Pre-period gentle slowdown", emotion: "Lower threshold for stress. Smaller days are wins.", body: "Sleep need may rise. Don't fight it.", work: "Avoid big decisions if you can defer them.", wellness: "Add iron-rich foods — restock for the week ahead." },
-  25: { headline: "Slow and steady", emotion: "Quiet mood. Be honest about your bandwidth.", body: "Gentle yoga or walks beat intense workouts.", work: "Wrap and document — leave a clean handover.", wellness: "An earlier bedtime tonight is a gift to tomorrow." },
-  26: { headline: "Listening to the body", emotion: "Acknowledge what you feel without fixing it.", body: "Cramps may pre-emptively start. Heat helps.", work: "Lighter day where possible. Skip stretch goals.", wellness: "Hydrate well — symptoms ease with simple care." },
-  27: { headline: "Soft landing approaching", emotion: "Be patient with yourself today.", body: "Lower energy is normal. Don't override it.", work: "Reflection over output. Note what you learned.", wellness: "Quiet evening. Set tomorrow up gently." },
-  28: { headline: "End of cycle. <em>Almost a reset.</em>", emotion: "Slight tenderness. A fresh chapter is right behind it.", body: "Symptoms may peak — short walks and warm food help.", work: "Finish lightly. Tomorrow is a soft restart.", wellness: "Run a warm shower tonight and call it early." }
+  // ============ Luteal — days 17-28 ============
+  17: { headline: "Progesterone takes the lead", emotion: "Steady and inward. Focus deepens.", body: "Cravings may begin. Choose protein over sugar to keep digestion smooth.", physical: "Slight breast fullness · light cravings · sleep deepens.", work: "Excellent for deep work, editing, organising.", wellness: "Keep magnesium-rich foods on hand this week — it eases cramps later." },
+  18: { headline: "Quiet productivity day", emotion: "Calm and methodical. Avoid overcommitment.", body: "Walks beat runs. Sleep needs may rise. Body holds onto a little more water.", physical: "Mild bloating starting · sleepier · digestion slower.", work: "Tackle long lists — your patience is high.", wellness: "Cut caffeine after lunch for cleaner sleep." },
+  19: { headline: "Inward but capable", emotion: "Slightly more sensitive — that's biology, not weakness.", body: "Bloating may start. Lower the salt today. Hydration helps reduce puffiness.", physical: "Bloating · water retention · early skin breakouts possible.", work: "Solo work over group work right now.", wellness: "A walk outside resets more than scrolling." },
+  20: { headline: "Settle into the slower rhythm", emotion: "Steadier, but less tolerant of noise.", body: "Hydrate and stretch — back tension may rise. Skin may feel more reactive.", physical: "Bloating · acne flaring · tension in shoulders/back.", work: "Boundaries today. Block your calendar where you can.", wellness: "Soothing rituals help — herbal tea, journaling, calming music." },
+  21: { headline: "Quiet competence", emotion: "Reflective. Good day to revisit what matters.", body: "Energy is stable but lower. Don't push through. Digestion slows under progesterone.", physical: "Sluggish digestion · breast tenderness · variable sleep.", work: "Closing loops, finishing edits, tying up details.", wellness: "Magnesium tonight may ease cramps and improve sleep." },
+  22: { headline: "Mid-luteal grounding", emotion: "Take care of the small irritations before they build.", body: "Bloating and breast tenderness peak around now. Loose layers help. Reduce salt and refined carbs.", physical: "Peak bloating · water retention · breast tenderness.", work: "Plan rather than push. Avoid stacking back-to-back calls.", wellness: "Skip alcohol if you can — it spikes PMS sensitivity and worsens sleep." },
+  23: { headline: "Sensitivity is real", emotion: "You may feel emotions closer to the surface.", body: "Cravings peak around now — protein steadies you. Skin may be at its most reactive.", physical: "Acne · cravings · interrupted sleep possible.", work: "Heads-down focus over high-stakes presenting.", wellness: "Five slow breaths before reactive emails. Hydration calms skin too." },
+  24: { headline: "Pre-period gentle slowdown", emotion: "Lower threshold for stress. Smaller days are wins.", body: "Sleep need may rise. Don't fight it. Bloating and cramps may pre-emptively start.", physical: "Pre-cramps · bloating · headaches more likely.", work: "Avoid big decisions if you can defer them.", wellness: "Add iron-rich foods — restock for the week ahead." },
+  25: { headline: "Slow and steady", emotion: "Quiet mood. Be honest about your bandwidth.", body: "Gentle yoga or walks beat intense workouts. Headaches may appear with hormone drops.", physical: "Mild headache · cramps starting · low energy.", work: "Wrap and document — leave a clean handover.", wellness: "An earlier bedtime tonight is a gift to tomorrow." },
+  26: { headline: "Listening to the body", emotion: "Acknowledge what you feel without fixing it.", body: "Cramps may pre-emptively start. Heat helps. Skin still reactive — keep routine simple.", physical: "Cramps · acne · fatigue rising.", work: "Lighter day where possible. Skip stretch goals.", wellness: "Hydrate well — symptoms ease with simple care." },
+  27: { headline: "Soft landing approaching", emotion: "Be patient with yourself today.", body: "Lower energy is normal. Don't override it. Bowel changes are common pre-period.", physical: "Cramps building · digestion changes · poor sleep possible.", work: "Reflection over output. Note what you learned.", wellness: "Quiet evening. Set tomorrow up gently." },
+  28: { headline: "End of cycle. <em>Almost a reset.</em>", emotion: "Slight tenderness. A fresh chapter is right behind it.", body: "Symptoms may peak — short walks, heat, and warm food help. Hormones are bottoming out.", physical: "Cramps · fatigue · sensitive skin · light bleeding may start.", work: "Finish lightly. Tomorrow is a soft restart.", wellness: "Run a warm shower tonight and call it early." }
 };
 
 function getDayPack(day) {
@@ -3317,6 +3674,33 @@ function getTrimester(week) {
   return 'Third trimester';
 }
 
+const PREG_WELLNESS = {
+  T1: {
+    emotion: 'Hormone shifts can feel heavy. Gentle journaling and short walks help today.',
+    hydration: 'Aim for 2.5L water. Sip through nausea — small, frequent works best.',
+    movement: 'Light yoga or walks beat intense workouts right now.',
+    nutrition: 'Folic acid daily. Add ginger or lemon for nausea relief.'
+  },
+  T2: {
+    emotion: 'Energy returns this trimester — savour it. Connection feels easier now.',
+    hydration: 'Hydrate before, during, and after movement. Watch for dark urine as a cue.',
+    movement: 'Pelvic floor and prenatal yoga support a stronger third trimester.',
+    nutrition: 'Iron-rich foods become important. Pair with vitamin C for absorption.'
+  },
+  T3: {
+    emotion: 'Big feelings are normal. Lean on your circle — it is preparation, not weakness.',
+    hydration: 'Hydration eases swelling. Coconut water and electrolytes help.',
+    movement: 'Slow walks, side-lying stretches, and pelvic tilts ease tension.',
+    nutrition: 'Smaller, frequent meals reduce reflux. Calcium and protein remain key.'
+  }
+};
+
+function getPregWellness(week) {
+  if (week <= 13) return PREG_WELLNESS.T1;
+  if (week <= 27) return PREG_WELLNESS.T2;
+  return PREG_WELLNESS.T3;
+}
+
 // =================================================================
 // GOAL SELECTION
 // =================================================================
@@ -3356,20 +3740,11 @@ function customiseForGoal() {
   if (selectedGoal === 'ttc') {
     eyebrow.textContent = 'Step 1 · Your fertility window';
     headline.innerHTML = 'Your <span class="italic">fertility companion</span>';
-    lead.textContent = "Log your last period dates. We'll predict your fertile window from there.";
+    lead.textContent = "Log your last period dates. We'll predict your fertile window and time your peak conception days.";
     continueText.textContent = 'See your fertility rhythm';
     screen2Lead.textContent = "Here's where you are in your cycle and what it means for conception.";
-  } else if (selectedGoal === 'perimenopause') {
-    eyebrow.textContent = 'Step 1 · Your patterns';
-    headline.innerHTML = 'Your <span class="italic">pattern tracker</span>';
-    lead.textContent = "Cycles can be unpredictable now. Log what you notice — even small patterns help.";
-    continueText.textContent = 'See what you logged';
-    screen2Lead.textContent = "Here's what your logged data is telling us about your patterns.";
-  } else if (selectedGoal === 'explore') {
-    eyebrow.textContent = 'Step 1 · Explore';
-    lead.textContent = "Tap dates on the calendar to log your period — or just have a look around.";
   }
-  // Default cycle keeps original copy
+  // 'cycle' and 'explore' share the default copy
 }
 
 function customiseSymptoms() {
@@ -3377,9 +3752,7 @@ function customiseSymptoms() {
   const symptomEl = document.getElementById('symptomOptions');
   let syms = [];
 
-  if (selectedGoal === 'perimenopause') {
-    syms = ['Hot flashes', 'Night sweats', 'Sleep issues', 'Mood swings', 'Brain fog', 'Joint aches', 'Vaginal dryness', 'Anxiety'];
-  } else if (selectedGoal === 'ttc') {
+  if (selectedGoal === 'ttc') {
     syms = ['Cervical mucus', 'Cramps', 'Bloating', 'Tender breasts', 'Spotting', 'Fatigue', 'Cravings'];
   } else {
     syms = ['Cramps', 'Bloating', 'Headache', 'Acne', 'Tender breasts', 'Cravings', 'Fatigue'];
@@ -3524,6 +3897,7 @@ function openDaySheet(date) {
     document.getElementById('daySheetHormones').textContent = 'Once you log your period start, we can show you what is happening hormonally on any day.';
     document.getElementById('daySheetEmotion').textContent = '—';
     document.getElementById('daySheetBody').textContent = '—';
+    document.getElementById('daySheetPhysical').textContent = '—';
     document.getElementById('daySheetWork').textContent = '—';
   } else {
     const pack = getDayPack(cycleDay);
@@ -3535,6 +3909,7 @@ function openDaySheet(date) {
     document.getElementById('daySheetHormones').textContent = describeHormones(cycleDay);
     document.getElementById('daySheetEmotion').textContent = pack.emotion;
     document.getElementById('daySheetBody').textContent = pack.body;
+    document.getElementById('daySheetPhysical').textContent = pack.physical || '—';
     document.getElementById('daySheetWork').textContent = pack.work;
   }
 
@@ -3675,10 +4050,27 @@ function ringPolar(r, angleDeg) {
   return { x: RING.cx + r * Math.cos(rad), y: RING.cy + r * Math.sin(rad) };
 }
 
+// Static SVG (curves, dots, phase wedges) is built once.
+// On drag, only the small dynamic overlay (handle + pointer + day text) updates,
+// and a CSS transform-transition gives the handle a smooth interpolated slide.
+let ringStaticBuilt = false;
+let ringStaticDimmed = null;
+
 function renderHormoneRing(currentDay, dimmed) {
   const svg = document.getElementById('ringSvg');
+  if (!svg) return;
+
+  // Rebuild static layer if dimmed-mode changed or first call.
+  if (!ringStaticBuilt || ringStaticDimmed !== dimmed) {
+    buildRingStatic(svg, dimmed);
+    ringStaticBuilt = true;
+    ringStaticDimmed = dimmed;
+  }
+  updateRingDynamic(currentDay, dimmed);
+}
+
+function buildRingStatic(svg, dimmed) {
   const cx = RING.cx, cy = RING.cy;
-  const dotRingR = RING.dotRingR;
   const curveOuterR = RING.curveOuterR;
   const curveInnerR = RING.curveInnerR;
 
@@ -3725,66 +4117,87 @@ function renderHormoneRing(currentDay, dimmed) {
   for (let d = 1; d <= CYCLE_LENGTH; d++) {
     const phaseOf = getPhase(d);
     const angle = ringDayToAngle(d);
-    const p = ringPolar(dotRingR, angle);
-    const isCurrent = !dimmed && d === currentDay;
+    const p = ringPolar(RING.dotRingR, angle);
     let fill, r;
-    if (phaseOf === 'menstrual') { fill = '#C76B7A'; r = isCurrent ? 5.5 : 3.2; }
-    else if (phaseOf === 'ovulation') { fill = '#2F7A7A'; r = isCurrent ? 5.5 : 3.2; }
-    else if (phaseOf === 'follicular') { fill = '#E8D4A0'; r = isCurrent ? 5.5 : 2.8; }
-    else { fill = '#C9A6BC'; r = isCurrent ? 5.5 : 2.8; }
-    dotsHtml += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${dimmed ? 0.3 : 1}"${isCurrent ? ' stroke="#3E1B33" stroke-width="2"' : ''}/>`;
+    if (phaseOf === 'menstrual') { fill = '#C76B7A'; r = 3.2; }
+    else if (phaseOf === 'ovulation') { fill = '#2F7A7A'; r = 3.2; }
+    else if (phaseOf === 'follicular') { fill = '#E8D4A0'; r = 2.8; }
+    else { fill = '#C9A6BC'; r = 2.8; }
+    dotsHtml += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${dimmed ? 0.3 : 1}"/>`;
   }
 
-  let pointer = '';
-  let handleHtml = '';
-  let cycleDayLabel = '';
-  if (!dimmed) {
-    const currentAngle = ringDayToAngle(currentDay);
-    const pInner = ringPolar(curveInnerR + 6, currentAngle);
-    const pOuter = ringPolar(dotRingR - 8, currentAngle);
-    pointer = `<line x1="${pInner.x.toFixed(1)}" y1="${pInner.y.toFixed(1)}" x2="${pOuter.x.toFixed(1)}" y2="${pOuter.y.toFixed(1)}" stroke="#3E1B33" stroke-width="1.2" opacity="0.5" stroke-dasharray="2 3"/>`;
+  // Static layer + persistent overlay containers (positioned/styled by JS on each tick)
+  svg.innerHTML = `
+    <g id="ringStaticLayer">
+      ${phaseHtml}
+      <circle cx="${cx}" cy="${cy}" r="${curveInnerR}" fill="rgba(255,255,255,0.7)" stroke="rgba(91,42,74,0.08)" stroke-width="1"/>
+      ${curveStroke(hEstrogen, '#C76B7A')}
+      ${curveStroke(hLh, '#C9A24A')}
+      ${curveStroke(hProgesterone, '#8E5378')}
+      ${curveStroke(hTestosterone, '#2F7A7A')}
+      ${dotsHtml}
+    </g>
+    <g id="clockPointerGroup"></g>
+    <g id="clockHighlight"></g>
+    <g id="clockHandleGroup"></g>
+    <g id="clockCenterText"></g>
+  `;
+}
 
-    // Draggable handle — soft halo + grip dot at outer ring radius
-    const handlePos = ringPolar(RING.handleR, currentAngle);
-    const phaseOfDay = getPhase(currentDay);
-    const handleColors = {
-      menstrual: '#C76B7A',
-      follicular: '#C9A24A',
-      ovulation: '#2F7A7A',
-      luteal: '#8E5378'
-    };
-    const hc = handleColors[phaseOfDay] || '#5B2A4A';
-    handleHtml = `
-      <circle class="clock-handle-halo" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="14" fill="${hc}" fill-opacity="0.18"/>
-      <circle class="clock-handle-halo" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="10" fill="${hc}" fill-opacity="0.32"/>
-      <circle class="clock-handle-grip" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="7" fill="white" stroke="${hc}" stroke-width="2.5"/>
-    `;
+function updateRingDynamic(currentDay, dimmed) {
+  const cx = RING.cx, cy = RING.cy;
+  const pointerG = document.getElementById('clockPointerGroup');
+  const highlightG = document.getElementById('clockHighlight');
+  const handleG = document.getElementById('clockHandleGroup');
+  const centerG = document.getElementById('clockCenterText');
+  if (!pointerG || !highlightG || !handleG || !centerG) return;
 
-    cycleDayLabel = `
-      <text x="${cx}" y="${cy - 8}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">DAY</text>
-      <text x="${cx}" y="${cy + 16}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="32" fill="#3E1B33">${currentDay}</text>
-      <text x="${cx}" y="${cy + 32}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" fill="#6B5A65" font-style="italic">of ${CYCLE_LENGTH}</text>
-    `;
-  } else {
-    cycleDayLabel = `
+  if (dimmed) {
+    pointerG.innerHTML = '';
+    highlightG.innerHTML = '';
+    handleG.innerHTML = '';
+    centerG.innerHTML = `
       <text x="${cx}" y="${cy - 4}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">NO</text>
       <text x="${cx}" y="${cy + 14}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="22" fill="#3E1B33" font-style="italic">data yet</text>
     `;
+    return;
   }
 
-  svg.innerHTML = `
-    ${phaseHtml}
-    <circle cx="${cx}" cy="${cy}" r="${curveInnerR}" fill="rgba(255,255,255,0.7)" stroke="rgba(91,42,74,0.08)" stroke-width="1"/>
-    ${curveStroke(hEstrogen, '#C76B7A')}
-    ${curveStroke(hLh, '#C9A24A')}
-    ${curveStroke(hProgesterone, '#8E5378')}
-    ${curveStroke(hTestosterone, '#2F7A7A')}
-    ${pointer}
-    ${dotsHtml}
-    ${handleHtml}
-    ${cycleDayLabel}
+  const angle = ringDayToAngle(currentDay);
+  const phaseOfDay = getPhase(currentDay);
+  const handleColors = {
+    menstrual: '#C76B7A', follicular: '#C9A24A',
+    ovulation: '#2F7A7A', luteal: '#8E5378'
+  };
+  const hc = handleColors[phaseOfDay] || '#5B2A4A';
+
+  const pInner = ringPolar(RING.curveInnerR + 6, angle);
+  const pOuter = ringPolar(RING.dotRingR - 8, angle);
+  const handlePos = ringPolar(RING.handleR, angle);
+  const dotPos = ringPolar(RING.dotRingR, angle);
+
+  pointerG.innerHTML = `<line x1="${pInner.x.toFixed(1)}" y1="${pInner.y.toFixed(1)}" x2="${pOuter.x.toFixed(1)}" y2="${pOuter.y.toFixed(1)}" stroke="#3E1B33" stroke-width="1.2" opacity="0.5" stroke-dasharray="2 3"/>`;
+
+  highlightG.innerHTML = `
+    <circle cx="${dotPos.x.toFixed(1)}" cy="${dotPos.y.toFixed(1)}" r="6.5" fill="${hc}" opacity="0.95"/>
+    <circle cx="${dotPos.x.toFixed(1)}" cy="${dotPos.y.toFixed(1)}" r="9" fill="none" stroke="${hc}" stroke-width="1.4" opacity="0.45"/>
+  `;
+
+  handleG.innerHTML = `
+    <circle class="clock-handle-halo" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="14" fill="${hc}" fill-opacity="0.18"/>
+    <circle class="clock-handle-halo" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="10" fill="${hc}" fill-opacity="0.32"/>
+    <circle class="clock-handle-grip" cx="${handlePos.x.toFixed(1)}" cy="${handlePos.y.toFixed(1)}" r="7" fill="white" stroke="${hc}" stroke-width="2.5"/>
+  `;
+
+  centerG.innerHTML = `
+    <text x="${cx}" y="${cy - 8}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" font-weight="600" fill="#6B5A65" letter-spacing="1.5">DAY</text>
+    <text x="${cx}" y="${cy + 16}" text-anchor="middle" font-family="DM Serif Display, serif" font-size="32" fill="#3E1B33">${currentDay}</text>
+    <text x="${cx}" y="${cy + 32}" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" fill="#6B5A65" font-style="italic">of ${CYCLE_LENGTH}</text>
   `;
 }
+
+// Reset static cache when goal changes affect ring (e.g., re-entering screen 2 with new state)
+function invalidateRingStatic() { ringStaticBuilt = false; ringStaticDimmed = null; }
 
 // =================================================================
 // CLOCK DRAG — pointer events on the SVG move the day handle
@@ -3881,7 +4294,7 @@ function renderClockInsight(day, dimmed) {
   phaseTagEl.className = 'clock-insight-phase-tag phase-' + phase;
   phaseTagEl.textContent = phaseContent.name;
   headlineEl.innerHTML = pack.headline;
-  blurbEl.textContent = describeHormones(day);
+  blurbEl.textContent = describeHormones(day) + (pack.physical ? ' ' + pack.physical : '');
 
   const e = hEstrogen(day), p = hProgesterone(day), l = hLh(day), t = hTestosterone(day);
   const setBar = (id, val) => { document.getElementById(id).style.width = (val * 100).toFixed(0) + '%'; };
@@ -3901,7 +4314,17 @@ function renderClockInsight(day, dimmed) {
   swap('clockEmotion', pack.emotion);
   swap('clockBody', pack.body);
   swap('clockWork', pack.work);
-  swap('clockWellness', phaseContent.wellness);
+
+  // TTC users get fertility-focused wellness copy on relevant days.
+  let wellnessText = phaseContent.wellness;
+  if (selectedGoal === 'ttc') {
+    if (day >= 12 && day <= 13) wellnessText = 'High fertility window approaching — protein, healthy fats, and good sleep matter most this week.';
+    else if (day === 14) wellnessText = 'Peak conception day. Try to lower stress and rest well tonight.';
+    else if (day === 15 || day === 16) wellnessText = 'Still in the fertile window. A calm, well-fed day supports conception odds.';
+    else if (day >= 17 && day <= 22) wellnessText = 'Implantation window opens around days 19–24 — gentle movement and steady nutrition help.';
+    else if (day <= 5) wellnessText = 'Reset gently. Iron-rich food, warm meals, and rest set you up for the next cycle.';
+  }
+  swap('clockWellness', wellnessText);
 }
 
 // =================================================================
@@ -3929,6 +4352,12 @@ function updatePregScreen() {
   document.getElementById('pregSizeMeasure').textContent = `About ${data.cm} · ${data.g}`;
 
   document.getElementById('pregInsightBody').textContent = data.insight;
+
+  const wellness = getPregWellness(pregWeek);
+  document.getElementById('pregWellEmotion').textContent = wellness.emotion;
+  document.getElementById('pregWellHydration').textContent = wellness.hydration;
+  document.getElementById('pregWellMovement').textContent = wellness.movement;
+  document.getElementById('pregWellNutrition').textContent = wellness.nutrition;
 
   const list = document.getElementById('pregChecklistList');
   list.innerHTML = data.care.map(item => `<li><span class="preg-check">✓</span><span>${item}</span></li>`).join('');
@@ -4042,7 +4471,7 @@ function saveLog() {
   const energyLabels = ['', 'Drained', 'Low', 'Steady', 'High', 'Buzzing'];
   const goalLabels = {
     cycle: 'My cycle', ttc: 'Trying to conceive', pregnant: `Pregnancy · Week ${pregWeek}`,
-    perimenopause: 'Perimenopause', explore: 'Just exploring'
+    explore: 'Just exploring'
   };
 
   // Goal row
@@ -4139,6 +4568,73 @@ function renderNudges(slotId) {
 }
 
 // =================================================================
+// DAILY CHECK-IN (lightweight inline card on calendar screen)
+// =================================================================
+const dailyCheckIn = { mood: null, energy: null, symptoms: new Set() };
+let dailyCheckinBound = false;
+let dailyCheckinSavedTimer = null;
+
+function revealDailyCheckIn() {
+  const el = document.getElementById('dailyCheckinWrap');
+  if (!el) return;
+  el.style.display = 'block';
+  bindDailyCheckin();
+}
+
+function bindDailyCheckin() {
+  if (dailyCheckinBound) return;
+  dailyCheckinBound = true;
+
+  // Mood + Energy: single-select (toggleable)
+  ['dailyMoodChips', 'dailyEnergyChips'].forEach(id => {
+    document.querySelectorAll('#' + id + ' .daily-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const wasSelected = chip.classList.contains('selected');
+        document.querySelectorAll('#' + id + ' .daily-chip').forEach(c => c.classList.remove('selected'));
+        if (id === 'dailyMoodChips') {
+          dailyCheckIn.mood = wasSelected ? null : chip.dataset.mood;
+          if (!wasSelected) chip.classList.add('selected');
+          // Bridge to logState so the Save log screen prefills.
+          const moodMap = { happy: 'great', calm: 'good', emotional: 'low', irritated: 'anxious', motivated: 'great', anxious: 'anxious' };
+          logState.mood = dailyCheckIn.mood ? (moodMap[dailyCheckIn.mood] || 'good') : null;
+        } else {
+          dailyCheckIn.energy = wasSelected ? null : chip.dataset.energy;
+          if (!wasSelected) chip.classList.add('selected');
+          const energyMap = { low: 1, balanced: 3, high: 5 };
+          logState.energy = dailyCheckIn.energy ? energyMap[dailyCheckIn.energy] : null;
+        }
+        flashCheckinSaved();
+      });
+    });
+  });
+
+  // Symptoms: multi-select
+  document.querySelectorAll('#dailySymptomChips .daily-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const sym = chip.dataset.symptom;
+      if (dailyCheckIn.symptoms.has(sym)) {
+        dailyCheckIn.symptoms.delete(sym);
+        chip.classList.remove('selected');
+        logState.symptoms.delete(sym);
+      } else {
+        dailyCheckIn.symptoms.add(sym);
+        chip.classList.add('selected');
+        logState.symptoms.add(sym);
+      }
+      flashCheckinSaved();
+    });
+  });
+}
+
+function flashCheckinSaved() {
+  const el = document.getElementById('dailyCheckinSaved');
+  if (!el) return;
+  el.classList.add('show');
+  clearTimeout(dailyCheckinSavedTimer);
+  dailyCheckinSavedTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// =================================================================
 // ONBOARDING SHEET
 // =================================================================
 function setupOnboardingChips() {
@@ -4149,20 +4645,6 @@ function setupOnboardingChips() {
       chip.classList.add('selected');
       onbDuration = parseInt(chip.dataset.duration, 10);
     });
-  });
-  // Mood / Energy (single select)
-  ['onbMoodChips', 'onbEnergyChips'].forEach(id => {
-    document.querySelectorAll('#' + id + ' .onb-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const wasSelected = chip.classList.contains('selected');
-        document.querySelectorAll('#' + id + ' .onb-chip').forEach(c => c.classList.remove('selected'));
-        if (!wasSelected) chip.classList.add('selected');
-      });
-    });
-  });
-  // Symptoms (multi-select)
-  document.querySelectorAll('#onbSymptomChips .onb-chip').forEach(chip => {
-    chip.addEventListener('click', () => chip.classList.toggle('selected'));
   });
 }
 
@@ -4204,17 +4686,6 @@ function saveOnboarding() {
     if (d <= today) periodDays.add(dateKey(d));
   }
 
-  // Pre-fill log state from chips (carried into Today's log screen).
-  const moodChip = document.querySelector('#onbMoodChips .onb-chip.selected');
-  const energyChip = document.querySelector('#onbEnergyChips .onb-chip.selected');
-  const onbMoodToLog = { happy: 'great', emotional: 'low', irritated: 'anxious', calm: 'good', anxious: 'anxious', motivated: 'great' };
-  const onbEnergyToLog = { low: 1, balanced: 3, high: 5 };
-  if (moodChip) logState.mood = onbMoodToLog[moodChip.dataset.mood] || 'good';
-  if (energyChip) logState.energy = onbEnergyToLog[energyChip.dataset.energy] || 3;
-  document.querySelectorAll('#onbSymptomChips .onb-chip.selected').forEach(c => {
-    logState.symptoms.add(c.dataset.symptom);
-  });
-
   // Pivot the calendar view to the month of the period start so the user sees it.
   viewMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
   selectedDate = new Date(today);
@@ -4222,6 +4693,8 @@ function saveOnboarding() {
   closeOnboarding();
   renderCalendar();
   updatePhaseAndToday(today);
+  // Reveal the lightweight daily check-in once cycle data exists.
+  revealDailyCheckIn();
 }
 
 // =================================================================
@@ -4285,8 +4758,16 @@ function goTo(n) {
   updateStepper(n);
 
   if (n === 1) {
+    // Show TTC intro card only for TTC goal
+    const ttcWrap = document.getElementById('ttcIntroWrap');
+    if (ttcWrap) ttcWrap.style.display = (selectedGoal === 'ttc') ? 'block' : 'none';
+
     renderCalendar();
     updatePhaseAndToday(selectedDate);
+
+    // Reveal the daily check-in if cycle data is present.
+    if (periodDays.size > 0) revealDailyCheckIn();
+
     // First-time users with no data get the onboarding sheet automatically
     if (periodDays.size === 0 && !onboardingShown && selectedGoal !== 'pregnant') {
       onboardingShown = true;
@@ -4296,7 +4777,7 @@ function goTo(n) {
   if (n === '1p') {
     updatePregScreen();
   }
-  if (n === 2) updateScreen2();
+  if (n === 2) { invalidateRingStatic(); updateScreen2(); }
   if (n === 3) {
     customiseSymptoms();
     renderNudges('screen3NudgeSlot');
