@@ -4078,10 +4078,13 @@ function updatePhaseAndToday(forDate) {
   const phase = getPhase(cycleDay);
 
   if (!phase) {
-    // No data yet — empty state
+    // No data yet — empty state. Keep the prompt visible here so first-time
+    // users know what to do.
     document.getElementById('phaseCard').className = 'phase-card phase-unknown';
     document.getElementById('phaseName').innerHTML = 'Log your <em>last period</em>';
-    document.getElementById('phaseBlurb').textContent = 'Tap dates on the calendar above to mark when you had your last period. We\'ll predict your phases from there.';
+    const blurbEmpty = document.getElementById('phaseBlurb');
+    blurbEmpty.textContent = 'Tap dates on the calendar above to mark when you had your last period. We\'ll predict your phases from there.';
+    blurbEmpty.style.display = '';
     document.getElementById('phaseDayPill').textContent = 'No data yet';
     document.getElementById('todayWrap').style.display = 'none';
     return;
@@ -4091,7 +4094,9 @@ function updatePhaseAndToday(forDate) {
 
   document.getElementById('phaseCard').className = 'phase-card phase-' + phase;
   document.getElementById('phaseName').innerHTML = `${content.name} <em>${content.italic}</em>`;
-  document.getElementById('phaseBlurb').textContent = content.blurb;
+  // Phase description lives in the dynamic insight cards below — no need to
+  // repeat it on the current-phase summary tile.
+  document.getElementById('phaseBlurb').style.display = 'none';
   document.getElementById('phaseDayPill').textContent = `Day ${cycleDay} of ${CYCLE_LENGTH}`;
 
   // Today card
