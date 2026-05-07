@@ -3552,11 +3552,24 @@ function getPredictedNextPeriod(referenceDate) {
 // Calendar date helpers — used by the hormone clock to show dates of month.
 const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+// Anchor cycle days on the CURRENT cycle's start (not the originally logged
+// period). If the user logged a period several cycles ago, getMostRecentPeriodStart
+// would still return that older date — but the clock represents *this* cycle, so
+// day 1 should correspond to the start of the cycle today is in.
+function getCurrentCycleStart() {
+  const todayCycleDay = getCycleDayForDate(today);
+  if (!todayCycleDay) return null;
+  const d = new Date(today);
+  d.setDate(today.getDate() - (todayCycleDay - 1));
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 function getCalendarDateForCycleDay(cycleDay) {
-  const periodStart = getMostRecentPeriodStart(today);
-  if (!periodStart) return null;
-  const d = new Date(periodStart);
-  d.setDate(periodStart.getDate() + (cycleDay - 1));
+  const start = getCurrentCycleStart();
+  if (!start) return null;
+  const d = new Date(start);
+  d.setDate(start.getDate() + (cycleDay - 1));
   return d;
 }
 
