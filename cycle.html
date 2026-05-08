@@ -3383,14 +3383,25 @@ function getOvulationPeakDay(periodStart) {
   return peak;
 }
 
+// Ovulation is only surfaced on the calendar for the cycle anchored to a
+// LOGGED period start. Predicted future cycles get a predicted-period
+// window but no second ovulation cluster — that was making each month
+// view crowded with two ovulation strips.
 function isOvulationDay(date) {
-  const cd = getCycleDayForDate(date);
-  return cd !== null && cd >= 13 && cd <= 16;
+  const start = getMostRecentPeriodStart(date);
+  if (!start) return false;
+  const days = daysBetween(start, date);
+  if (days < 0 || days >= CYCLE_LENGTH) return false;
+  const cd = days + 1;
+  return cd >= 13 && cd <= 16;
 }
 
 function isOvulationPeak(date) {
-  const cd = getCycleDayForDate(date);
-  return cd === 14;
+  const start = getMostRecentPeriodStart(date);
+  if (!start) return false;
+  const days = daysBetween(start, date);
+  if (days < 0 || days >= CYCLE_LENGTH) return false;
+  return days + 1 === 14;
 }
 
 function getPredictedNextPeriod(referenceDate) {
