@@ -612,7 +612,11 @@
 
   .cal-day {
     aspect-ratio: 1;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
     font-size: 13px;
     font-weight: 500;
     color: var(--plum-deep);
@@ -638,7 +642,52 @@
   .cal-day-num {
     position: relative;
     z-index: 1;
+    line-height: 1;
   }
+
+  /* Phase icons — refined drop + blossom that bounce / bloom in */
+  .cal-day-icon {
+    width: 10px;
+    height: 12px;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1.5px rgba(91, 42, 74, 0.18));
+  }
+  .cal-day-icon.drop-icon {
+    animation: dropFall 0.55s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+  }
+  .cal-day-icon.flower-icon {
+    width: 12px;
+    height: 12px;
+    animation: flowerBloom 0.6s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+  }
+  .cal-day-icon.flower-icon .flower-spin {
+    transform-origin: center;
+    animation: flowerSway 6s ease-in-out infinite;
+  }
+  .cal-day-icon.drop-icon { animation: dropFall 0.55s cubic-bezier(0.34, 1.5, 0.64, 1) both, dropPulse 3s ease-in-out 0.6s infinite; }
+
+  @keyframes dropFall {
+    0%   { opacity: 0; transform: translateY(-6px) scale(0.5); }
+    65%  { transform: translateY(2px) scale(1.18); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes dropPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+  }
+  @keyframes flowerBloom {
+    0%   { opacity: 0; transform: scale(0) rotate(-25deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes flowerSway {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(18deg); }
+  }
+  /* Selected day inverts colors so icons should turn white */
+  .cal-day.selected .drop-icon path:first-of-type { fill: rgba(255,255,255,0.95); }
+  .cal-day.selected .drop-icon ellipse { fill: rgba(255,255,255,0.5); }
+  .cal-day.selected .flower-icon path { fill: rgba(255,255,255,0.92); }
+  .cal-day.selected .flower-icon circle { fill: #FFE6A8; }
 
   /* Period day — solid rose pill, deeper text */
   .cal-day.is-period {
@@ -739,29 +788,21 @@
     justify-content: center;
   }
 
-  .legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+  .legend-svg {
+    width: 12px;
+    height: 14px;
     flex-shrink: 0;
-    display: inline-block;
-  }
-
-  .legend-dot-period {
-    background: linear-gradient(135deg, #FBE0E5 0%, #F4D4DC 100%);
-    box-shadow: inset 0 0 0 1.5px rgba(199, 107, 122, 0.5);
-  }
-
-  .legend-dot-ovulation {
-    background: linear-gradient(135deg, #4A9696 0%, #2F7A7A 100%);
-    box-shadow: 0 1px 3px rgba(47, 122, 122, 0.3);
+    filter: drop-shadow(0 1px 1.5px rgba(91, 42, 74, 0.18));
   }
 
   .legend-dot-predicted {
-    background: transparent;
-    border: 1.5px dashed rgba(199, 107, 122, 0.6);
     width: 11px;
     height: 11px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px dashed rgba(199, 107, 122, 0.6);
+    flex-shrink: 0;
+    display: inline-block;
   }
 
   .cal-helper {
@@ -2771,11 +2812,24 @@
 
         <div class="cal-legend">
           <div class="cal-legend-item">
-            <span class="legend-dot legend-dot-period"></span>
+            <svg class="legend-svg" viewBox="0 0 12 16" aria-hidden="true">
+              <defs><linearGradient id="legendDropG" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#E8A8B7"/><stop offset="100%" stop-color="#A84458"/></linearGradient></defs>
+              <path d="M6 1 C 6 1, 10.5 6, 10.5 10.2 A 4.5 4.5 0 0 1 1.5 10.2 C 1.5 6, 6 1, 6 1 Z" fill="url(#legendDropG)"/>
+            </svg>
             Period
           </div>
           <div class="cal-legend-item">
-            <span class="legend-dot legend-dot-ovulation"></span>
+            <svg class="legend-svg" viewBox="-7 -7 14 14" aria-hidden="true">
+              <defs><radialGradient id="legendPetalG" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#9DD0CC"/><stop offset="100%" stop-color="#2F7A7A"/></radialGradient></defs>
+              <g>
+                <path d="M 0 -1.4 C 2 -1.4 3.2 -3.4 0 -5 C -3.2 -3.4 -2 -1.4 0 -1.4 Z" fill="url(#legendPetalG)" transform="rotate(0)"/>
+                <path d="M 0 -1.4 C 2 -1.4 3.2 -3.4 0 -5 C -3.2 -3.4 -2 -1.4 0 -1.4 Z" fill="url(#legendPetalG)" transform="rotate(72)"/>
+                <path d="M 0 -1.4 C 2 -1.4 3.2 -3.4 0 -5 C -3.2 -3.4 -2 -1.4 0 -1.4 Z" fill="url(#legendPetalG)" transform="rotate(144)"/>
+                <path d="M 0 -1.4 C 2 -1.4 3.2 -3.4 0 -5 C -3.2 -3.4 -2 -1.4 0 -1.4 Z" fill="url(#legendPetalG)" transform="rotate(216)"/>
+                <path d="M 0 -1.4 C 2 -1.4 3.2 -3.4 0 -5 C -3.2 -3.4 -2 -1.4 0 -1.4 Z" fill="url(#legendPetalG)" transform="rotate(288)"/>
+              </g>
+              <circle r="1.4" fill="#E8C282" stroke="#C9A24A" stroke-width="0.4"/>
+            </svg>
             Ovulation
           </div>
           <div class="cal-legend-item">
@@ -3748,8 +3802,38 @@ function renderCalendar() {
     if (date.getTime() === selectedDate.getTime()) classes.push('selected');
     if (date > today) classes.push('future');
 
-    // Day number only — phase is communicated by the colored cell pill itself.
-    const innerHtml = `<span class="cal-day-num">${date.getDate()}</span>`;
+    // Day number + a refined phase icon (drop for period, blossom for ovulation).
+    let innerHtml = `<span class="cal-day-num">${date.getDate()}</span>`;
+    if (isPeriod) {
+      innerHtml += `
+        <svg class="cal-day-icon drop-icon" viewBox="0 0 12 16" aria-hidden="true">
+          <defs>
+            <linearGradient id="dropG" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stop-color="#E8A8B7"/>
+              <stop offset="100%" stop-color="#A84458"/>
+            </linearGradient>
+          </defs>
+          <path d="M6 1 C 6 1, 10.5 6, 10.5 10.2 A 4.5 4.5 0 0 1 1.5 10.2 C 1.5 6, 6 1, 6 1 Z"
+            fill="url(#dropG)"/>
+          <ellipse cx="4.6" cy="8.5" rx="1.1" ry="1.6" fill="rgba(255,255,255,0.55)"/>
+        </svg>`;
+    } else if (isOvulation) {
+      // 5-petal blossom with golden center
+      const petal = (rotate) => `<path d="M 0 -1.4 C 2 -1.4 3.2 -3.4 0 -5 C -3.2 -3.4 -2 -1.4 0 -1.4 Z" fill="url(#petalG)" transform="rotate(${rotate})"/>`;
+      innerHtml += `
+        <svg class="cal-day-icon flower-icon" viewBox="-7 -7 14 14" aria-hidden="true">
+          <defs>
+            <radialGradient id="petalG" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#9DD0CC"/>
+              <stop offset="100%" stop-color="#2F7A7A"/>
+            </radialGradient>
+          </defs>
+          <g class="flower-spin">
+            ${petal(0)}${petal(72)}${petal(144)}${petal(216)}${petal(288)}
+          </g>
+          <circle r="1.4" fill="#E8C282" stroke="#C9A24A" stroke-width="0.4"/>
+        </svg>`;
+    }
     return `<div class="${classes.join(' ')}" onclick="handleDayClick('${date.toISOString()}')">${innerHtml}</div>`;
   }
 
