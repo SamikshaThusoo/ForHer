@@ -597,14 +597,58 @@
     border-color: var(--fh-plum-1);
     box-shadow: 0 3px 10px rgba(91, 42, 74, 0.2);
   }
-  .fh-log-chip.energy.selected {
-    background: linear-gradient(135deg, #E8A8B7 0%, #C9A24A 100%);
-    border-color: #C9A24A;
-  }
   .fh-log-chip.symptom.selected {
     background: linear-gradient(135deg, #C76B7A 0%, #A84458 100%);
     border-color: #C76B7A;
   }
+
+  /* Energy scale (1..10 segments) */
+  .fh-log-energy-bar {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+  .fh-log-energy-dot {
+    flex: 1;
+    height: 10px;
+    border-radius: 4px;
+    background: #FBF3F5;
+    border: 1px solid rgba(91, 42, 74, 0.12);
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  }
+  .fh-log-energy-dot:hover { transform: translateY(-1px); }
+  .fh-log-energy-dot.active {
+    border-color: transparent;
+    background: linear-gradient(90deg, #E8A8B7 0%, #C9A24A 100%);
+  }
+  .fh-log-energy-dot.peak {
+    box-shadow: 0 2px 10px rgba(201, 162, 74, 0.32);
+  }
+  .fh-log-energy-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #8E5378;
+    margin-top: 6px;
+    padding: 0 2px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .fh-log-energy-readout {
+    margin-left: 8px;
+    padding: 3px 8px;
+    background: rgba(91, 42, 74, 0.06);
+    color: var(--fh-plum-1);
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  .fh-log-energy-readout.show { opacity: 1; }
 
   .fh-log-actions {
     display: flex;
@@ -1118,11 +1162,26 @@
   </div>
 
   <div class="fh-log-section">
-    <div class="fh-log-section-label">Energy</div>
-    <div class="fh-log-chips" id="fhLogEnergyChips">
-      <button class="fh-log-chip energy" data-energy="low"      type="button">Low</button>
-      <button class="fh-log-chip energy" data-energy="balanced" type="button">Balanced</button>
-      <button class="fh-log-chip energy" data-energy="high"     type="button">High</button>
+    <div class="fh-log-section-label">
+      Energy
+      <span class="fh-log-energy-readout" id="fhLogEnergyReadout"></span>
+    </div>
+    <div class="fh-log-energy-bar" id="fhLogEnergyBar">
+      <div class="fh-log-energy-dot" data-level="1"></div>
+      <div class="fh-log-energy-dot" data-level="2"></div>
+      <div class="fh-log-energy-dot" data-level="3"></div>
+      <div class="fh-log-energy-dot" data-level="4"></div>
+      <div class="fh-log-energy-dot" data-level="5"></div>
+      <div class="fh-log-energy-dot" data-level="6"></div>
+      <div class="fh-log-energy-dot" data-level="7"></div>
+      <div class="fh-log-energy-dot" data-level="8"></div>
+      <div class="fh-log-energy-dot" data-level="9"></div>
+      <div class="fh-log-energy-dot" data-level="10"></div>
+    </div>
+    <div class="fh-log-energy-labels">
+      <span>Drained</span>
+      <span>Balanced</span>
+      <span>Buzzing</span>
     </div>
   </div>
 
@@ -1164,7 +1223,13 @@
     const backdrop = document.getElementById('fhLogBackdrop');
     if (!card) return;
 
-    const ENERGY_LEVEL = { low: 2, balanced: 5, high: 9 }; // map to 1..10 scale used by cycle.html
+    const ENERGY_BAND = (lvl) => {
+      if (lvl <= 2) return 'Drained';
+      if (lvl <= 4) return 'Low';
+      if (lvl <= 6) return 'Balanced';
+      if (lvl <= 8) return 'High';
+      return 'Buzzing';
+    };
 
     function loadState() {
       try { return JSON.parse(localStorage.getItem(FH_KEY)) || null; }
@@ -1267,8 +1332,7 @@
         <div class="fh-engage-headline">${copy.headline}</div>
         <p class="fh-engage-sub">${copy.sub}</p>
         <div class="fh-engage-actions">
-          <button class="fh-engage-btn secondary" type="button" data-action="log">Log symptoms</button>
-          <button class="fh-engage-btn primary"   type="button" data-action="open">Open <span class="arrow">→</span></button>
+          <button class="fh-engage-btn primary" type="button" data-action="log">Log symptoms</button>
           <span class="fh-engage-saved" id="fhEngageSaved">Saved</span>
         </div>
       `;
@@ -1297,22 +1361,39 @@
       document.body.style.overflow = '';
     }
 
+    let sheetEnergy = null; // 1..10 selection inside the open sheet
+
+    function paintEnergy(level) {
+      const dots = sheet.querySelectorAll('#fhLogEnergyBar .fh-log-energy-dot');
+      dots.forEach(d => {
+        const dl = parseInt(d.dataset.level, 10);
+        d.classList.toggle('active', level != null && dl <= level);
+        d.classList.toggle('peak',   level != null && dl === level);
+      });
+      const readout = document.getElementById('fhLogEnergyReadout');
+      if (level == null) {
+        readout.textContent = '';
+        readout.classList.remove('show');
+      } else {
+        readout.textContent = `${ENERGY_BAND(level)} · ${level}/10`;
+        readout.classList.add('show');
+      }
+    }
+
     function hydrateSheetFromState() {
       const s = loadState();
       const t = (s && s.lastCheckIn && s.lastCheckIn.date === todayKey()) ? s.lastCheckIn : null;
       sheet.querySelectorAll('.fh-log-chip').forEach(c => c.classList.remove('selected'));
+      sheetEnergy = null;
+      paintEnergy(null);
       if (!t) return;
       if (t.mood) {
         const el = sheet.querySelector(`[data-mood="${t.mood}"]`);
         if (el) el.classList.add('selected');
       }
       if (t.energy) {
-        // Map 1..10 stored value back to low/balanced/high.
-        let band = 'balanced';
-        if (t.energy <= 3) band = 'low';
-        else if (t.energy >= 7) band = 'high';
-        const el = sheet.querySelector(`[data-energy="${band}"]`);
-        if (el) el.classList.add('selected');
+        sheetEnergy = t.energy;
+        paintEnergy(t.energy);
       }
       (t.symptoms || []).forEach(sym => {
         const el = sheet.querySelector(`[data-symptom="${sym}"]`);
@@ -1328,12 +1409,12 @@
         if (!wasSelected) chip.classList.add('selected');
       });
     });
-    // Energy: single-select toggle
-    sheet.querySelectorAll('#fhLogEnergyChips .fh-log-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const wasSelected = chip.classList.contains('selected');
-        sheet.querySelectorAll('#fhLogEnergyChips .fh-log-chip').forEach(c => c.classList.remove('selected'));
-        if (!wasSelected) chip.classList.add('selected');
+    // Energy scale: tap a segment to set 1..10; tap again to deselect.
+    sheet.querySelectorAll('#fhLogEnergyBar .fh-log-energy-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const level = parseInt(dot.dataset.level, 10);
+        sheetEnergy = (sheetEnergy === level) ? null : level;
+        paintEnergy(sheetEnergy);
       });
     });
     // Symptoms: multi-select
@@ -1343,12 +1424,11 @@
 
     function collectSheetState() {
       const moodEl = sheet.querySelector('#fhLogMoodChips .fh-log-chip.selected');
-      const energyEl = sheet.querySelector('#fhLogEnergyChips .fh-log-chip.selected');
       const symptoms = [...sheet.querySelectorAll('#fhLogSymptomChips .fh-log-chip.selected')]
         .map(c => c.dataset.symptom);
       return {
         mood: moodEl ? moodEl.dataset.mood : null,
-        energy: energyEl ? ENERGY_LEVEL[energyEl.dataset.energy] : null,
+        energy: sheetEnergy,
         symptoms
       };
     }
@@ -1378,7 +1458,13 @@
     });
     document.getElementById('fhLogOpenBtn').addEventListener('click', () => {
       saveSheet();
-      window.location.href = 'cycle.html';
+      closeLogSheet();
+      // Hand off to the existing 3-flow chooser (Cycle / AHC / PCOS).
+      // Wait for the log sheet to finish sliding down before opening the
+      // chooser so the two sheets don't visually stack.
+      setTimeout(() => {
+        if (typeof openForHerFlow === 'function') openForHerFlow();
+      }, 280);
     });
 
     // ---------- Saved badge ----------
