@@ -823,46 +823,6 @@
     line-height: 1.35;
   }
 
-  /* Premium "For Her" quick-link tile */
-  .ql.ql-fh {
-    background: linear-gradient(135deg, var(--fh-plum-1), var(--fh-plum-2));
-    color: #fff;
-    box-shadow: 0 8px 20px rgba(91, 42, 74, 0.2);
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .ql.ql-fh:hover  { transform: scale(1.02); }
-  .ql.ql-fh:active { transform: scale(0.98); }
-  .ql.ql-fh .ql-ic {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-  }
-  .ql.ql-fh .ql-title { color: #fff; }
-  .ql.ql-fh .ql-sub   { color: rgba(255, 255, 255, 0.82); }
-
-  /* Subtle shimmer that drifts across every few seconds */
-  .ql.ql-fh::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -60%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(110deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.16) 50%,
-      transparent 100%);
-    transform: skewX(-18deg);
-    pointer-events: none;
-    animation: fhShimmer 6s ease-in-out 2.5s infinite;
-  }
-  @keyframes fhShimmer {
-    0%, 70%, 100% { left: -60%; }
-    20%           { left: 130%; }
-  }
-
   /* ============ BOTTOM NAV ============ */
   .bottom-bar {
     position: fixed;
@@ -917,11 +877,6 @@
     text-decoration: none;
     box-shadow: 0 8px 20px rgba(245, 138, 31, 0.35);
     cursor: pointer;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ql.ql-fh::after { animation: none; }
-    .ql.ql-fh:hover { transform: none; }
   }
 
   /* ============ BOTTOM SHEET ============ */
@@ -1093,12 +1048,6 @@
   <!-- QUICK LINKS -->
   <div class="section-title">Quick links</div>
   <div class="ql-row">
-    <div class="ql ql-fh" id="fhTile" data-state="new" role="button" tabindex="0"
-         aria-label="Open For Her" onclick="openForHerFlow()">
-      <div class="ql-ic">❀</div>
-      <div class="ql-title">For Her</div>
-      <div class="ql-sub" data-fh-tile-sub>Track your cycle &amp; check PCOS risk</div>
-    </div>
     <div class="ql">
       <div class="ql-ic">📅</div>
       <div class="ql-title">My Bookings</div>
@@ -1182,19 +1131,9 @@
 </script>
 
 <script>
-  /* For Her quick-link tile state. Drive from real user context later.
-       'new'        → first-time
-       'returning'  → user has cycle history
-       'risk'       → AHC / PCOS model flagged the user */
-  const FH_TILE_STATE = 'new';
-  const FH_TILE_COPY = {
-    new:       'Track your cycle & check PCOS risk',
-    returning: 'Day 12 • Ovulation phase',
-    risk:      'Irregular cycles detected',
-  };
-
+  /* Wire the For Her chooser sheet (still used by the engagement card's
+     "Open full journey" button) — close handlers + data-go routing. */
   (function () {
-    const tile     = document.getElementById('fhTile');
     const sheet    = document.getElementById('fhSheet');
     const backdrop = document.getElementById('sheetBackdrop');
     const closeBtn = document.getElementById('sheetClose');
@@ -1203,22 +1142,6 @@
       sheet.classList.remove('open');
       backdrop.classList.remove('open');
       document.body.style.overflow = '';
-    }
-
-    /* Quick-link tile: render state copy and forward keyboard
-       activation to the inline onclick handler for parity. */
-    if (tile) {
-      const sub = tile.querySelector('[data-fh-tile-sub]');
-      tile.dataset.state = FH_TILE_STATE;
-      if (sub && FH_TILE_COPY[FH_TILE_STATE]) {
-        sub.textContent = FH_TILE_COPY[FH_TILE_STATE];
-      }
-      tile.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          if (typeof openForHerFlow === 'function') openForHerFlow();
-        }
-      });
     }
 
     if (backdrop) backdrop.addEventListener('click', closeSheet);
@@ -1232,7 +1155,6 @@
         });
       });
     }
-
   })();
 </script>
 
@@ -1583,18 +1505,6 @@
       const state = loadState();
       if (state && state.hasData) renderState2(state);
       else renderState1();
-      // Keep the existing Quick Links tile sub-copy in sync.
-      const tile = document.getElementById('fhTile');
-      const tileSub = tile && tile.querySelector('[data-fh-tile-sub]');
-      if (tile && tileSub && state && state.hasData) {
-        const day = getCycleDay(state);
-        const phase = getPhase(day);
-        const copy = PHASE_COPY[phase];
-        if (day && copy) {
-          tile.dataset.state = 'returning';
-          tileSub.textContent = `Day ${day} • ${copy.name} phase`;
-        }
-      }
     }
 
     render();
