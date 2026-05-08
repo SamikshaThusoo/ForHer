@@ -2487,218 +2487,6 @@
   }
 
   /* ============================================
-     DAILY CHECK-IN CARD (screen 1, after onboarding)
-     ============================================ */
-  .daily-checkin-wrap { padding: 0 20px 14px; }
-
-  .daily-checkin-card {
-    background: white;
-    border-radius: 22px;
-    padding: 18px 20px 16px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(234, 223, 227, 0.6);
-    position: relative;
-    overflow: hidden;
-    animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  .daily-checkin-card::before {
-    content: "";
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(232, 168, 183, 0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .daily-checkin-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 4px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .daily-checkin-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 17px;
-    color: var(--plum-deep);
-    line-height: 1.25;
-    letter-spacing: -0.1px;
-  }
-  .daily-checkin-title em { font-style: italic; color: var(--plum-soft); }
-
-  .daily-checkin-tag {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--teal);
-    background: var(--teal-bg);
-    padding: 4px 9px;
-    border-radius: 10px;
-    flex-shrink: 0;
-  }
-
-  .daily-checkin-sub {
-    font-size: 12px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-    margin-bottom: 14px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .daily-checkin-section { margin-top: 12px; position: relative; z-index: 1; }
-  .daily-checkin-section:first-of-type { margin-top: 0; }
-
-  .daily-checkin-section-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.1px;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-bottom: 8px;
-  }
-
-  .daily-chips {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .daily-chip {
-    padding: 7px 12px;
-    background: var(--cream);
-    border: 1.5px solid var(--line);
-    border-radius: 18px;
-    font-size: 11.5px;
-    font-weight: 500;
-    color: var(--plum-deep);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-  }
-
-  .daily-chip:hover {
-    border-color: var(--plum-soft);
-    background: var(--rose-bg);
-    transform: translateY(-1px);
-  }
-
-  .daily-chip.selected {
-    background: linear-gradient(135deg, var(--plum) 0%, var(--plum-soft) 100%);
-    color: white;
-    border-color: var(--plum);
-    box-shadow: 0 3px 10px rgba(91, 42, 74, 0.18);
-  }
-
-  .daily-chip.energy-chip.selected {
-    background: linear-gradient(135deg, var(--gold) 0%, var(--rose-deep) 100%);
-    border-color: var(--gold);
-  }
-
-  .daily-chip.symptom-chip.selected {
-    background: linear-gradient(135deg, var(--phase-menstrual) 0%, #A84458 100%);
-    border-color: var(--phase-menstrual);
-  }
-
-  .daily-energy-bar {
-    display: flex;
-    gap: 3px;
-    align-items: center;
-  }
-
-  .daily-energy-dot {
-    flex: 1;
-    height: 10px;
-    border-radius: 4px;
-    background: var(--cream);
-    border: 1px solid var(--line);
-    cursor: pointer;
-    transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
-  }
-
-  .daily-energy-dot:hover {
-    background: var(--rose-bg);
-    transform: translateY(-1px);
-  }
-
-  .daily-energy-dot.active {
-    border-color: transparent;
-    background: linear-gradient(90deg, #E8A8B7 0%, #C9A24A 100%);
-  }
-
-  .daily-energy-dot.active.peak {
-    box-shadow: 0 2px 10px rgba(201, 162, 74, 0.35);
-  }
-
-  .daily-energy-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: var(--ink-soft);
-    margin-top: 6px;
-    padding: 0 2px;
-    font-weight: 500;
-  }
-
-  .daily-energy-readout {
-    font-weight: 500;
-    font-size: 10px;
-    color: var(--plum);
-    background: var(--rose-bg);
-    padding: 3px 8px;
-    border-radius: 10px;
-    margin-left: 8px;
-    letter-spacing: 0.4px;
-    text-transform: none;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .daily-energy-readout.show { opacity: 1; }
-
-  .daily-checkin-saved {
-    margin-top: 12px;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, var(--teal-bg) 0%, var(--rose-bg) 100%);
-    border-radius: 12px;
-    font-size: 11.5px;
-    color: var(--teal);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    pointer-events: none;
-  }
-
-  .daily-checkin-saved.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .daily-checkin-saved::before {
-    content: "✓";
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--teal);
-    color: white;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  /* ============================================
      PREGNANCY WELLNESS CARDS
      ============================================ */
   .preg-wellness-grid {
@@ -3031,66 +2819,8 @@
       </div>
     </div>
 
-    <!-- Lightweight daily check-in (revealed once cycle data exists) -->
-    <div class="daily-checkin-wrap stagger-4" id="dailyCheckinWrap" style="display: none;">
-      <div class="daily-checkin-card">
-        <div class="daily-checkin-head">
-          <div class="daily-checkin-title">A quick <em>check-in</em></div>
-          <span class="daily-checkin-tag">Today</span>
-        </div>
-        <p class="daily-checkin-sub">Optional — but the more you log, the more we can tailor each day. No streaks, no pressure.</p>
-
-        <div class="daily-checkin-section">
-          <div class="daily-checkin-section-label">Mood</div>
-          <div class="daily-chips" id="dailyMoodChips">
-            <div class="daily-chip" data-mood="happy">Happy</div>
-            <div class="daily-chip" data-mood="calm">Calm</div>
-            <div class="daily-chip" data-mood="emotional">Emotional</div>
-            <div class="daily-chip" data-mood="irritated">Irritated</div>
-            <div class="daily-chip" data-mood="motivated">Motivated</div>
-            <div class="daily-chip" data-mood="anxious">Anxious</div>
-          </div>
-        </div>
-
-        <div class="daily-checkin-section">
-          <div class="daily-checkin-section-label">
-            Energy
-            <span class="daily-energy-readout" id="dailyEnergyReadout"></span>
-          </div>
-          <div class="daily-energy-bar" id="dailyEnergyBar">
-            <div class="daily-energy-dot" data-level="1"></div>
-            <div class="daily-energy-dot" data-level="2"></div>
-            <div class="daily-energy-dot" data-level="3"></div>
-            <div class="daily-energy-dot" data-level="4"></div>
-            <div class="daily-energy-dot" data-level="5"></div>
-            <div class="daily-energy-dot" data-level="6"></div>
-            <div class="daily-energy-dot" data-level="7"></div>
-            <div class="daily-energy-dot" data-level="8"></div>
-            <div class="daily-energy-dot" data-level="9"></div>
-            <div class="daily-energy-dot" data-level="10"></div>
-          </div>
-          <div class="daily-energy-labels">
-            <span>Drained</span>
-            <span>Balanced</span>
-            <span>Buzzing</span>
-          </div>
-        </div>
-
-        <div class="daily-checkin-section">
-          <div class="daily-checkin-section-label">Symptoms</div>
-          <div class="daily-chips" id="dailySymptomChips">
-            <div class="daily-chip symptom-chip" data-symptom="cramps">Cramps</div>
-            <div class="daily-chip symptom-chip" data-symptom="acne">Acne</div>
-            <div class="daily-chip symptom-chip" data-symptom="bloating">Bloating</div>
-            <div class="daily-chip symptom-chip" data-symptom="headache">Headache</div>
-            <div class="daily-chip symptom-chip" data-symptom="fatigue">Fatigue</div>
-            <div class="daily-chip symptom-chip" data-symptom="cravings">Cravings</div>
-          </div>
-        </div>
-
-        <div class="daily-checkin-saved" id="dailyCheckinSaved">Saved for today</div>
-      </div>
-    </div>
+    <!-- Daily mood/energy/symptom logging now lives on the homepage card's
+         bottom sheet — no inline check-in here. -->
 
     <div class="today-wrap stagger-4" id="todayWrap" style="display: none;">
       <div class="section-label" id="todayLabel">For today</div>
@@ -4807,110 +4537,12 @@ function renderNudges(slotId) {
 }
 
 // =================================================================
-// DAILY CHECK-IN (lightweight inline card on calendar screen)
+// DAILY CHECK-IN STATE
+// The actual UI lives on the homepage card's bottom sheet (index.html).
+// Here we just hold the state object so saveLog and the homepage card
+// stay in sync via the shared forher.cycle.v1 localStorage snapshot.
 // =================================================================
 const dailyCheckIn = { mood: null, energy: null, symptoms: new Set() };
-let dailyCheckinBound = false;
-let dailyCheckinSavedTimer = null;
-
-function hasLoggedToday() {
-  return !!(dailyCheckIn.mood || dailyCheckIn.energy ||
-            (dailyCheckIn.symptoms && dailyCheckIn.symptoms.size > 0));
-}
-
-function revealDailyCheckIn() {
-  const el = document.getElementById('dailyCheckinWrap');
-  if (!el) return;
-  // If today's check-in was already filled (via homepage card sheet or
-  // an earlier visit), don't nudge the user to log it a second time.
-  if (hasLoggedToday()) {
-    el.style.display = 'none';
-    return;
-  }
-  el.style.display = 'block';
-  bindDailyCheckin();
-}
-
-function bindDailyCheckin() {
-  if (dailyCheckinBound) return;
-  dailyCheckinBound = true;
-
-  // Mood: single-select chips (toggleable)
-  document.querySelectorAll('#dailyMoodChips .daily-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const wasSelected = chip.classList.contains('selected');
-      document.querySelectorAll('#dailyMoodChips .daily-chip').forEach(c => c.classList.remove('selected'));
-      dailyCheckIn.mood = wasSelected ? null : chip.dataset.mood;
-      if (!wasSelected) chip.classList.add('selected');
-      flashCheckinSaved();
-    });
-  });
-
-  // Energy: 10-segment bar (1 = drained ... 10 = buzzing).
-  // dailyCheckIn.energy stays as the granular 1..10 level.
-  // logState.energy mirrors it in the 1..5 scale used by the saved summary.
-  const ENERGY_BAND_LABEL = (lvl) => {
-    if (lvl <= 2) return 'Drained';
-    if (lvl <= 4) return 'Low';
-    if (lvl <= 6) return 'Balanced';
-    if (lvl <= 8) return 'High';
-    return 'Buzzing';
-  };
-  const energyDots = document.querySelectorAll('#dailyEnergyBar .daily-energy-dot');
-  const readout = document.getElementById('dailyEnergyReadout');
-  document.querySelectorAll('#dailyEnergyBar .daily-energy-dot').forEach(dot => {
-    dot.addEventListener('click', () => {
-      const level = parseInt(dot.dataset.level, 10);
-      // Tapping the current peak level deselects.
-      if (dailyCheckIn.energy === level) {
-        dailyCheckIn.energy = null;
-        logState.energy = null;
-        energyDots.forEach(d => d.classList.remove('active', 'peak'));
-        if (readout) { readout.textContent = ''; readout.classList.remove('show'); }
-      } else {
-        dailyCheckIn.energy = level;
-        logState.energy = Math.max(1, Math.round(level / 2)); // 1..10 → 1..5
-        energyDots.forEach(d => {
-          const dl = parseInt(d.dataset.level, 10);
-          d.classList.toggle('active', dl <= level);
-          d.classList.toggle('peak', dl === level);
-        });
-        if (readout) {
-          readout.textContent = `${ENERGY_BAND_LABEL(level)} · ${level}/10`;
-          readout.classList.add('show');
-        }
-      }
-      flashCheckinSaved();
-    });
-  });
-
-  // Symptoms: multi-select
-  document.querySelectorAll('#dailySymptomChips .daily-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const sym = chip.dataset.symptom;
-      if (dailyCheckIn.symptoms.has(sym)) {
-        dailyCheckIn.symptoms.delete(sym);
-        chip.classList.remove('selected');
-        logState.symptoms.delete(sym);
-      } else {
-        dailyCheckIn.symptoms.add(sym);
-        chip.classList.add('selected');
-        logState.symptoms.add(sym);
-      }
-      flashCheckinSaved();
-    });
-  });
-}
-
-function flashCheckinSaved() {
-  const el = document.getElementById('dailyCheckinSaved');
-  if (!el) return;
-  el.classList.add('show');
-  clearTimeout(dailyCheckinSavedTimer);
-  dailyCheckinSavedTimer = setTimeout(() => el.classList.remove('show'), 1800);
-  // Mirror the latest check-in state to localStorage for the homepage card.
-  persistCycleState();
-}
 
 // =================================================================
 // ONBOARDING SHEET
@@ -4971,8 +4603,6 @@ function saveOnboarding() {
   closeOnboarding();
   renderCalendar();
   updatePhaseAndToday(today);
-  // Reveal the lightweight daily check-in once cycle data exists.
-  revealDailyCheckIn();
   persistCycleState();
 }
 
@@ -5088,9 +4718,6 @@ function goTo(n) {
     renderCalendar();
     updatePhaseAndToday(selectedDate);
 
-    // Reveal the daily check-in if cycle data is present.
-    if (periodDays.size > 0) revealDailyCheckIn();
-
     // First-time users with no data get the onboarding sheet automatically
     if (periodDays.size === 0 && !onboardingShown && selectedGoal !== 'pregnant') {
       onboardingShown = true;
@@ -5131,9 +4758,7 @@ function updateStepper(n) {
 }
 
 function restart() {
-  // Clear daily check-in selections so the next session starts fresh.
-  document.querySelectorAll('.daily-chip.selected').forEach(c => c.classList.remove('selected'));
-  document.querySelectorAll('.daily-energy-dot.active').forEach(d => d.classList.remove('active'));
+  // Clear in-memory check-in state so the next session starts fresh.
   dailyCheckIn.mood = null;
   dailyCheckIn.energy = null;
   dailyCheckIn.symptoms.clear();
