@@ -635,16 +635,22 @@
 
   .cal-day.adjacent-month:hover { background: rgba(244, 212, 220, 0.35); }
 
-  /* Period day — uses blood-drop SVG */
-  .cal-day.is-period {
-    background: var(--phase-menstrual-bg);
-    color: var(--phase-menstrual);
-    font-weight: 600;
+  .cal-day-num {
+    position: relative;
+    z-index: 1;
   }
 
-  /* Predicted period day — softer */
+  /* Period day — solid rose pill, deeper text */
+  .cal-day.is-period {
+    background: linear-gradient(135deg, #FBE0E5 0%, #F4D4DC 100%);
+    color: #A84458;
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px rgba(199, 107, 122, 0.18);
+  }
+
+  /* Predicted period day — softer dashed ring */
   .cal-day.predicted-period {
-    background: rgba(199, 107, 122, 0.08);
+    background: rgba(199, 107, 122, 0.06);
     color: var(--phase-menstrual);
   }
 
@@ -653,65 +659,24 @@
     position: absolute;
     inset: 2px;
     border-radius: 50%;
-    border: 1.5px dashed rgba(199, 107, 122, 0.45);
+    border: 1.5px dashed rgba(199, 107, 122, 0.5);
     pointer-events: none;
   }
 
+  /* Ovulation day — soft teal pill, deeper teal text */
   .cal-day.is-ovulation {
-    background: var(--phase-ovulation-bg);
-    color: var(--phase-ovulation);
-    font-weight: 600;
+    background: linear-gradient(135deg, #E8F4F1 0%, #D4EAE4 100%);
+    color: #1F5F5F;
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px rgba(47, 122, 122, 0.2);
   }
 
-  /* SVG icons that sit inside the day cell */
-  .cal-day-icon {
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
+  /* Ovulation peak — solid teal fill with white text + soft pulse */
+  .cal-day.is-ovulation-peak {
+    background: linear-gradient(135deg, #4A9696 0%, #2F7A7A 100%);
+    color: white;
+    box-shadow: 0 3px 10px rgba(47, 122, 122, 0.32);
   }
-
-  .cal-day .blood-drop {
-    width: 8px;
-    height: 10px;
-    animation: bloodDropFall 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) both;
-  }
-
-  @keyframes bloodDropFall {
-    0% { opacity: 0; transform: translate(-50%, -8px) scale(0.4); }
-    60% { transform: translate(-50%, 2px) scale(1.15); }
-    100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-  }
-
-  .cal-day .flower {
-    width: 14px;
-    height: 14px;
-    animation: flowerBloom 0.6s cubic-bezier(0.34, 1.5, 0.64, 1) both, flowerSpin 8s linear infinite;
-    transform-origin: center;
-  }
-
-  @keyframes flowerBloom {
-    0% { opacity: 0; transform: translateX(-50%) scale(0); }
-    100% { opacity: 1; transform: translateX(-50%) scale(1); }
-  }
-
-  /* The flower ALSO needs a slow rotation — combine animations */
-  .cal-day.is-ovulation .flower {
-    animation: flowerBloom 0.6s cubic-bezier(0.34, 1.5, 0.64, 1) both;
-  }
-
-  .cal-day.is-ovulation:hover .flower {
-    animation: flowerBloom 0.6s cubic-bezier(0.34, 1.5, 0.64, 1) both, flowerWiggle 0.5s ease;
-  }
-
-  @keyframes flowerWiggle {
-    0%, 100% { transform: translateX(-50%) rotate(0deg); }
-    25% { transform: translateX(-50%) rotate(-12deg); }
-    75% { transform: translateX(-50%) rotate(12deg); }
-  }
-
-  /* Pulse glow on ovulation peak day */
   .cal-day.is-ovulation-peak::after {
     content: "";
     position: absolute;
@@ -724,7 +689,7 @@
 
   @keyframes ovulationPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(47, 122, 122, 0); }
-    50% { box-shadow: 0 0 0 4px rgba(47, 122, 122, 0.18); }
+    50% { box-shadow: 0 0 0 5px rgba(47, 122, 122, 0.18); }
   }
 
   .cal-day.today { border-color: var(--plum); font-weight: 700; }
@@ -736,9 +701,6 @@
     border-color: var(--plum);
     transform: scale(1.05);
   }
-
-  .cal-day.selected .blood-drop path { fill: white !important; }
-  .cal-day.selected .flower path { fill: white !important; }
 
   .cal-day.future { opacity: 0.55; }
 
@@ -775,6 +737,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+  }
+
+  .legend-dot-period {
+    background: linear-gradient(135deg, #FBE0E5 0%, #F4D4DC 100%);
+    box-shadow: inset 0 0 0 1.5px rgba(199, 107, 122, 0.5);
+  }
+
+  .legend-dot-ovulation {
+    background: linear-gradient(135deg, #4A9696 0%, #2F7A7A 100%);
+    box-shadow: 0 1px 3px rgba(47, 122, 122, 0.3);
+  }
+
+  .legend-dot-predicted {
+    background: transparent;
+    border: 1.5px dashed rgba(199, 107, 122, 0.6);
+    width: 11px;
+    height: 11px;
   }
 
   .cal-helper {
@@ -2784,31 +2771,15 @@
 
         <div class="cal-legend">
           <div class="cal-legend-item">
-            <span class="legend-icon">
-              <svg width="10" height="12" viewBox="0 0 10 12">
-                <path d="M5 0 C 5 0, 9 5, 9 8 A 4 4 0 0 1 1 8 C 1 5, 5 0, 5 0 Z" fill="#C76B7A"/>
-              </svg>
-            </span>
+            <span class="legend-dot legend-dot-period"></span>
             Period
           </div>
           <div class="cal-legend-item">
-            <span class="legend-icon">
-              <svg width="14" height="14" viewBox="0 0 14 14">
-                <g transform="translate(7,7)">
-                  <ellipse cx="0" cy="-3.5" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85"/>
-                  <ellipse cx="3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(60)"/>
-                  <ellipse cx="3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(120)"/>
-                  <ellipse cx="0" cy="3.5" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(180)"/>
-                  <ellipse cx="-3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(240)"/>
-                  <ellipse cx="-3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(300)"/>
-                  <circle r="1.4" fill="#C9A24A"/>
-                </g>
-              </svg>
-            </span>
+            <span class="legend-dot legend-dot-ovulation"></span>
             Ovulation
           </div>
           <div class="cal-legend-item">
-            <span class="legend-icon" style="border-radius: 50%; border: 1.5px dashed rgba(199, 107, 122, 0.6); width: 12px; height: 12px;"></span>
+            <span class="legend-dot legend-dot-predicted"></span>
             Predicted
           </div>
         </div>
@@ -3777,13 +3748,8 @@ function renderCalendar() {
     if (date.getTime() === selectedDate.getTime()) classes.push('selected');
     if (date > today) classes.push('future');
 
-    let innerHtml = `${date.getDate()}`;
-    if (isPeriod) {
-      innerHtml += `<span class="cal-day-icon"><svg class="blood-drop" viewBox="0 0 10 12"><path d="M5 0 C 5 0, 9 5, 9 8 A 4 4 0 0 1 1 8 C 1 5, 5 0, 5 0 Z" fill="#C76B7A"/></svg></span>`;
-    } else if (isOvulation) {
-      innerHtml += `<span class="cal-day-icon"><svg class="flower" viewBox="0 0 14 14"><g transform="translate(7,7)"><ellipse cx="0" cy="-3.5" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85"/><ellipse cx="3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(60)"/><ellipse cx="3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(120)"/><ellipse cx="0" cy="3.5" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(180)"/><ellipse cx="-3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(240)"/><ellipse cx="-3.5" cy="0" rx="1.8" ry="3.2" fill="#2F7A7A" opacity="0.85" transform="rotate(300)"/><circle r="1.4" fill="#C9A24A"/></g></svg></span>`;
-    }
-
+    // Day number only — phase is communicated by the colored cell pill itself.
+    const innerHtml = `<span class="cal-day-num">${date.getDate()}</span>`;
     return `<div class="${classes.join(' ')}" onclick="handleDayClick('${date.toISOString()}')">${innerHtml}</div>`;
   }
 
