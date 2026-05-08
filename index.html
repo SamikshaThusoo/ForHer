@@ -319,41 +319,40 @@
   }
   .dots i.active { background: var(--hh-blue-deep); width: 18px; border-radius: 999px; }
 
-  /* ============ FOR HER ENGAGEMENT CARD ============ */
+  /* ============ FOR HER ENGAGEMENT CARD (compact) ============ */
   .fh-engage-wrap { padding: 0 14px 14px; }
 
   .fh-engage {
     position: relative;
     overflow: hidden;
-    border-radius: 22px;
-    padding: 18px 18px 16px;
+    border-radius: 18px;
+    padding: 14px 16px 14px;
     background:
-      radial-gradient(120% 140% at 100% 0%, rgba(244, 212, 220, 0.55) 0%, transparent 60%),
-      linear-gradient(135deg, #FFFFFF 0%, #FBF3F5 55%, #F5F0F6 100%);
-    border: 1px solid rgba(91, 42, 74, 0.12);
-    box-shadow: 0 8px 22px rgba(91, 42, 74, 0.08), 0 1px 3px rgba(91, 42, 74, 0.04);
+      radial-gradient(140% 160% at 100% 0%, rgba(244, 212, 220, 0.5) 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBF3F5 60%, #F5F0F6 100%);
+    border: 1px solid rgba(91, 42, 74, 0.1);
+    box-shadow: 0 4px 14px rgba(91, 42, 74, 0.06);
     color: #3E1B33;
-    animation: fhEngageIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: fhEngageIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
   @keyframes fhEngageIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Subtle shimmer drifting across every few seconds */
   .fh-engage::after {
     content: "";
     position: absolute;
     top: 0; left: -60%;
     width: 55%; height: 100%;
-    background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.42) 50%, transparent 100%);
+    background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
     transform: skewX(-18deg);
     pointer-events: none;
-    animation: fhEngageShimmer 8s ease-in-out 2.5s infinite;
+    animation: fhEngageShimmer 9s ease-in-out 3s infinite;
   }
   @keyframes fhEngageShimmer {
-    0%, 80%, 100% { left: -60%; }
-    90%           { left: 130%; }
+    0%, 85%, 100% { left: -60%; }
+    93%           { left: 130%; }
   }
 
   .fh-engage-head {
@@ -361,7 +360,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     position: relative;
     z-index: 1;
   }
@@ -369,27 +368,26 @@
   .fh-engage-brand {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
   }
 
   .fh-engage-mark {
-    width: 30px; height: 30px;
-    border-radius: 10px;
+    width: 26px; height: 26px;
+    border-radius: 8px;
     background: linear-gradient(135deg, var(--fh-plum-1) 0%, #C97A8E 100%);
     color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-    box-shadow: 0 4px 10px rgba(91, 42, 74, 0.22);
+    font-size: 12px;
+    box-shadow: 0 3px 8px rgba(91, 42, 74, 0.2);
   }
 
   .fh-engage-title {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     color: var(--fh-plum-1);
-    letter-spacing: 0.2px;
   }
 
-  /* Cycle-day mini progress pill */
+  /* Compact cycle pill: Day n/28 · Phase */
   .fh-engage-cycle {
     display: inline-flex;
     align-items: center;
@@ -397,211 +395,249 @@
     background: rgba(91, 42, 74, 0.06);
     border: 1px solid rgba(91, 42, 74, 0.1);
     border-radius: 999px;
-    padding: 4px 10px;
+    padding: 3px 9px;
     font-size: 10.5px;
     font-weight: 600;
     color: var(--fh-plum-1);
     letter-spacing: 0.2px;
+    white-space: nowrap;
   }
-  .fh-engage-cycle .fh-engage-cycle-bar {
-    width: 38px;
-    height: 4px;
-    background: rgba(91, 42, 74, 0.12);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .fh-engage-cycle .fh-engage-cycle-bar i {
-    display: block;
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #C76B7A 0%, #8E5378 100%);
-    border-radius: 2px;
-    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  .fh-engage-cycle .dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--fh-plum-1);
+    opacity: 0.55;
   }
 
   .fh-engage-headline {
-    font-size: 16px;
+    font-size: 14.5px;
     font-weight: 700;
-    line-height: 1.32;
+    line-height: 1.3;
     color: #3E1B33;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     position: relative;
     z-index: 1;
   }
   .fh-engage-headline em { font-style: italic; color: #8E5378; font-weight: 600; }
 
   .fh-engage-sub {
-    font-size: 12.5px;
+    font-size: 11.5px;
     color: #6B5A65;
-    line-height: 1.5;
-    margin-bottom: 12px;
+    line-height: 1.45;
+    margin-bottom: 10px;
     position: relative;
     z-index: 1;
   }
 
-  .fh-engage-section-label {
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 1.1px;
-    text-transform: uppercase;
-    color: #6B5A65;
-    margin: 6px 0 6px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .fh-engage-chips {
+  .fh-engage-actions {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    gap: 8px;
     position: relative;
     z-index: 1;
-    margin-bottom: 8px;
   }
 
-  .fh-engage-chip {
-    padding: 7px 11px;
-    background: rgba(255,255,255,0.85);
-    border: 1.5px solid rgba(91, 42, 74, 0.12);
-    border-radius: 18px;
+  .fh-engage-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
     font-size: 12px;
-    font-weight: 500;
-    color: #3E1B33;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.15s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.2s ease;
-    user-select: none;
+    transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 6px;
   }
-  .fh-engage-chip:hover {
-    transform: translateY(-1px);
-    border-color: rgba(91, 42, 74, 0.25);
-  }
-  .fh-engage-chip:active { transform: scale(0.96); }
-  .fh-engage-chip.selected {
+  .fh-engage-btn:active { transform: scale(0.97); }
+
+  .fh-engage-btn.primary {
     background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
     color: #fff;
-    border-color: var(--fh-plum-1);
-    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.22);
-    animation: fhChipPulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.18);
   }
-  @keyframes fhChipPulse {
-    0% { transform: scale(0.9); }
-    60% { transform: scale(1.06); }
-    100% { transform: scale(1); }
+  .fh-engage-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(91, 42, 74, 0.24); }
+  .fh-engage-btn.secondary {
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(91, 42, 74, 0.12);
+    color: var(--fh-plum-1);
   }
-
-  /* Energy: mini 3-segment bar (Low / Balanced / High) */
-  .fh-engage-energy {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    margin: 4px 0 6px;
-    position: relative;
-    z-index: 1;
-  }
-  .fh-engage-energy-dot {
-    flex: 1;
-    height: 8px;
-    border-radius: 4px;
-    background: rgba(91, 42, 74, 0.08);
-    border: 1px solid rgba(91, 42, 74, 0.1);
-    cursor: pointer;
-    transition: background 0.18s ease, transform 0.15s ease;
-  }
-  .fh-engage-energy-dot:hover { transform: translateY(-1px); }
-  .fh-engage-energy-dot.active {
-    background: linear-gradient(90deg, #E8A8B7 0%, #C9A24A 100%);
-    border-color: transparent;
-  }
-  .fh-engage-energy-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 9.5px;
-    color: #8E5378;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    margin-bottom: 4px;
-  }
+  .fh-engage-btn.secondary:hover { background: #fff; border-color: rgba(91, 42, 74, 0.22); }
+  .fh-engage-btn .arrow { transition: transform 0.18s ease; }
+  .fh-engage-btn:hover .arrow { transform: translateX(2px); }
 
   .fh-engage-saved {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    margin-top: 4px;
-    padding: 4px 10px;
-    background: rgba(47, 122, 122, 0.1);
+    margin-left: 8px;
+    padding: 3px 9px;
+    background: rgba(47, 122, 122, 0.12);
     color: #2F7A7A;
     border-radius: 999px;
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.4px;
     opacity: 0;
     transform: translateY(2px);
     transition: opacity 0.25s ease, transform 0.25s ease;
     pointer-events: none;
-    position: relative;
-    z-index: 1;
   }
   .fh-engage-saved.show { opacity: 1; transform: translateY(0); }
-  .fh-engage-saved::before {
-    content: "✓";
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: #2F7A7A;
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 8px;
-    font-weight: 700;
+
+  /* ============ FOR HER LOG SHEET (bottom modal) ============ */
+  .fh-log-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(62, 27, 51, 0.45);
+    backdrop-filter: blur(3px);
+    z-index: 90;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .fh-log-backdrop.open { opacity: 1; visibility: visible; }
+
+  .fh-log-sheet {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%) translateY(100%);
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FBF3F5 100%);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    padding: 14px 20px 24px;
+    box-shadow: 0 -16px 40px rgba(91, 42, 74, 0.18);
+    z-index: 91;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    max-height: 86vh;
+    overflow-y: auto;
+  }
+  .fh-log-sheet.open { transform: translateX(-50%) translateY(0); }
+
+  .fh-log-handle {
+    width: 38px; height: 4px;
+    background: rgba(91, 42, 74, 0.18);
+    border-radius: 999px;
+    margin: 4px auto 14px;
   }
 
-  /* State 1 — first time CTA */
-  .fh-engage-cta {
-    width: 100%;
-    margin-top: 4px;
-    padding: 11px 14px;
+  .fh-log-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .fh-log-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #3E1B33;
+    line-height: 1.25;
+  }
+  .fh-log-title em { font-style: italic; color: #8E5378; font-weight: 600; }
+  .fh-log-sub {
+    font-size: 12px;
+    color: #6B5A65;
+    line-height: 1.45;
+    margin-top: 2px;
+  }
+  .fh-log-close {
+    width: 28px; height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(91, 42, 74, 0.06);
+    color: #6B5A65;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .fh-log-close:hover { background: rgba(91, 42, 74, 0.12); color: #3E1B33; }
+
+  .fh-log-section { margin-bottom: 14px; }
+  .fh-log-section-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: #6B5A65;
+    margin-bottom: 8px;
+  }
+
+  .fh-log-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .fh-log-chip {
+    padding: 7px 12px;
+    background: #fff;
+    border: 1.5px solid rgba(91, 42, 74, 0.12);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #3E1B33;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.18s ease, border-color 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+  }
+  .fh-log-chip:hover { border-color: rgba(91, 42, 74, 0.25); transform: translateY(-1px); }
+  .fh-log-chip:active { transform: scale(0.96); }
+  .fh-log-chip.selected {
     background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
     color: #fff;
+    border-color: var(--fh-plum-1);
+    box-shadow: 0 3px 10px rgba(91, 42, 74, 0.2);
+  }
+  .fh-log-chip.energy.selected {
+    background: linear-gradient(135deg, #E8A8B7 0%, #C9A24A 100%);
+    border-color: #C9A24A;
+  }
+  .fh-log-chip.symptom.selected {
+    background: linear-gradient(135deg, #C76B7A 0%, #A84458 100%);
+    border-color: #C76B7A;
+  }
+
+  .fh-log-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .fh-log-btn {
+    flex: 1;
+    padding: 12px 14px;
     border: none;
     border-radius: 14px;
     font-family: inherit;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(91, 42, 74, 0.22);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    display: flex;
+    transition: transform 0.15s ease, box-shadow 0.18s ease;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    position: relative;
-    z-index: 1;
-  }
-  .fh-engage-cta:hover  { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(91, 42, 74, 0.26); }
-  .fh-engage-cta:active { transform: translateY(0) scale(0.98); }
-  .fh-engage-cta .arrow { transition: transform 0.2s ease; }
-  .fh-engage-cta:hover .arrow { transform: translateX(3px); }
-
-  .fh-engage-bullets {
-    display: flex;
-    flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 12px;
-    position: relative;
-    z-index: 1;
   }
-  .fh-engage-bullet {
-    font-size: 11px;
-    font-weight: 600;
+  .fh-log-btn.primary {
+    background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(91, 42, 74, 0.22);
+  }
+  .fh-log-btn.primary:active { transform: scale(0.98); }
+  .fh-log-btn.ghost {
+    background: rgba(255,255,255,0.85);
+    border: 1.5px solid rgba(91, 42, 74, 0.12);
     color: var(--fh-plum-1);
-    background: rgba(255,255,255,0.7);
-    border: 1px solid rgba(91, 42, 74, 0.1);
-    padding: 4px 9px;
-    border-radius: 999px;
   }
+  .fh-log-btn.ghost:hover { background: #fff; border-color: rgba(91, 42, 74, 0.25); }
 
   /* ============ QUICK LINKS ============ */
   .section-title {
@@ -905,10 +941,10 @@
 
   <div class="dots"><i></i><i class="active"></i><i></i></div>
 
-  <!-- FOR HER ENGAGEMENT CARD (state-driven) -->
+  <!-- FOR HER ENGAGEMENT CARD (compact, state-driven) -->
   <div class="fh-engage-wrap">
     <div class="fh-engage" id="fhEngageCard" role="region" aria-label="For Her daily companion">
-      <!-- Markup is rendered by renderForHerEngageCard() based on stored state -->
+      <!-- Markup rendered by renderForHerEngageCard() based on stored state -->
     </div>
   </div>
 
@@ -1058,47 +1094,84 @@
   })();
 </script>
 
+<!-- For Her: lightweight log sheet (mood / energy / symptoms) -->
+<div class="fh-log-backdrop" id="fhLogBackdrop"></div>
+<section class="fh-log-sheet" id="fhLogSheet" role="dialog" aria-modal="true" aria-labelledby="fhLogTitle">
+  <div class="fh-log-handle"></div>
+  <div class="fh-log-head">
+    <div>
+      <h3 class="fh-log-title" id="fhLogTitle">A quick <em>check-in</em></h3>
+      <p class="fh-log-sub">Optional — log how you're feeling. Stays on your homepage.</p>
+    </div>
+    <button class="fh-log-close" id="fhLogClose" aria-label="Close">×</button>
+  </div>
+
+  <div class="fh-log-section">
+    <div class="fh-log-section-label">Mood</div>
+    <div class="fh-log-chips" id="fhLogMoodChips">
+      <button class="fh-log-chip" data-mood="happy"     type="button"><span>🙂</span>Happy</button>
+      <button class="fh-log-chip" data-mood="tired"     type="button"><span>😴</span>Tired</button>
+      <button class="fh-log-chip" data-mood="emotional" type="button"><span>🥺</span>Emotional</button>
+      <button class="fh-log-chip" data-mood="irritated" type="button"><span>😖</span>Irritated</button>
+      <button class="fh-log-chip" data-mood="motivated" type="button"><span>⚡</span>Motivated</button>
+    </div>
+  </div>
+
+  <div class="fh-log-section">
+    <div class="fh-log-section-label">Energy</div>
+    <div class="fh-log-chips" id="fhLogEnergyChips">
+      <button class="fh-log-chip energy" data-energy="low"      type="button">Low</button>
+      <button class="fh-log-chip energy" data-energy="balanced" type="button">Balanced</button>
+      <button class="fh-log-chip energy" data-energy="high"     type="button">High</button>
+    </div>
+  </div>
+
+  <div class="fh-log-section">
+    <div class="fh-log-section-label">Symptoms</div>
+    <div class="fh-log-chips" id="fhLogSymptomChips">
+      <button class="fh-log-chip symptom" data-symptom="cramps"   type="button">Cramps</button>
+      <button class="fh-log-chip symptom" data-symptom="acne"     type="button">Acne</button>
+      <button class="fh-log-chip symptom" data-symptom="bloating" type="button">Bloating</button>
+      <button class="fh-log-chip symptom" data-symptom="fatigue"  type="button">Fatigue</button>
+      <button class="fh-log-chip symptom" data-symptom="headache" type="button">Headache</button>
+      <button class="fh-log-chip symptom" data-symptom="cravings" type="button">Cravings</button>
+    </div>
+  </div>
+
+  <div class="fh-log-actions">
+    <button class="fh-log-btn primary" id="fhLogSaveBtn" type="button">Save</button>
+    <button class="fh-log-btn ghost" id="fhLogOpenBtn" type="button">Open full journey →</button>
+  </div>
+</section>
+
 <script>
   /* ============================================================
-     FOR HER ENGAGEMENT CARD
-     Reads the cycle snapshot persisted by cycle.html and renders one of
-     two states inline on the homepage:
-       - State 1 (no data)     → discovery prompt + Start tracking CTA
-       - State 2 (has data)    → personalised daily companion with inline
-                                  mood + energy logging
-     Inline edits are written back to the same localStorage key so they
-     stay in sync next time the user opens cycle.html.
+     FOR HER ENGAGEMENT CARD (compact)
+     - State 1: discovery prompt + Start tracking CTA
+     - State 2: glanceable daily companion (day · phase · 1 insight),
+       with two CTAs that route into the bottom-sheet logger or open
+       the full cycle.html flow.
+     - Bottom sheet houses mood / energy / symptom logging without
+       crowding the homepage.
      ============================================================ */
   (function () {
     const FH_KEY = 'forher.cycle.v1';
     const CYCLE_LENGTH = 28;
     const PERIOD_LENGTH = 5;
+
     const card = document.getElementById('fhEngageCard');
+    const sheet = document.getElementById('fhLogSheet');
+    const backdrop = document.getElementById('fhLogBackdrop');
     if (!card) return;
 
-    const MOODS = [
-      { id: 'happy',     emoji: '🙂', label: 'Happy' },
-      { id: 'calm',      emoji: '😌', label: 'Calm' },
-      { id: 'emotional', emoji: '🥺', label: 'Emotional' },
-      { id: 'irritated', emoji: '😖', label: 'Irritated' },
-      { id: 'motivated', emoji: '⚡', label: 'Motivated' },
-      { id: 'anxious',   emoji: '😰', label: 'Anxious' }
-    ];
+    const ENERGY_LEVEL = { low: 2, balanced: 5, high: 9 }; // map to 1..10 scale used by cycle.html
 
     function loadState() {
       try { return JSON.parse(localStorage.getItem(FH_KEY)) || null; }
       catch (_) { return null; }
     }
 
-    function saveCheckIn(patch) {
-      const s = loadState() || {};
-      const today = todayKey();
-      s.lastCheckIn = Object.assign(
-        { date: today, mood: null, energy: null, symptoms: [] },
-        s.lastCheckIn && s.lastCheckIn.date === today ? s.lastCheckIn : { date: today },
-        patch
-      );
-      s.updatedAt = new Date().toISOString();
+    function writeState(s) {
       try { localStorage.setItem(FH_KEY, JSON.stringify(s)); } catch (_) {}
     }
 
@@ -1108,14 +1181,11 @@
     }
 
     function daysBetween(aIso, bIso) {
-      const a = new Date(aIso + 'T00:00:00');
-      const b = new Date(bIso + 'T00:00:00');
-      return Math.floor((b - a) / 86400000);
+      return Math.floor((new Date(bIso + 'T00:00:00') - new Date(aIso + 'T00:00:00')) / 86400000);
     }
 
     function getCycleDay(state) {
       if (!state || !state.periodDays || !state.periodDays.length) return null;
-      // Most recent period start = first day of the latest contiguous run.
       const sorted = [...state.periodDays].sort();
       const starts = [];
       for (let i = 0; i < sorted.length; i++) {
@@ -1139,24 +1209,24 @@
 
     const PHASE_COPY = {
       menstrual: {
-        name: 'Menstrual phase',
-        headline: "Your body is in <em>restoration</em> mode",
-        sub: 'Gentle movement, hydration, and warm meals will land softly today.'
+        name: 'Period',
+        headline: 'Your body is in <em>restoration</em> mode',
+        sub: 'Gentle movement and hydration may help today.'
       },
       follicular: {
-        name: 'Follicular phase',
-        headline: "Motivation and clarity may <em>rise</em>",
-        sub: 'A great window for new ideas and challenging projects.'
+        name: 'Follicular',
+        headline: 'Motivation and clarity may <em>rise</em>',
+        sub: 'A good window for new ideas and challenging work.'
       },
       ovulation: {
-        name: 'Ovulation phase',
-        headline: "Energy may feel <em>elevated</em> today",
-        sub: 'Great day for presentations, collaboration, and conversations that matter.'
+        name: 'Ovulation',
+        headline: 'Energy and confidence may <em>peak</em> today',
+        sub: 'Great day for presentations and collaboration.'
       },
       luteal: {
-        name: 'Luteal phase',
-        headline: "Slow down where you <em>can</em> today",
-        sub: 'Bloating, cravings, or fatigue may rise — small breaks help.'
+        name: 'Luteal',
+        headline: 'Slow down where you <em>can</em> today',
+        sub: 'Bloating or fatigue may rise — small breaks help.'
       }
     };
 
@@ -1169,37 +1239,20 @@
           </div>
         </div>
         <div class="fh-engage-headline">Understand your cycle &amp; <em>hormonal rhythm</em></div>
-        <p class="fh-engage-sub">A premium, gynae-led daily companion for cycle, fertility, and pre-conception care.</p>
-        <div class="fh-engage-bullets">
-          <span class="fh-engage-bullet">Period tracking</span>
-          <span class="fh-engage-bullet">PCOS risk</span>
-          <span class="fh-engage-bullet">Daily insights</span>
+        <p class="fh-engage-sub">Period tracking · PCOS risk · daily insights — built around you.</p>
+        <div class="fh-engage-actions">
+          <button class="fh-engage-btn primary" type="button" data-action="open">
+            Start tracking <span class="arrow">→</span>
+          </button>
         </div>
-        <button class="fh-engage-cta" type="button" onclick="window.location.href='cycle.html'">
-          Start tracking <span class="arrow">→</span>
-        </button>
       `;
+      bindCardActions(false);
     }
 
     function renderState2(state) {
       const day = getCycleDay(state);
       const phase = getPhase(day);
       const copy = PHASE_COPY[phase] || PHASE_COPY.follicular;
-      const pct = day ? Math.min(100, (day / CYCLE_LENGTH) * 100) : 0;
-      const todays = state.lastCheckIn && state.lastCheckIn.date === todayKey() ? state.lastCheckIn : null;
-      const selectedMood = todays ? todays.mood : null;
-      const selectedEnergy = todays ? todays.energy : null;
-
-      const moodChips = MOODS.map(m => `
-        <button class="fh-engage-chip mood-chip ${selectedMood === m.id ? 'selected' : ''}"
-                data-mood="${m.id}" type="button" aria-label="${m.label}">
-          <span>${m.emoji}</span>${m.label}
-        </button>
-      `).join('');
-
-      const energyDots = [1,2,3,4,5,6,7,8,9,10].map(lvl => `
-        <div class="fh-engage-energy-dot ${selectedEnergy && lvl <= selectedEnergy ? 'active' : ''}" data-level="${lvl}"></div>
-      `).join('');
 
       card.innerHTML = `
         <div class="fh-engage-head">
@@ -1208,53 +1261,127 @@
             <div class="fh-engage-title">For Her</div>
           </div>
           <div class="fh-engage-cycle">
-            Day ${day}/${CYCLE_LENGTH}
-            <span class="fh-engage-cycle-bar"><i style="width:${pct.toFixed(0)}%"></i></span>
+            Day ${day}/${CYCLE_LENGTH}<span class="dot"></span>${copy.name}
           </div>
         </div>
         <div class="fh-engage-headline">${copy.headline}</div>
         <p class="fh-engage-sub">${copy.sub}</p>
-
-        <div class="fh-engage-section-label">Mood</div>
-        <div class="fh-engage-chips" id="fhEngageMoodChips">${moodChips}</div>
-
-        <div class="fh-engage-section-label">Energy</div>
-        <div class="fh-engage-energy" id="fhEngageEnergyBar">${energyDots}</div>
-        <div class="fh-engage-energy-labels"><span>Low</span><span>Balanced</span><span>High</span></div>
-
-        <div class="fh-engage-saved" id="fhEngageSaved">Saved</div>
+        <div class="fh-engage-actions">
+          <button class="fh-engage-btn secondary" type="button" data-action="log">Log symptoms</button>
+          <button class="fh-engage-btn primary"   type="button" data-action="open">Open <span class="arrow">→</span></button>
+          <span class="fh-engage-saved" id="fhEngageSaved">Saved</span>
+        </div>
       `;
+      bindCardActions(true);
+    }
 
-      // Mood chip handlers
-      card.querySelectorAll('.mood-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          const moodId = chip.dataset.mood;
-          const wasSelected = chip.classList.contains('selected');
-          card.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
-          if (!wasSelected) chip.classList.add('selected');
-          saveCheckIn({ mood: wasSelected ? null : moodId });
-          flashSaved();
-        });
-      });
-
-      // Energy bar handlers
-      const dots = card.querySelectorAll('.fh-engage-energy-dot');
-      dots.forEach(dot => {
-        dot.addEventListener('click', () => {
-          const level = parseInt(dot.dataset.level, 10);
-          const current = (loadState() && loadState().lastCheckIn && loadState().lastCheckIn.date === todayKey())
-            ? (loadState().lastCheckIn.energy || null) : null;
-          const newLevel = current === level ? null : level;
-          dots.forEach(d => {
-            const dl = parseInt(d.dataset.level, 10);
-            d.classList.toggle('active', newLevel != null && dl <= newLevel);
-          });
-          saveCheckIn({ energy: newLevel });
-          flashSaved();
+    function bindCardActions(hasData) {
+      card.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.action === 'log') openLogSheet();
+          else if (btn.dataset.action === 'open') window.location.href = 'cycle.html';
         });
       });
     }
 
+    // ---------- Bottom sheet logger ----------
+    function openLogSheet() {
+      hydrateSheetFromState();
+      sheet.classList.add('open');
+      backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLogSheet() {
+      sheet.classList.remove('open');
+      backdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function hydrateSheetFromState() {
+      const s = loadState();
+      const t = (s && s.lastCheckIn && s.lastCheckIn.date === todayKey()) ? s.lastCheckIn : null;
+      sheet.querySelectorAll('.fh-log-chip').forEach(c => c.classList.remove('selected'));
+      if (!t) return;
+      if (t.mood) {
+        const el = sheet.querySelector(`[data-mood="${t.mood}"]`);
+        if (el) el.classList.add('selected');
+      }
+      if (t.energy) {
+        // Map 1..10 stored value back to low/balanced/high.
+        let band = 'balanced';
+        if (t.energy <= 3) band = 'low';
+        else if (t.energy >= 7) band = 'high';
+        const el = sheet.querySelector(`[data-energy="${band}"]`);
+        if (el) el.classList.add('selected');
+      }
+      (t.symptoms || []).forEach(sym => {
+        const el = sheet.querySelector(`[data-symptom="${sym}"]`);
+        if (el) el.classList.add('selected');
+      });
+    }
+
+    // Mood: single-select toggle
+    sheet.querySelectorAll('#fhLogMoodChips .fh-log-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const wasSelected = chip.classList.contains('selected');
+        sheet.querySelectorAll('#fhLogMoodChips .fh-log-chip').forEach(c => c.classList.remove('selected'));
+        if (!wasSelected) chip.classList.add('selected');
+      });
+    });
+    // Energy: single-select toggle
+    sheet.querySelectorAll('#fhLogEnergyChips .fh-log-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const wasSelected = chip.classList.contains('selected');
+        sheet.querySelectorAll('#fhLogEnergyChips .fh-log-chip').forEach(c => c.classList.remove('selected'));
+        if (!wasSelected) chip.classList.add('selected');
+      });
+    });
+    // Symptoms: multi-select
+    sheet.querySelectorAll('#fhLogSymptomChips .fh-log-chip').forEach(chip => {
+      chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    });
+
+    function collectSheetState() {
+      const moodEl = sheet.querySelector('#fhLogMoodChips .fh-log-chip.selected');
+      const energyEl = sheet.querySelector('#fhLogEnergyChips .fh-log-chip.selected');
+      const symptoms = [...sheet.querySelectorAll('#fhLogSymptomChips .fh-log-chip.selected')]
+        .map(c => c.dataset.symptom);
+      return {
+        mood: moodEl ? moodEl.dataset.mood : null,
+        energy: energyEl ? ENERGY_LEVEL[energyEl.dataset.energy] : null,
+        symptoms
+      };
+    }
+
+    function saveSheet() {
+      const patch = collectSheetState();
+      const s = loadState() || {};
+      s.lastCheckIn = {
+        date: todayKey(),
+        mood: patch.mood,
+        energy: patch.energy,
+        symptoms: patch.symptoms
+      };
+      s.updatedAt = new Date().toISOString();
+      writeState(s);
+      flashSaved();
+    }
+
+    document.getElementById('fhLogClose').addEventListener('click', closeLogSheet);
+    backdrop.addEventListener('click', closeLogSheet);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sheet.classList.contains('open')) closeLogSheet();
+    });
+    document.getElementById('fhLogSaveBtn').addEventListener('click', () => {
+      saveSheet();
+      closeLogSheet();
+    });
+    document.getElementById('fhLogOpenBtn').addEventListener('click', () => {
+      saveSheet();
+      window.location.href = 'cycle.html';
+    });
+
+    // ---------- Saved badge ----------
     let savedTimer = null;
     function flashSaved() {
       const el = card.querySelector('#fhEngageSaved');
@@ -1268,8 +1395,7 @@
       const state = loadState();
       if (state && state.hasData) renderState2(state);
       else renderState1();
-      // Mirror state into the existing Quick Links tile so its sub-copy stays
-      // current without changing the discovery entry point.
+      // Keep the existing Quick Links tile sub-copy in sync.
       const tile = document.getElementById('fhTile');
       const tileSub = tile && tile.querySelector('[data-fh-tile-sub]');
       if (tile && tileSub && state && state.hasData) {
@@ -1278,13 +1404,12 @@
         const copy = PHASE_COPY[phase];
         if (day && copy) {
           tile.dataset.state = 'returning';
-          tileSub.textContent = `Day ${day} • ${copy.name}`;
+          tileSub.textContent = `Day ${day} • ${copy.name} phase`;
         }
       }
     }
 
     render();
-    // Re-render if storage changes from another tab (e.g., cycle.html in another tab).
     window.addEventListener('storage', (e) => { if (e.key === FH_KEY) render(); });
   })();
 </script>
