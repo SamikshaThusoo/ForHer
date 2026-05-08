@@ -2159,6 +2159,24 @@
 
   .day-sheet-cta:hover { background: var(--rose-bg); border-color: var(--rose-deep); color: var(--phase-menstrual); }
 
+  .day-sheet-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .day-sheet-actions .day-sheet-cta { margin-top: 0; }
+
+  .day-sheet-cta.danger {
+    background: linear-gradient(135deg, var(--phase-menstrual-bg) 0%, var(--rose-bg) 100%);
+    color: var(--phase-menstrual);
+    border-color: rgba(199, 107, 122, 0.4);
+  }
+  .day-sheet-cta.danger:hover {
+    background: var(--phase-menstrual);
+    color: white;
+    border-color: var(--phase-menstrual);
+  }
+
   /* ============================================
      HORMONAL CLOCK — DRAGGABLE HANDLE + DYNAMIC INSIGHTS
      ============================================ */
@@ -3468,7 +3486,10 @@
       </div>
     </div>
   </div>
-  <button class="day-sheet-cta" onclick="closeDaySheet()">Close</button>
+  <div class="day-sheet-actions">
+    <button class="day-sheet-cta danger" id="daySheetRemoveBtn" style="display: none;" onclick="removePeriodFromSheet()">Remove period day</button>
+    <button class="day-sheet-cta" onclick="closeDaySheet()">Close</button>
+  </div>
 </div>
 
 <script>
@@ -4024,7 +4045,11 @@ function handleDayClick(isoString) {
 // =================================================================
 // DAY INSIGHT SHEET (calendar tap)
 // =================================================================
+let daySheetActiveDate = null;
+
 function openDaySheet(date) {
+  daySheetActiveDate = new Date(date);
+  daySheetActiveDate.setHours(0, 0, 0, 0);
   const cycleDay = getCycleDayForDate(date);
   const phase = getPhase(cycleDay);
   const opts = { weekday: 'long', month: 'long', day: 'numeric' };
@@ -4054,6 +4079,12 @@ function openDaySheet(date) {
     document.getElementById('daySheetWork').textContent = pack.work;
   }
 
+  // Show "Remove period day" only when the tapped date is currently logged.
+  const removeBtn = document.getElementById('daySheetRemoveBtn');
+  if (removeBtn) {
+    removeBtn.style.display = periodDays.has(dateKey(daySheetActiveDate)) ? '' : 'none';
+  }
+
   document.getElementById('daySheetBackdrop').classList.add('open');
   document.getElementById('daySheet').classList.add('open');
 }
@@ -4061,6 +4092,20 @@ function openDaySheet(date) {
 function closeDaySheet() {
   document.getElementById('daySheetBackdrop').classList.remove('open');
   document.getElementById('daySheet').classList.remove('open');
+}
+
+function removePeriodFromSheet() {
+  if (!daySheetActiveDate) return;
+  const key = dateKey(daySheetActiveDate);
+  if (!periodDays.has(key)) return;
+  periodDays.delete(key);
+  // Refresh everything that depends on period dates.
+  renderCalendar();
+  updatePhaseAndToday(today);
+  if (currentScreen === 2) { invalidateRingStatic(); updateScreen2(); }
+  persistCycleState();
+  closeDaySheet();
+  showToast('Period day removed');
 }
 
 function changeMonth(delta) {
