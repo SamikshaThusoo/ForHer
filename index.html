@@ -521,7 +521,7 @@
   }
   .fh-engage-row:hover .row-chev { transform: translateX(2px); }
 
-  /* State 1: stronger discovery CTA */
+  /* State 1: stronger discovery CTA with hover glass shimmer */
   .fh-engage-btn {
     flex: 1;
     padding: 10px 14px;
@@ -539,8 +539,31 @@
     background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
     color: #fff;
     box-shadow: 0 6px 18px rgba(91, 42, 74, 0.2);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
   }
+  /* Diagonal glass shimmer that sweeps across on hover (matches the
+     For Her quick-link tile treatment). */
+  .fh-engage-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -65%;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(110deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.42) 50%,
+      transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    transition: left 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+  }
+  .fh-engage-btn > * { position: relative; z-index: 1; }
   .fh-engage-btn:hover  { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(91, 42, 74, 0.26); }
+  .fh-engage-btn:hover::before { left: 130%; }
   .fh-engage-btn:active { transform: translateY(0) scale(0.98); }
   .fh-engage-btn .arrow { transition: transform 0.18s ease; }
   .fh-engage-btn:hover .arrow { transform: translateX(3px); }
