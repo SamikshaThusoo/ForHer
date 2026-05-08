@@ -437,26 +437,28 @@
     z-index: 1;
   }
 
-  /* Compact content-sized row CTA (state 2) — clean at rest, glass shimmer on hover */
+  /* Dark plum row CTA (state 2) — same gradient family as Start tracking,
+     with hover diagonal shimmer */
   .fh-engage-row {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     padding: 8px 12px 8px 10px;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(91, 42, 74, 0.14);
+    background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 999px;
     cursor: pointer;
-    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.2s ease;
+    transition: transform 0.18s ease, box-shadow 0.2s ease;
     font-family: inherit;
     text-align: left;
-    color: var(--fh-plum-1);
+    color: #fff;
     position: relative;
     overflow: hidden;
     isolation: isolate;
+    box-shadow: 0 6px 18px rgba(91, 42, 74, 0.22);
   }
-  /* Diagonal shimmer that sweeps across only on hover (matches the
-     Start tracking button treatment). */
+  /* Diagonal sheen sweeps across only on hover (same treatment as the
+     Start tracking button) */
   .fh-engage-row::before {
     content: "";
     position: absolute;
@@ -466,7 +468,7 @@
     height: 100%;
     background: linear-gradient(110deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.65) 50%,
+      rgba(255, 255, 255, 0.42) 50%,
       transparent 100%);
     transform: skewX(-18deg);
     pointer-events: none;
@@ -475,10 +477,8 @@
   }
   .fh-engage-row > * { position: relative; z-index: 1; }
   .fh-engage-row:hover {
-    background: #fff;
-    border-color: rgba(91, 42, 74, 0.25);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(91, 42, 74, 0.1);
+    box-shadow: 0 10px 24px rgba(91, 42, 74, 0.28);
   }
   .fh-engage-row:hover::before { left: 130%; }
   .fh-engage-row:active { transform: translateY(0) scale(0.98); }
@@ -486,8 +486,8 @@
   .fh-engage-row .row-icon {
     width: 24px; height: 24px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FBE0E5 0%, #F4D4DC 100%);
-    color: #8E5378;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -505,18 +505,17 @@
   .fh-engage-row .row-label {
     font-size: 12.5px;
     font-weight: 700;
-    color: var(--fh-plum-1);
+    color: #fff;
   }
 
   .fh-engage-row .row-hint {
     font-size: 10px;
-    color: #8E5378;
+    color: rgba(255, 255, 255, 0.78);
     font-weight: 500;
-    opacity: 0.85;
   }
 
   .fh-engage-row .row-chev {
-    color: #8E5378;
+    color: rgba(255, 255, 255, 0.85);
     font-size: 14px;
     transition: transform 0.2s ease;
     flex-shrink: 0;
