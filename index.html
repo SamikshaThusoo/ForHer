@@ -431,42 +431,102 @@
 
   .fh-engage-actions {
     display: flex;
+    align-items: center;
     gap: 8px;
     position: relative;
     z-index: 1;
   }
 
+  /* Compact full-width row CTA (state 2) — feels native and tappable */
+  .fh-engage-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 14px 10px 12px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(91, 42, 74, 0.14);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+    text-align: left;
+    color: var(--fh-plum-1);
+  }
+  .fh-engage-row:hover {
+    background: #fff;
+    border-color: rgba(91, 42, 74, 0.28);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(91, 42, 74, 0.1);
+  }
+  .fh-engage-row:active { transform: translateY(0) scale(0.98); }
+
+  .fh-engage-row .row-icon {
+    width: 30px; height: 30px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #FBE0E5 0%, #F4D4DC 100%);
+    color: #8E5378;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .fh-engage-row .row-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .fh-engage-row .row-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fh-plum-1);
+    line-height: 1.2;
+  }
+
+  .fh-engage-row .row-hint {
+    font-size: 10.5px;
+    color: #8E5378;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+
+  .fh-engage-row .row-chev {
+    color: #8E5378;
+    font-size: 16px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  .fh-engage-row:hover .row-chev { transform: translateX(3px); }
+
+  /* State 1: stronger discovery CTA */
   .fh-engage-btn {
     flex: 1;
-    padding: 8px 12px;
+    padding: 10px 14px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-  }
-  .fh-engage-btn:active { transform: scale(0.97); }
-
-  .fh-engage-btn.primary {
+    gap: 8px;
     background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.18);
+    box-shadow: 0 6px 18px rgba(91, 42, 74, 0.2);
   }
-  .fh-engage-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(91, 42, 74, 0.24); }
-  .fh-engage-btn.secondary {
-    background: rgba(255,255,255,0.85);
-    border: 1px solid rgba(91, 42, 74, 0.12);
-    color: var(--fh-plum-1);
-  }
-  .fh-engage-btn.secondary:hover { background: #fff; border-color: rgba(91, 42, 74, 0.22); }
+  .fh-engage-btn:hover  { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(91, 42, 74, 0.26); }
+  .fh-engage-btn:active { transform: translateY(0) scale(0.98); }
   .fh-engage-btn .arrow { transition: transform 0.18s ease; }
-  .fh-engage-btn:hover .arrow { transform: translateX(2px); }
+  .fh-engage-btn:hover .arrow { transform: translateX(3px); }
 
   .fh-engage-saved {
     display: inline-flex;
@@ -508,85 +568,83 @@
     width: 100%;
     max-width: 420px;
     background: linear-gradient(180deg, #FFFFFF 0%, #FBF3F5 100%);
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
-    padding: 14px 20px 24px;
+    border-top-left-radius: 26px;
+    border-top-right-radius: 26px;
+    padding: 18px 24px 32px;
     box-shadow: 0 -16px 40px rgba(91, 42, 74, 0.18);
     z-index: 91;
     transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-    max-height: 86vh;
+    max-height: 88vh;
     overflow-y: auto;
   }
   .fh-log-sheet.open { transform: translateX(-50%) translateY(0); }
 
   .fh-log-handle {
-    width: 38px; height: 4px;
+    width: 40px; height: 4px;
     background: rgba(91, 42, 74, 0.18);
     border-radius: 999px;
-    margin: 4px auto 14px;
+    margin: 4px auto 18px;
   }
 
   .fh-log-head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: 12px;
+    margin-bottom: 22px;
   }
   .fh-log-title {
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
     color: #3E1B33;
     line-height: 1.25;
   }
   .fh-log-title em { font-style: italic; color: #8E5378; font-weight: 600; }
-  .fh-log-sub {
-    font-size: 12px;
-    color: #6B5A65;
-    line-height: 1.45;
-    margin-top: 2px;
-  }
   .fh-log-close {
-    width: 28px; height: 28px;
+    width: 30px; height: 30px;
     border: none;
     border-radius: 50%;
     background: rgba(91, 42, 74, 0.06);
     color: #6B5A65;
-    font-size: 16px;
+    font-size: 17px;
     cursor: pointer;
     flex-shrink: 0;
+    line-height: 1;
   }
   .fh-log-close:hover { background: rgba(91, 42, 74, 0.12); color: #3E1B33; }
 
-  .fh-log-section { margin-bottom: 14px; }
+  .fh-log-section { margin-bottom: 22px; }
+  .fh-log-section:last-of-type { margin-bottom: 24px; }
   .fh-log-section-label {
-    font-size: 9.5px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1.1px;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
     color: #6B5A65;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
   }
 
   .fh-log-chips {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
   .fh-log-chip {
-    padding: 7px 12px;
+    padding: 9px 14px;
     background: #fff;
     border: 1.5px solid rgba(91, 42, 74, 0.12);
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 500;
     color: #3E1B33;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.18s ease, border-color 0.18s ease;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     user-select: none;
   }
   .fh-log-chip:hover { border-color: rgba(91, 42, 74, 0.25); transform: translateY(-1px); }
@@ -605,13 +663,13 @@
   /* Energy scale (1..10 segments) */
   .fh-log-energy-bar {
     display: flex;
-    gap: 3px;
+    gap: 4px;
     align-items: center;
   }
   .fh-log-energy-dot {
     flex: 1;
-    height: 10px;
-    border-radius: 4px;
+    height: 12px;
+    border-radius: 5px;
     background: #FBF3F5;
     border: 1px solid rgba(91, 42, 74, 0.12);
     cursor: pointer;
@@ -628,20 +686,20 @@
   .fh-log-energy-labels {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: 10.5px;
     color: #8E5378;
-    margin-top: 6px;
+    margin-top: 10px;
     padding: 0 2px;
     font-weight: 600;
     letter-spacing: 0.3px;
   }
   .fh-log-energy-readout {
-    margin-left: 8px;
-    padding: 3px 8px;
+    margin-left: 10px;
+    padding: 3px 9px;
     background: rgba(91, 42, 74, 0.06);
     color: var(--fh-plum-1);
     border-radius: 999px;
-    font-size: 10px;
+    font-size: 10.5px;
     font-weight: 600;
     letter-spacing: 0.3px;
     text-transform: none;
@@ -652,8 +710,8 @@
 
   .fh-log-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 6px;
+    gap: 10px;
+    margin-top: 10px;
   }
   .fh-log-btn {
     flex: 1;
@@ -1143,10 +1201,7 @@
 <section class="fh-log-sheet" id="fhLogSheet" role="dialog" aria-modal="true" aria-labelledby="fhLogTitle">
   <div class="fh-log-handle"></div>
   <div class="fh-log-head">
-    <div>
-      <h3 class="fh-log-title" id="fhLogTitle">A quick <em>check-in</em></h3>
-      <p class="fh-log-sub">Optional — log how you're feeling. Stays on your homepage.</p>
-    </div>
+    <h3 class="fh-log-title" id="fhLogTitle">A quick <em>check-in</em></h3>
     <button class="fh-log-close" id="fhLogClose" aria-label="Close">×</button>
   </div>
 
@@ -1332,7 +1387,14 @@
         <div class="fh-engage-headline">${copy.headline}</div>
         <p class="fh-engage-sub">${copy.sub}</p>
         <div class="fh-engage-actions">
-          <button class="fh-engage-btn primary" type="button" data-action="log">Log symptoms</button>
+          <button class="fh-engage-row" type="button" data-action="log" aria-label="Log how you feel today">
+            <span class="row-icon">❤</span>
+            <span class="row-body">
+              <span class="row-label">Log how you feel today</span>
+              <span class="row-hint">Mood · energy · symptoms</span>
+            </span>
+            <span class="row-chev">›</span>
+          </button>
           <span class="fh-engage-saved" id="fhEngageSaved">Saved</span>
         </div>
       `;
