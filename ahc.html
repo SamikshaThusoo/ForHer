@@ -1406,6 +1406,18 @@ function renderResults(result) {
   const { tier, domainSignals, domainPositive, positiveDomainCount,
           pedersenPredictors, pedersenCount, tshAbnormal } = result;
 
+  // Persist a lightweight marker so the For Her PCOS routing knows AHC data
+  // exists. Future PCOS taps from the homepage / chooser will deep-link
+  // here (ahc.html) instead of the cold self-assessment.
+  try {
+    localStorage.setItem('forher.ahc.v1', JSON.stringify({
+      tier,
+      positiveDomainCount,
+      pedersenCount,
+      completedAt: new Date().toISOString()
+    }));
+  } catch (_) {}
+
   // ---- Risk hero ----
   const tierConfig = {
     low: {

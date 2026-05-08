@@ -247,6 +247,7 @@
   }
 
   .goal-card[data-goal="cycle"]::after { background: radial-gradient(circle, rgba(232, 168, 183, 0.5) 0%, transparent 70%); }
+  .goal-card[data-goal="pcos"]::after { background: radial-gradient(circle, rgba(142, 83, 120, 0.4) 0%, transparent 70%); }
   .goal-card[data-goal="ttc"]::after { background: radial-gradient(circle, rgba(201, 162, 74, 0.45) 0%, transparent 70%); }
   .goal-card[data-goal="pregnant"]::after { background: radial-gradient(circle, rgba(143, 196, 196, 0.45) 0%, transparent 70%); }
   .goal-card[data-goal="explore"]::after { background: radial-gradient(circle, rgba(201, 166, 188, 0.4) 0%, transparent 70%); }
@@ -266,6 +267,7 @@
   }
 
   .goal-card[data-goal="cycle"] .goal-icon { background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%); }
+  .goal-card[data-goal="pcos"] .goal-icon { background: linear-gradient(135deg, var(--plum-soft) 0%, var(--plum) 100%); }
   .goal-card[data-goal="ttc"] .goal-icon { background: linear-gradient(135deg, var(--gold-soft) 0%, var(--gold) 100%); }
   .goal-card[data-goal="pregnant"] .goal-icon { background: linear-gradient(135deg, var(--teal-soft) 0%, var(--teal) 100%); }
   .goal-card[data-goal="explore"] .goal-icon { background: linear-gradient(135deg, #C9A6BC 0%, #8E5378 100%); }
@@ -2870,13 +2872,22 @@
       <div class="goal-card stagger-1" data-goal="cycle" onclick="selectGoal('cycle')">
         <div class="goal-icon">☾</div>
         <div class="goal-body">
-          <div class="goal-title">Tracking my <em>cycle</em></div>
+          <div class="goal-title">Track my <em>cycle</em></div>
           <div class="goal-desc">Log periods, predict cycles, and understand your phases.</div>
         </div>
         <div class="goal-radio"></div>
       </div>
 
-      <div class="goal-card stagger-2" data-goal="ttc" onclick="selectGoal('ttc')">
+      <div class="goal-card stagger-2" data-goal="pcos" onclick="selectGoal('pcos')">
+        <div class="goal-icon">◐</div>
+        <div class="goal-body">
+          <div class="goal-title">Check <em>PCOS risk</em></div>
+          <div class="goal-desc">A short check-in. We'll use your AHC report if you have one.</div>
+        </div>
+        <div class="goal-radio"></div>
+      </div>
+
+      <div class="goal-card stagger-3" data-goal="ttc" onclick="selectGoal('ttc')">
         <div class="goal-icon">❀</div>
         <div class="goal-body">
           <div class="goal-title">Trying to <em>conceive</em></div>
@@ -2885,7 +2896,7 @@
         <div class="goal-radio"></div>
       </div>
 
-      <div class="goal-card stagger-3" data-goal="pregnant" onclick="selectGoal('pregnant')">
+      <div class="goal-card stagger-4" data-goal="pregnant" onclick="selectGoal('pregnant')">
         <div class="goal-icon">✦</div>
         <div class="goal-body">
           <div class="goal-title">I'm <em>pregnant</em></div>
@@ -2894,7 +2905,7 @@
         <div class="goal-radio"></div>
       </div>
 
-      <div class="goal-card stagger-4" data-goal="explore" onclick="selectGoal('explore')">
+      <div class="goal-card stagger-5" data-goal="explore" onclick="selectGoal('explore')">
         <div class="goal-icon">❋</div>
         <div class="goal-body">
           <div class="goal-title">Just <em>exploring</em></div>
@@ -3858,8 +3869,39 @@ function selectGoal(goal) {
   document.getElementById('goalContinueBtn').disabled = false;
 }
 
+const FH_JOURNEY_KEY = 'forher.journey.v1';
+const FH_AHC_KEY = 'forher.ahc.v1';
+
+function persistJourney(goal) {
+  try { localStorage.setItem(FH_JOURNEY_KEY, JSON.stringify({ goal, savedAt: new Date().toISOString() })); }
+  catch (_) {}
+}
+
+function readJourney() {
+  try {
+    const raw = localStorage.getItem(FH_JOURNEY_KEY);
+    return raw ? JSON.parse(raw).goal : null;
+  } catch (_) { return null; }
+}
+
+function hasAhcData() {
+  try { return !!localStorage.getItem(FH_AHC_KEY); } catch (_) { return false; }
+}
+
+function routePcos() {
+  // PCOS routing: AHC report exists → ahc.html with the existing journey;
+  // otherwise drop the user straight into the PCOS self-assessment.
+  if (hasAhcData()) window.location.href = 'ahc.html';
+  else window.location.href = 'banner.html?source=forher';
+}
+
 function confirmGoal() {
   if (!selectedGoal) return;
+
+  // Persist the user's journey so future visits can deep-link.
+  persistJourney(selectedGoal);
+
+  if (selectedGoal === 'pcos') { routePcos(); return; }
 
   if (selectedGoal === 'ttc') {
     simState.ttc = true;
@@ -5122,6 +5164,22 @@ function showToast(msg) {
 // Init
 hydrateCycleState();
 setupOnboardingChips();
+
+// Deep-link if the user already has a saved journey — skip the chooser.
+(function autoSkipChooser() {
+  const saved = readJourney();
+  if (!saved) return;
+  // PCOS short-circuits to ahc/banner before any UI renders.
+  if (saved === 'pcos') { routePcos(); return; }
+  // Other journeys: hydrate selectedGoal and confirm so the user lands on
+  // their flow (cycle/ttc/explore → screen 1, pregnant → screen 1p).
+  selectedGoal = saved;
+  if (saved === 'ttc') simState.ttc = true;
+  document.getElementById('stepper').classList.remove('hidden');
+  customiseForGoal();
+  if (saved === 'pregnant') goTo('1p');
+  else goTo(1);
+})();
 </script>
 </body>
 </html>
