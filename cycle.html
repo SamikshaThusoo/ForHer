@@ -4728,9 +4728,20 @@ const dailyCheckIn = { mood: null, energy: null, symptoms: new Set() };
 let dailyCheckinBound = false;
 let dailyCheckinSavedTimer = null;
 
+function hasLoggedToday() {
+  return !!(dailyCheckIn.mood || dailyCheckIn.energy ||
+            (dailyCheckIn.symptoms && dailyCheckIn.symptoms.size > 0));
+}
+
 function revealDailyCheckIn() {
   const el = document.getElementById('dailyCheckinWrap');
   if (!el) return;
+  // If today's check-in was already filled (via homepage card sheet or
+  // an earlier visit), don't nudge the user to log it a second time.
+  if (hasLoggedToday()) {
+    el.style.display = 'none';
+    return;
+  }
   el.style.display = 'block';
   bindDailyCheckin();
 }
