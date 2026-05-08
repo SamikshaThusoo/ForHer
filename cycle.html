@@ -3889,10 +3889,8 @@ function hasAhcData() {
 }
 
 function routePcos() {
-  // PCOS routing: AHC report exists → ahc.html with the existing journey;
-  // otherwise drop the user straight into the PCOS self-assessment.
-  if (hasAhcData()) window.location.href = 'ahc.html';
-  else window.location.href = 'banner.html?source=forher';
+  // Prototype mode: always route PCOS through the AHC-driven journey.
+  window.location.href = 'ahc.html';
 }
 
 function confirmGoal() {
@@ -5165,21 +5163,8 @@ function showToast(msg) {
 hydrateCycleState();
 setupOnboardingChips();
 
-// Deep-link if the user already has a saved journey — skip the chooser.
-(function autoSkipChooser() {
-  const saved = readJourney();
-  if (!saved) return;
-  // PCOS short-circuits to ahc/banner before any UI renders.
-  if (saved === 'pcos') { routePcos(); return; }
-  // Other journeys: hydrate selectedGoal and confirm so the user lands on
-  // their flow (cycle/ttc/explore → screen 1, pregnant → screen 1p).
-  selectedGoal = saved;
-  if (saved === 'ttc') simState.ttc = true;
-  document.getElementById('stepper').classList.remove('hidden');
-  customiseForGoal();
-  if (saved === 'pregnant') goTo('1p');
-  else goTo(1);
-})();
+// Prototype mode: always show the "What brings you here?" chooser on
+// entry, even for returning users. (Auto-skip disabled intentionally.)
 </script>
 </body>
 </html>

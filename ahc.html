@@ -968,9 +968,38 @@
     </div>
 
     <div class="cta-wrap">
-      <button class="btn" onclick="goToPCOS()">
+      <button class="btn" onclick="goTo('Dx')">
         Understand your PCOS risk <span class="arrow">→</span>
       </button>
+    </div>
+  </div>
+
+  <!-- SCREEN DX: DIAGNOSIS GATE (asked before the questionnaire begins) -->
+  <div class="screen" id="screenDx">
+    <span class="eyebrow">Quick check</span>
+    <h1>Have you been <span class="italic">diagnosed</span> with PCOS or PCOD?</h1>
+    <p class="lead">A doctor's diagnosis means we can skip the screening and go straight to your care plan.</p>
+
+    <div class="action-card" onclick="handleDx('yes')">
+      <div class="action-icon icon-consult">✓</div>
+      <div class="action-content">
+        <div class="action-title">Yes, I've been diagnosed</div>
+        <div class="action-sub">Take me to my care plan and next-step recommendations.</div>
+      </div>
+      <div class="action-chevron">›</div>
+    </div>
+
+    <div class="action-card" onclick="handleDx('no')">
+      <div class="action-icon icon-test">◐</div>
+      <div class="action-content">
+        <div class="action-title">No / Not sure</div>
+        <div class="action-sub">Run the 2-minute symptom assessment to understand your risk.</div>
+      </div>
+      <div class="action-chevron">›</div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="btn btn-secondary" onclick="goTo(1)">‹ Back</button>
     </div>
   </div>
 
@@ -1530,8 +1559,20 @@ function goTo(n) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen' + n).classList.add('active');
   currentScreen = n;
-  updateProgress(n);
+  // Diagnosis gate sits between step 1 and step 2 — keep the bar at step 1.
+  if (typeof n === 'number') updateProgress(n);
+  else if (n === 'Dx') updateProgress(1);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handleDx(answer) {
+  if (answer === 'yes') {
+    // Already diagnosed — surface the care plan directly.
+    try { localStorage.setItem('forher.pcos.diagnosed', 'true'); } catch (_) {}
+    goTo(4);
+  } else {
+    goToPCOS();
+  }
 }
 
 function updateProgress(n) {
