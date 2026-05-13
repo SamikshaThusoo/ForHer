@@ -4053,9 +4053,15 @@ function updateScreen2() {
   const isOvulationFocus = (selectedGoal === 'ttc');
 
   if (cycleDay <= PERIOD_LENGTH) {
-    document.getElementById('countdownLabel').textContent = 'Period day';
+    // Distinguish a logged period day from a *predicted* one. Until the user
+    // actually logs the new period, don't assert "You're on your period" —
+    // the cycle math is a forecast, not a fact.
+    const isLoggedToday = periodDays.has(dateKey(today));
+    document.getElementById('countdownLabel').textContent = isLoggedToday ? 'Period day' : 'Likely period day';
     document.getElementById('countdownNumber').innerHTML = `${cycleDay} <em>of ${PERIOD_LENGTH}</em>`;
-    document.getElementById('countdownSub').textContent = "You're on your period. Rest is productive.";
+    document.getElementById('countdownSub').textContent = isLoggedToday
+      ? "You're on your period. Rest is productive."
+      : "Likely your period today. Tap 'Log period' on the calendar to confirm.";
   } else if (isOvulationFocus && cycleDay < 13) {
     const daysToOvulation = 14 - cycleDay;
     document.getElementById('countdownLabel').textContent = 'Fertile window in';
