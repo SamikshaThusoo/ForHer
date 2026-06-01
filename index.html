@@ -589,6 +589,53 @@
   }
   .fh-engage-saved.show { opacity: 1; transform: translateY(0); }
 
+  /* ---- PCOS result state: tier-tinted card + risk pill + secondary CTA ---- */
+  .fh-engage.risk-low {
+    background:
+      radial-gradient(140% 160% at 100% 0%, rgba(143, 196, 196, 0.4) 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #EEF6F5 60%, #F1F7F6 100%);
+    border-color: rgba(47, 122, 122, 0.16);
+  }
+  .fh-engage.risk-moderate {
+    background:
+      radial-gradient(140% 160% at 100% 0%, rgba(201, 162, 74, 0.34) 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBF4E6 60%, #FAF2E2 100%);
+    border-color: rgba(201, 162, 74, 0.22);
+  }
+  .fh-engage.risk-high {
+    background:
+      radial-gradient(140% 160% at 100% 0%, rgba(232, 168, 183, 0.5) 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBEBEF 60%, #F8E5EB 100%);
+    border-color: rgba(232, 168, 183, 0.3);
+  }
+  .fh-engage-risk-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .fh-engage-risk-pill .dot { width: 5px; height: 5px; border-radius: 50%; }
+  .risk-low      .fh-engage-risk-pill { background: rgba(47, 122, 122, 0.14); color: #1F5C5C; }
+  .risk-low      .fh-engage-risk-pill .dot { background: #2F7A7A; }
+  .risk-moderate .fh-engage-risk-pill { background: rgba(201, 162, 74, 0.20); color: #8A6B1F; }
+  .risk-moderate .fh-engage-risk-pill .dot { background: #C9A24A; }
+  .risk-high     .fh-engage-risk-pill { background: rgba(232, 168, 183, 0.30); color: #A84458; }
+  .risk-high     .fh-engage-risk-pill .dot { background: #E8A8B7; }
+
+  .fh-engage-btn.secondary {
+    background: #fff;
+    color: var(--fh-plum-1);
+    border: 1px solid rgba(91, 42, 74, 0.22);
+    box-shadow: 0 4px 12px rgba(91, 42, 74, 0.08);
+  }
+  .fh-engage-btn.secondary::before { display: none; }
+  .fh-engage-btn.secondary:hover { background: #FBF3F5; box-shadow: 0 8px 18px rgba(91, 42, 74, 0.12); }
+
   /* ============ FOR HER LOG SHEET (bottom modal) ============ */
   .fh-log-backdrop {
     position: fixed;
@@ -1101,11 +1148,11 @@
     <span class="opt-go">›</span>
   </a>
 
-  <a class="opt" data-go="ahc.html?source=forher">
+  <a class="opt" data-go="banner.html">
     <div class="opt-ic">✦</div>
     <div class="opt-body">
       <div class="opt-title">2-min PCOS risk</div>
-      <div class="opt-sub">With your Health Check Insight</div>
+      <div class="opt-sub">Folds in your Health Check, if available</div>
     </div>
     <span class="opt-go">›</span>
   </a>
@@ -1306,6 +1353,9 @@
     };
 
     function renderState1() {
+      // First-time hook: copy adapts to AHC state (see firstTimeHookCopy).
+      const hook = firstTimeHookCopy();
+      card.className = 'fh-engage';
       card.innerHTML = `
         <div class="fh-engage-head">
           <div class="fh-engage-brand">
@@ -1313,15 +1363,15 @@
             <div class="fh-engage-title">For Her</div>
           </div>
         </div>
-        <div class="fh-engage-headline">Your body has a <em>rhythm.</em></div>
-        <p class="fh-engage-sub">Cycle tracking, hormonal wellness, PCOS risk: pick the journey that fits you.</p>
+        <div class="fh-engage-headline">${hook.headline}</div>
+        <p class="fh-engage-sub">${hook.sub}</p>
         <div class="fh-engage-actions">
-          <button class="fh-engage-btn primary" type="button" data-action="open">
-            Start listening <span class="arrow">→</span>
+          <button class="fh-engage-btn primary" type="button" data-action="assess">
+            ${hook.cta} <span class="arrow">→</span>
           </button>
         </div>
       `;
-      bindCardActions(false);
+      bindCardActions();
     }
 
     function renderState2(state) {
@@ -1329,6 +1379,7 @@
       const phase = getPhase(day);
       const copy = PHASE_COPY[phase] || PHASE_COPY.follicular;
 
+      card.className = 'fh-engage';
       card.innerHTML = `
         <div class="fh-engage-head">
           <div class="fh-engage-brand">
@@ -1356,13 +1407,76 @@
       bindCardActions(true);
     }
 
-    function bindCardActions(hasData) {
+    function bindCardActions() {
       card.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', () => {
-          if (btn.dataset.action === 'log') openLogSheet();
-          else if (btn.dataset.action === 'open') window.location.href = 'cycle.html';
+          const a = btn.dataset.action;
+          if (a === 'log') openLogSheet();
+          // PCOS-first: the assessment is the front door.
+          else if (a === 'assess' || a === 'result') window.location.href = 'banner.html';
+          else if (a === 'track' || a === 'open') window.location.href = 'cycle.html';
         });
       });
+    }
+
+    // ---------- PCOS result (read-only here; written by banner.html) ----------
+    const FH_PCOS_KEY = 'forher.pcos.v1';
+    function loadPcosResult() {
+      try { return JSON.parse(localStorage.getItem(FH_PCOS_KEY)) || null; }
+      catch (_) { return null; }
+    }
+
+    const PCOS_COPY = {
+      low: {
+        label: 'PCOS check · Low',
+        headline: 'Your PCOS risk is <em>low</em>',
+        sub: 'Nothing stands out right now — keep tracking and we’ll flag anything that shifts.'
+      },
+      moderate: {
+        label: 'PCOS check · Review',
+        headline: 'Further <em>evaluation</em> suggested',
+        sub: 'Your pattern meets the screening threshold. A clinical check will add clarity.'
+      },
+      high: {
+        label: 'PCOS check · Action',
+        headline: 'Clinical <em>evaluation</em> recommended',
+        sub: 'Multiple hallmark features showed up. Early evaluation is recommended.'
+      }
+    };
+
+    function renderPcosResult(pcos) {
+      const tier = (pcos && PCOS_COPY[pcos.tier]) ? pcos.tier : 'low';
+      const copy = PCOS_COPY[tier];
+      card.className = 'fh-engage risk-' + tier;
+      card.innerHTML = `
+        <div class="fh-engage-head">
+          <div class="fh-engage-brand">
+            <div class="fh-engage-mark">❀</div>
+            <div class="fh-engage-title">For Her</div>
+          </div>
+          <span class="fh-engage-risk-pill"><span class="dot"></span>${copy.label}</span>
+        </div>
+        <div class="fh-engage-headline">${copy.headline}</div>
+        <p class="fh-engage-sub">${copy.sub}</p>
+        <div class="fh-engage-actions">
+          <button class="fh-engage-btn primary" type="button" data-action="track">
+            Start tracking <span class="arrow">→</span>
+          </button>
+          <button class="fh-engage-btn secondary" type="button" data-action="result">
+            View my result
+          </button>
+        </div>
+      `;
+      bindCardActions();
+    }
+
+    // First-time hook copy. Neutral by default; Task 2 makes this AHC-aware.
+    function firstTimeHookCopy() {
+      return {
+        headline: 'Your body has a <em>rhythm.</em>',
+        sub: 'A quick check can tell you your PCOS risk — then track your cycle from there.',
+        cta: 'Check my PCOS risk'
+      };
     }
 
     // ---------- Bottom sheet logger ----------
@@ -1495,13 +1609,18 @@
     }
 
     function render() {
+      // Priority: PCOS result → daily cycle card → first-time hook.
+      const pcos = loadPcosResult();
+      if (pcos && pcos.tier) { renderPcosResult(pcos); return; }
       const state = loadState();
       if (state && state.hasData) renderState2(state);
       else renderState1();
     }
 
     render();
-    window.addEventListener('storage', (e) => { if (e.key === FH_KEY) render(); });
+    window.addEventListener('storage', (e) => {
+      if (e.key === FH_KEY || e.key === FH_PCOS_KEY) render();
+    });
   })();
 </script>
 </body>
