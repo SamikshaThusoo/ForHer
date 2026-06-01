@@ -1272,8 +1272,25 @@
      ============================================================ */
   (function () {
     const FH_KEY = 'forher.cycle.v1';
-    const CYCLE_LENGTH = 28;
+    const FH_CYCLE_LEN_KEY = 'forher.cyclelen.v1';
+    const DEFAULT_CYCLE_LENGTH = 28;
     const PERIOD_LENGTH = 5;
+
+    // Cycle length is learned in cycle.html and shared via forher.cyclelen.v1.
+    // Here we only read it (clamped to a clinically plausible 21–40 days).
+    function getCycleLength() {
+      try {
+        const raw = localStorage.getItem(FH_CYCLE_LEN_KEY);
+        if (raw) {
+          const v = parseInt(JSON.parse(raw).length, 10);
+          if (v >= 21 && v <= 40) return v;
+        }
+      } catch (_) {}
+      return DEFAULT_CYCLE_LENGTH;
+    }
+    function hasLearnedCycleLength() {
+      try { return !!localStorage.getItem(FH_CYCLE_LEN_KEY); } catch (_) { return false; }
+    }
 
     const card = document.getElementById('fhEngageCard');
     const sheet = document.getElementById('fhLogSheet');
@@ -1318,7 +1335,8 @@
       for (const s of starts) { if (s <= today) lastStart = s; else break; }
       if (!lastStart) return null;
       const diff = daysBetween(lastStart, today);
-      return ((diff % CYCLE_LENGTH) + CYCLE_LENGTH) % CYCLE_LENGTH + 1;
+      const len = getCycleLength();
+      return ((diff % len) + len) % len + 1;
     }
 
     function getPhase(day) {
@@ -1387,7 +1405,7 @@
             <div class="fh-engage-title">For Her</div>
           </div>
           <div class="fh-engage-cycle">
-            Day ${day}/${CYCLE_LENGTH}<span class="dot"></span>${copy.name}
+            ${hasLearnedCycleLength() ? 'Day' : 'Around day'} ${day}/${getCycleLength()}<span class="dot"></span>${copy.name}
           </div>
         </div>
         <div class="fh-engage-headline">${copy.headline}</div>
