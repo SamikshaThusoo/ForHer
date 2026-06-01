@@ -972,16 +972,6 @@
     transform: translateX(0);
   }
 
-  .q-option.selected::after {
-    content: "✓";
-    position: absolute;
-    right: 18px;
-    color: white;
-    font-size: 16px;
-    font-weight: 700;
-    animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
   @keyframes checkPop {
     from { opacity: 0; transform: scale(0.5); }
     to { opacity: 1; transform: scale(1); }
@@ -993,13 +983,24 @@
     border-radius: 50%;
     border: 2px solid var(--line);
     flex-shrink: 0;
+    position: relative;
     transition: all 0.2s ease;
   }
 
   .q-option:hover .q-option-radio { border-color: var(--plum-soft); }
+  /* Selected: white ring with a filled plum centre dot (visible on the
+     plum option background) instead of a featureless white circle. */
   .q-option.selected .q-option-radio {
     border-color: white;
     background: white;
+  }
+  .q-option.selected .q-option-radio::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--plum);
+    animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .q-nav {
