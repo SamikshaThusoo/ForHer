@@ -29,8 +29,18 @@ All state is in `localStorage`; no build step.
 - **Community-driven daily card**: instead of static phase copy, the daily card body is
   driven by `getCommunityHooks(phase, intent)` (loads `forher-community.js`). A
   moderate/high PCOS result biases content to the `pcos` pool; otherwise the stored
-  intent is used. The featured hook rotates by cycle day; falls back to static phase
-  copy if the module is unavailable.
+  intent is used. Falls back to static phase copy if the module is unavailable.
+- **Tappable hero**: the featured hook is a tappable block ("More in your journey ›")
+  that opens `cycle.html` (the full hook set).
+- **Save + social proof**: each featured hook has a Save toggle (persisted to
+  `forher.savedtips.v1`) and an "N saved" count. Saving toggles in place — it does not
+  re-render/rotate the tip.
+- **Fresh tip almost every time**: the featured hook now rotates via a persistent
+  counter `forher.hookrot.v1` that advances on each render, so consecutive visits (and
+  re-entries after a reset) surface different tips. The counter is intentionally NOT
+  cleared by the demo reset, so each demo run shows new variations.
+- **Demo reset** (`index.html` + `cycle.html`): a small fixed "↺ Reset demo" pill clears
+  the PCOS risk + entered period flow (and derived state) and reloads — prototype-only.
 - **PCOS-first entry**: first-time CTA and the chooser's PCOS option now open
   `banner.html` (was `cycle.html` / `ahc.html`).
 - **Learned cycle length**: reads `forher.cyclelen.v1` (clamped 21–40) via

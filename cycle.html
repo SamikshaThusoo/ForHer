@@ -5026,5 +5026,30 @@ setupOnboardingChips();
 // Prototype mode: always show the "What brings you here?" chooser on
 // entry, even for returning users. (Auto-skip disabled intentionally.)
 </script>
+<!-- ===== Prototype-only demo reset (clears PCOS risk + period flow) ===== -->
+<button id="fhResetDemo" type="button" aria-label="Reset demo data">↺ Reset demo</button>
+<style>
+  #fhResetDemo {
+    position: fixed; left: 12px; bottom: 12px; z-index: 9999;
+    font: 700 11px/1 'DM Sans', system-ui, sans-serif; letter-spacing: 0.2px;
+    color: #5B2A4A; background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(91,42,74,0.25); border-radius: 999px;
+    padding: 8px 12px; cursor: pointer; box-shadow: 0 4px 14px rgba(91,42,74,0.15);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  }
+  #fhResetDemo:hover { background: #fff; }
+  #fhResetDemo:active { transform: scale(0.97); }
+</style>
+<script>
+  // Demo helper: reset the PCOS risk and the entered period flow (plus derived
+  // state). Keeps forher.hookrot.v1 so each run shows a different primary hook.
+  document.getElementById('fhResetDemo').addEventListener('click', function () {
+    ['forher.pcos.v1','forher.cycle.v1','forher.cyclelen.v1','forher.intent.v1',
+     'forher.ahc.v1','forher.journey.v1','forher.savedtips.v1'].forEach(function (k) {
+      try { localStorage.removeItem(k); } catch (_) {}
+    });
+    location.reload();
+  });
+</script>
 </body>
 </html>
