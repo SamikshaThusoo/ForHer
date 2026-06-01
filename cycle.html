@@ -328,6 +328,22 @@
     padding: 0 20px 14px;
   }
 
+  .recheck-bar { padding: 0 20px 14px; }
+  .recheck-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 13px; border-radius: 999px;
+    background: rgba(91, 42, 74, 0.05); border: 1px solid rgba(91, 42, 74, 0.16);
+    color: var(--plum); font-family: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s ease;
+  }
+  .recheck-btn:hover { background: rgba(91, 42, 74, 0.09); }
+  .recheck-btn .recheck-ic {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--plum); color: #fff; font-size: 10px;
+  }
+  .recheck-btn .recheck-chev { opacity: 0.6; font-weight: 700; }
+
   .sync-btn {
     width: 100%;
     padding: 13px 16px;
@@ -2739,14 +2755,9 @@
         <div class="goal-radio"></div>
       </div>
 
-      <div class="goal-card stagger-2" data-goal="pcos" onclick="selectGoal('pcos')">
-        <div class="goal-icon">◐</div>
-        <div class="goal-body">
-          <div class="goal-title">Check <em>PCOS risk</em></div>
-          <div class="goal-desc">A short check-in. We'll use your AHC report if you have one.</div>
-        </div>
-        <div class="goal-radio"></div>
-      </div>
+      <!-- PCOS check removed from the gate — the assessment is now the front
+           door (home card → ahc.html/banner.html). Re-assessment lives on the
+           tracking screen via the "Re-check PCOS risk" action. -->
 
       <div class="goal-card stagger-3" data-goal="ttc" onclick="selectGoal('ttc')">
         <div class="goal-icon">❀</div>
@@ -2800,6 +2811,16 @@
         <span id="syncBtnText">Sync from Health app</span>
         <span class="sync-btn-sub">·</span>
         <span class="sync-btn-sub">iOS / Android</span>
+      </button>
+    </div>
+
+    <!-- Re-assess PCOS risk (the assessment is the front door; this is the
+         re-check entry now that the intent gate no longer offers it). -->
+    <div class="recheck-bar stagger-1">
+      <button class="recheck-btn" onclick="reassessPcos()">
+        <span class="recheck-ic">◐</span>
+        <span id="recheckLabel">Re-check my PCOS risk</span>
+        <span class="recheck-chev">›</span>
       </button>
     </div>
 
@@ -3783,6 +3804,18 @@ function readPcosResult() {
     const raw = localStorage.getItem('forher.pcos.v1');
     return raw ? JSON.parse(raw) : null;
   } catch (_) { return null; }
+}
+
+// Re-check / re-assess PCOS risk. Same routing as the home entry: via the AHC
+// flagged-parameters page when a health check exists, else the plain HRA.
+function reassessPcos() {
+  window.location.href = hasAhcData() ? 'ahc.html' : 'banner.html';
+}
+
+// The label nudges "re-check" vs "check" depending on whether a result exists.
+function refreshRecheckLabel() {
+  const el = document.getElementById('recheckLabel');
+  if (el) el.textContent = hasPcosResult() ? 'Re-check my PCOS risk' : 'Check my PCOS risk';
 }
 
 function routePcos() {
@@ -5023,8 +5056,22 @@ function showToast(msg) {
 hydrateCycleState();
 setupOnboardingChips();
 
-// Prototype mode: always show the "What brings you here?" chooser on
-// entry, even for returning users. (Auto-skip disabled intentionally.)
+// The intent gate ("What brings you here today?") appears only ONCE — the
+// first time, before any intent is saved. On return visits (intent already in
+// forher.intent.v1) we skip straight to the right screen. Reset demo clears the
+// intent, so the gate shows again.
+(function maybeSkipGate() {
+  const intent = readJourney();
+  if (!intent) return; // first time → leave the gate (screen 0) visible
+  selectedGoal = intent;
+  if (intent === 'ttc') simState.ttc = true;
+  const stepper = document.getElementById('stepper');
+  if (stepper) stepper.classList.remove('hidden');
+  customiseForGoal();
+  if (intent === 'pregnant') goTo('1p'); else goTo(1);
+})();
+
+refreshRecheckLabel();
 </script>
 <!-- ===== Prototype-only demo controls (seed/clear AHC + reset the flow) ===== -->
 <div id="fhDemoBar" role="group" aria-label="Demo controls">
