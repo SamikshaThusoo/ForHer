@@ -636,6 +636,44 @@
   .fh-engage-btn.secondary::before { display: none; }
   .fh-engage-btn.secondary:hover { background: #FBF3F5; box-shadow: 0 8px 18px rgba(91, 42, 74, 0.12); }
 
+  /* Compact PCOS-risk chip on the daily card (full result lives in banner.html) */
+  .fh-engage-riskchip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    margin: 0 0 9px;
+    padding: 6px 10px;
+    border: 1px solid rgba(91, 42, 74, 0.12);
+    border-radius: 10px;
+    background: rgba(91, 42, 74, 0.04);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: #5B2A4A;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+  .fh-engage-riskchip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .fh-engage-riskchip .rc-label { color: #6B5A65; }
+  .fh-engage-riskchip .rc-label strong { font-weight: 700; }
+  .fh-engage-riskchip .rc-chev { margin-left: auto; font-weight: 700; opacity: 0.7; }
+  .fh-engage-riskchip:hover { background: rgba(91, 42, 74, 0.07); }
+  .fh-engage-riskchip.risk-low      { border-color: rgba(47,122,122,0.28);  background: rgba(47,122,122,0.07); }
+  .fh-engage-riskchip.risk-low .dot { background: #2F7A7A; }
+  .fh-engage-riskchip.risk-low .rc-label strong,
+  .fh-engage-riskchip.risk-low .rc-chev { color: #1F5C5C; }
+  .fh-engage-riskchip.risk-moderate      { border-color: rgba(201,162,74,0.34); background: rgba(201,162,74,0.10); }
+  .fh-engage-riskchip.risk-moderate .dot { background: #C9A24A; }
+  .fh-engage-riskchip.risk-moderate .rc-label strong,
+  .fh-engage-riskchip.risk-moderate .rc-chev { color: #8A6B1F; }
+  .fh-engage-riskchip.risk-high      { border-color: rgba(232,168,183,0.4); background: rgba(232,168,183,0.14); }
+  .fh-engage-riskchip.risk-high .dot { background: #E8A8B7; }
+  .fh-engage-riskchip.risk-high .rc-label strong,
+  .fh-engage-riskchip.risk-high .rc-chev { color: #A84458; }
+
   /* ============ FOR HER LOG SHEET (bottom modal) ============ */
   .fh-log-backdrop {
     position: fixed;
@@ -1392,7 +1430,24 @@
       bindCardActions();
     }
 
-    function renderState2(state) {
+    const RISK_WORD = { low: 'Low', moderate: 'Moderate', high: 'High' };
+
+    // Compact PCOS-risk strip for the daily card. Once a user is tracking, the
+    // result lives here as a chip (→ banner.html); the depth is carried by the
+    // daily hooks / community in the full journey.
+    function riskChipHtml(pcos) {
+      if (!pcos || !RISK_WORD[pcos.tier]) return '';
+      return `
+        <button class="fh-engage-riskchip risk-${pcos.tier}" type="button" data-action="result"
+                aria-label="PCOS risk ${RISK_WORD[pcos.tier]} — view result">
+          <span class="dot"></span>
+          <span class="rc-label">PCOS risk · <strong>${RISK_WORD[pcos.tier]}</strong></span>
+          <span class="rc-chev">View ›</span>
+        </button>
+      `;
+    }
+
+    function renderState2(state, pcos) {
       const day = getCycleDay(state);
       const phase = getPhase(day);
       const copy = PHASE_COPY[phase] || PHASE_COPY.follicular;
@@ -1408,6 +1463,7 @@
             ${hasLearnedCycleLength() ? 'Day' : 'Around day'} ${day}/${getCycleLength()}<span class="dot"></span>${copy.name}
           </div>
         </div>
+        ${riskChipHtml(pcos)}
         <div class="fh-engage-headline">${copy.headline}</div>
         <p class="fh-engage-sub">${copy.sub}</p>
         <div class="fh-engage-actions">
@@ -1664,12 +1720,14 @@
     }
 
     function render() {
-      // Priority: PCOS result → daily cycle card → first-time hook.
+      // Once tracking, the daily card leads and the PCOS result rides along as a
+      // compact chip (depth lives in the daily hooks / community). Before any
+      // cycle data, a saved result is shown on its own to invite tracking.
       const pcos = loadPcosResult();
-      if (pcos && pcos.tier) { renderPcosResult(pcos); return; }
       const state = loadState();
-      if (state && state.hasData) renderState2(state);
-      else renderState1();
+      if (state && state.hasData) { renderState2(state, pcos); return; }
+      if (pcos && pcos.tier) { renderPcosResult(pcos); return; }
+      renderState1();
     }
 
     render();

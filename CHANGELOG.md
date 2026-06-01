@@ -73,10 +73,11 @@ All state is in `localStorage`; no build step.
 
 ## Open product decisions (flagged, not guessed)
 
-- **Home priority once a user has BOTH a PCOS result and logged cycle data**: currently
-  the **PCOS result wins** (per spec default). Trade-off: a daily user who took the
-  assessment keeps seeing the result card instead of the daily companion. Easy to flip
-  to "daily card wins once `hasData`, keep a compact risk chip" — confirm preference.
+- **Home priority once a user has BOTH a PCOS result and logged cycle data**: RESOLVED —
+  the **daily card leads** and the PCOS result rides along as a compact tappable risk
+  chip (→ banner.html). Depth (action plan, what-it-means) is carried by the daily
+  hooks / community, not the home card. Before any cycle data, a saved result still
+  shows on its own to invite tracking.
 - **AHC metabolic thresholds** (`AHC_BMI_THRESHOLD=25`, `AHC_HBA1C_THRESHOLD=5.7`):
   placeholders, left as TODO for clinical sign-off.
 - **TTC 12-month nudge**: data is trackable from logged history; surfacing a Tulip
