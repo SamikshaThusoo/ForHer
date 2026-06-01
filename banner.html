@@ -2055,20 +2055,20 @@
       <div id="featuredTulipSlot"></div>
 
       <!-- Action cards -->
-      <div class="action-card" onclick="showToast('Connecting you with a specialist…')">
+      <div class="action-card" id="actConsult" onclick="showToast('Connecting you with a specialist…')">
         <div class="action-icon icon-consult">❤</div>
         <div class="action-content">
-          <div class="action-title">Consult a Gynecologist</div>
-          <div class="action-sub">Discuss your symptoms with a specialist through video or in-clinic.</div>
+          <div class="action-title" id="actConsultTitle">Consult a Gynecologist</div>
+          <div class="action-sub" id="actConsultSub">Discuss your symptoms with a specialist through video or in-clinic.</div>
         </div>
         <div class="action-chevron">›</div>
       </div>
 
-      <div class="action-card" onclick="showToast('Opening test booking…')">
+      <div class="action-card" id="actTests" onclick="showToast('Opening test booking…')">
         <div class="action-icon icon-test">✧</div>
         <div class="action-content">
-          <div class="action-title">Recommended Tests</div>
-          <div class="action-sub">
+          <div class="action-title" id="actTestsTitle">Recommended Tests</div>
+          <div class="action-sub" id="actTestsSub">
             <ul>
               <li>Hormonal panel (LH, FSH, testosterone, AMH)</li>
               <li>Pelvic ultrasound (if clinically indicated)</li>
@@ -2854,10 +2854,35 @@ function renderResults(result) {
   // Render Tulip slots based on TTC
   renderTulipSlots(ttcFlag, tier);
 
-  // Update action plan headline based on TTC
+  // Low risk gets a lighter plan — no specialist/tests push; keep-tracking +
+  // re-check. Moderate/high keep the clinical consult + recommended tests.
+  const consultCard = document.getElementById('actConsult');
+  const testsCard = document.getElementById('actTests');
+  if (tier === 'low') {
+    document.getElementById('actConsultTitle').textContent = 'Keep tracking your cycle';
+    document.getElementById('actConsultSub').textContent = 'No specialist visit needed right now — keep logging and we\'ll flag anything that shifts.';
+    if (consultCard) consultCard.setAttribute('onclick', "showToast('Opening cycle tracking…')");
+    document.getElementById('actTestsTitle').textContent = 'Re-check if things change';
+    document.getElementById('actTestsSub').innerHTML = 'Re-take this 2-minute check if you notice new or worsening symptoms (irregular cycles, excess hair, persistent acne).';
+    if (testsCard) testsCard.setAttribute('onclick', "showToast('We\\'ll remind you to re-check…')");
+  } else {
+    document.getElementById('actConsultTitle').textContent = (tier === 'high') ? 'Consult a specialist soon' : 'Consult a Gynecologist';
+    document.getElementById('actConsultSub').textContent = (tier === 'high')
+      ? 'Early evaluation is recommended — book a gynaecologist or endocrinologist.'
+      : 'Discuss your symptoms with a specialist through video or in-clinic.';
+    if (consultCard) consultCard.setAttribute('onclick', "showToast('Connecting you with a specialist…')");
+    document.getElementById('actTestsTitle').textContent = 'Recommended Tests';
+    document.getElementById('actTestsSub').innerHTML = '<ul><li>Hormonal panel (LH, FSH, testosterone, AMH)</li><li>Pelvic ultrasound (if clinically indicated)</li><li>Expanded metabolic screen</li></ul>';
+    if (testsCard) testsCard.setAttribute('onclick', "showToast('Opening test booking…')");
+  }
+
+  // Update action plan headline based on TTC / tier
   if (ttcFlag) {
     document.getElementById('actionTitle').innerHTML = 'Your <span class="italic">guided next steps</span>';
     document.getElementById('actionLead').textContent = 'Since you\'re planning a pregnancy, we\'ve placed pre-conception care first. The supporting actions below complement that journey.';
+  } else if (tier === 'low') {
+    document.getElementById('actionTitle').innerHTML = 'You\'re in <span class="italic">good shape</span>';
+    document.getElementById('actionLead').textContent = 'Nothing urgent right now — here\'s how to stay ahead and what to watch for.';
   } else {
     document.getElementById('actionTitle').innerHTML = 'Three ways to <span class="italic">move forward</span>';
     document.getElementById('actionLead').textContent = 'Pick what feels right for you. You can explore each pathway at your own pace.';

@@ -80,8 +80,10 @@
     { id: 'v-menstrual',    phase: 'menstrual',  intent: 'any',  title: 'Gentle flow for your period', duration: '8 min', accent: '#C76B7A', url: '' },
     { id: 'v-follicular',   phase: 'follicular', intent: 'any',  title: 'Energising morning flow',  duration: '15 min', accent: '#C9A24A', url: '' },
     { id: 'v-ovulation',    phase: 'ovulation',  intent: 'any',  title: 'Strength & stamina session', duration: '18 min', accent: '#2F7A7A', url: '' },
-    { id: 'v-luteal-pms',   phase: 'luteal',     intent: 'any',  title: 'Yoga for PMS relief',      duration: '10 min', accent: '#8E5378', url: '' },
-    { id: 'v-breath',       phase: 'any',        intent: 'any',  title: '5-minute breathing reset', duration: '5 min',  accent: '#2F7A7A', url: '' }
+    { id: 'v-luteal-pms',   phase: 'luteal',     intent: 'any',     title: 'Yoga for PMS relief',      duration: '10 min', accent: '#8E5378', url: '' },
+    { id: 'v-ttc',          phase: 'any',        intent: 'ttc',     title: 'Fertility-friendly yoga',  duration: '14 min', accent: '#C9A24A', url: '' },
+    { id: 'v-prenatal',     phase: 'any',        intent: 'pregnant', title: 'Gentle prenatal stretch', duration: '10 min', accent: '#2F7A7A', url: '' },
+    { id: 'v-breath',       phase: 'any',        intent: 'any',     title: '5-minute breathing reset', duration: '5 min',  accent: '#2F7A7A', url: '' }
   ];
 
   // Best video for the phase + intent (intent- and phase-specific rank first).
