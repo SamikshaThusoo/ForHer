@@ -1627,8 +1627,10 @@
         btn.addEventListener('click', (e) => {
           const a = btn.dataset.action;
           if (a === 'log') openLogSheet();
-          // PCOS-first: the assessment is the front door.
-          else if (a === 'assess' || a === 'result') window.location.href = 'banner.html';
+          // PCOS-first: the assessment is the front door. With AHC, go via the
+          // flagged-parameters page first; "View my result" always opens banner.
+          else if (a === 'assess') window.location.href = pcosEntryUrl();
+          else if (a === 'result') window.location.href = 'banner.html';
           else if (a === 'track' || a === 'open') window.location.href = 'cycle.html';
           else if (a === 'save') {
             // Toggle in place — don't re-render (that would rotate to a new tip).
@@ -1808,6 +1810,13 @@
         sub: 'A quick check can tell you your PCOS risk — then track your cycle from there.',
         cta: 'Check my PCOS risk'
       };
+    }
+
+    // Where "Check my PCOS risk" goes: with a health check on record, route via
+    // the AHC flagged-parameters page (ahc.html → banner.html?source=ahc);
+    // otherwise straight into the plain assessment.
+    function pcosEntryUrl() {
+      return flaggedAhcMarkers().length ? 'ahc.html' : 'banner.html';
     }
 
     // ---------- Bottom sheet logger ----------
