@@ -1255,6 +1255,24 @@
     z-index: 1;
   }
 
+  .preg-pcos-note {
+    background: linear-gradient(135deg, rgba(201,162,74,0.14) 0%, rgba(201,162,74,0.05) 100%);
+    border: 1px solid rgba(201,162,74,0.32);
+    border-radius: 18px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  .preg-pcos-note-head {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 700; color: #8A6B1F; margin-bottom: 5px;
+  }
+  .preg-pcos-ic {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(201,162,74,0.22); color: #8A6B1F; font-size: 11px;
+  }
+  .preg-pcos-note p { font-size: 12px; line-height: 1.5; color: #6B5A3A; margin: 0; }
+
   .preg-insight-card {
     background: white;
     border-radius: 22px;
@@ -2956,6 +2974,13 @@
         </div>
       </div>
 
+      <!-- PCOS history persists into pregnancy: a prior risk/diagnosis is
+           surfaced here because it warrants earlier glucose monitoring. -->
+      <div class="preg-pcos-note" id="pregPcosNote" style="display:none;">
+        <div class="preg-pcos-note-head"><span class="preg-pcos-ic">✦</span> Carrying a PCOS history</div>
+        <p id="pregPcosNoteBody">—</p>
+      </div>
+
       <div class="preg-size-card stagger-3">
         <div class="preg-size-eyebrow">Your baby this week</div>
         <div class="preg-size-emoji" id="pregSizeEmoji">🥒</div>
@@ -3720,18 +3745,23 @@ function selectGoal(goal) {
   document.getElementById('goalContinueBtn').disabled = false;
 }
 
-const FH_JOURNEY_KEY = 'forher.journey.v1';
+const FH_INTENT_KEY = 'forher.intent.v1';
+const FH_JOURNEY_KEY = 'forher.journey.v1'; // legacy — read-only fallback
 const FH_AHC_KEY = 'forher.ahc.v1';
 
+// Intent is persisted to forher.intent.v1 and stays editable: the gate is
+// reachable on every entry, so calling this again simply re-sets the intent.
 function persistJourney(goal) {
-  try { localStorage.setItem(FH_JOURNEY_KEY, JSON.stringify({ goal, savedAt: new Date().toISOString() })); }
+  try { localStorage.setItem(FH_INTENT_KEY, JSON.stringify({ intent: goal, setAt: new Date().toISOString() })); }
   catch (_) {}
 }
 
 function readJourney() {
   try {
-    const raw = localStorage.getItem(FH_JOURNEY_KEY);
-    return raw ? JSON.parse(raw).goal : null;
+    const cur = localStorage.getItem(FH_INTENT_KEY);
+    if (cur) return JSON.parse(cur).intent || null;
+    const legacy = localStorage.getItem(FH_JOURNEY_KEY); // migrate older sessions
+    return legacy ? JSON.parse(legacy).goal : null;
   } catch (_) { return null; }
 }
 
@@ -4589,6 +4619,23 @@ function updatePregScreen() {
 
   const list = document.getElementById('pregChecklistList');
   list.innerHTML = data.care.map(item => `<li><span class="preg-check">✓</span><span>${item}</span></li>`).join('');
+
+  // Surface a prior PCOS result — pregnancy drops the cycle questionnaire and
+  // prediction, but NOT the PCOS flag (raises GDM / pre-eclampsia risk).
+  const pcosNote = document.getElementById('pregPcosNote');
+  if (pcosNote) {
+    const pcos = (typeof readPcosResult === 'function') ? readPcosResult() : null;
+    if (pcos && pcos.tier) {
+      const tierWord = pcos.tier === 'high' ? 'a clinically significant PCOS pattern'
+        : pcos.tier === 'moderate' ? 'a PCOS pattern worth monitoring'
+        : 'a prior PCOS screen';
+      document.getElementById('pregPcosNoteBody').textContent =
+        `Your earlier assessment flagged ${tierWord}. PCOS can raise the chance of gestational diabetes and pre-eclampsia, so earlier glucose monitoring is often recommended — share this with your obstetrician.`;
+      pcosNote.style.display = 'block';
+    } else {
+      pcosNote.style.display = 'none';
+    }
+  }
 
   // Disable buttons at limits
   document.getElementById('weekDownBtn').disabled = pregWeek <= 1;
