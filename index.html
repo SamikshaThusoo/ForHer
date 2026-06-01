@@ -506,6 +506,54 @@
     color: #A84458;
   }
   .fh-engage-savecount { font-size: 10.5px; font-weight: 600; color: #9A8A92; }
+  .fh-engage-morelink {
+    margin-left: auto; border: none; background: none; cursor: pointer;
+    font-family: inherit; font-size: 10.5px; font-weight: 700; color: #8E5378; letter-spacing: 0.2px;
+  }
+  .fh-engage-morelink:hover { text-decoration: underline; }
+
+  /* Split community layout: tip (left) + wellness video tile (right) */
+  .fh-engage-split {
+    display: flex; gap: 12px; align-items: stretch;
+    margin-bottom: 9px; position: relative; z-index: 1;
+  }
+  .fh-engage-split .fh-engage-feature {
+    flex: 1; width: auto; margin: 0; padding: 0; background: none;
+  }
+  .fh-engage-split .fh-engage-feature:hover { background: none; }
+  .fh-engage-split .fh-engage-headline.community { margin-bottom: 0; }
+
+  .fh-engage-video {
+    flex: 0 0 108px; width: 108px;
+    border: none; background: none; padding: 0; cursor: pointer;
+    display: flex; flex-direction: column; gap: 5px; font-family: inherit; text-align: left;
+  }
+  .fh-engage-video-thumb {
+    position: relative; height: 64px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--v-accent, #8E5378) 0%, rgba(62,27,51,0.9) 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(91,42,74,0.18); overflow: hidden;
+  }
+  .fh-engage-video-thumb::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(120% 100% at 100% 0%, rgba(255,255,255,0.22) 0%, transparent 55%);
+  }
+  .fh-engage-video-play {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.92); color: var(--v-accent, #8E5378);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; padding-left: 2px; position: relative; z-index: 1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+  .fh-engage-video-dur {
+    position: absolute; right: 5px; bottom: 5px; z-index: 1;
+    font-size: 9px; font-weight: 700; color: #fff;
+    background: rgba(0,0,0,0.32); border-radius: 999px; padding: 2px 6px;
+  }
+  .fh-engage-video:hover .fh-engage-video-thumb { box-shadow: 0 8px 18px rgba(91,42,74,0.26); }
+  .fh-engage-video-title {
+    font-size: 10.5px; font-weight: 600; line-height: 1.25; color: #5B2A4A;
+  }
 
   .fh-engage-sub {
     font-size: 11.5px;
@@ -1578,18 +1626,34 @@
       const kind = hook ? HOOK_KIND[hook.kind] : null;
       const saved = hook ? isTipSaved(hook.id) : false;
       const savedCount = hook ? hook.savedCount + (saved ? 1 : 0) : 0;
+      const contentIntent = (pcos && (pcos.tier === 'moderate' || pcos.tier === 'high'))
+        ? 'pcos' : (loadIntent() || 'cycle');
+      const video = (typeof getCommunityVideo === 'function') ? getCommunityVideo(phase, contentIntent) : null;
+      const videoHtml = video
+        ? `<button class="fh-engage-video" type="button" data-action="video" data-url="${video.url || ''}"
+                   style="--v-accent:${video.accent}" aria-label="Play ${video.title}">
+             <span class="fh-engage-video-thumb">
+               <span class="fh-engage-video-play">▶</span>
+               <span class="fh-engage-video-dur">${video.duration}</span>
+             </span>
+             <span class="fh-engage-video-title">${video.title}</span>
+           </button>`
+        : '';
       const bodyHtml = hook
-        ? `<button class="fh-engage-feature" type="button" data-action="open" aria-label="${kind.label}: ${hook.text} — open your journey for more">
-             <div class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</div>
-             <div class="fh-engage-headline community">${hook.text}</div>
-             <span class="fh-engage-feature-more">More in your journey <span class="chev">›</span></span>
-           </button>
+        ? `<div class="fh-engage-split">
+             <button class="fh-engage-feature" type="button" data-action="open" aria-label="${kind.label}: ${hook.text}">
+               <div class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</div>
+               <div class="fh-engage-headline community">${hook.text}</div>
+             </button>
+             ${videoHtml}
+           </div>
            <div class="fh-engage-hookfoot">
              <button class="fh-engage-save ${saved ? 'is-saved' : ''}" type="button" data-action="save"
                      data-tip="${hook.id}" data-base="${hook.savedCount}" aria-pressed="${saved}" aria-label="Save this tip">
                <span class="fh-engage-save-ic">${saved ? '♥' : '♡'}</span><span class="fh-engage-save-label">${saved ? 'Saved' : 'Save'}</span>
              </button>
              <span class="fh-engage-savecount">${savedCount.toLocaleString()} saved</span>
+             <button class="fh-engage-morelink" type="button" data-action="open">More in your journey ›</button>
            </div>`
         : `<div class="fh-engage-headline">${copy.headline}</div>
            <p class="fh-engage-sub">${copy.sub}</p>`;
@@ -1632,6 +1696,11 @@
           else if (a === 'assess') window.location.href = pcosEntryUrl();
           else if (a === 'result') window.location.href = 'banner.html';
           else if (a === 'track' || a === 'open') window.location.href = 'cycle.html';
+          else if (a === 'video') {
+            // Real URL opens the recording; placeholder routes into the journey.
+            const url = btn.dataset.url;
+            if (url) window.open(url, '_blank'); else window.location.href = 'cycle.html';
+          }
           else if (a === 'save') {
             // Toggle in place — don't re-render (that would rotate to a new tip).
             e.stopPropagation();

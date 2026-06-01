@@ -73,6 +73,30 @@
   };
   var KIND_ORDER = ['peer', 'pacing', 'recipe'];
 
+  // Wellness videos (recorded sessions). Placeholder metadata — wire real URLs /
+  // thumbnails into `url` and `thumb` later. // DRAFT — pending content team
+  var FORHER_VIDEOS = [
+    { id: 'v-pcos-yoga',    phase: 'any',        intent: 'pcos', title: 'Yoga for PCOS',            duration: '12 min', accent: '#8E5378', url: '' },
+    { id: 'v-menstrual',    phase: 'menstrual',  intent: 'any',  title: 'Gentle flow for your period', duration: '8 min', accent: '#C76B7A', url: '' },
+    { id: 'v-follicular',   phase: 'follicular', intent: 'any',  title: 'Energising morning flow',  duration: '15 min', accent: '#C9A24A', url: '' },
+    { id: 'v-ovulation',    phase: 'ovulation',  intent: 'any',  title: 'Strength & stamina session', duration: '18 min', accent: '#2F7A7A', url: '' },
+    { id: 'v-luteal-pms',   phase: 'luteal',     intent: 'any',  title: 'Yoga for PMS relief',      duration: '10 min', accent: '#8E5378', url: '' },
+    { id: 'v-breath',       phase: 'any',        intent: 'any',  title: '5-minute breathing reset', duration: '5 min',  accent: '#2F7A7A', url: '' }
+  ];
+
+  // Best video for the phase + intent (intent- and phase-specific rank first).
+  function getCommunityVideo(phase, intent) {
+    var pool = FORHER_VIDEOS.filter(function (v) {
+      return (v.intent === intent || v.intent === 'any') && (v.phase === phase || v.phase === 'any');
+    });
+    pool.sort(function (a, b) {
+      var as = (a.intent === 'any' ? 1 : 0) + (a.phase === 'any' ? 1 : 0);
+      var bs = (b.intent === 'any' ? 1 : 0) + (b.phase === 'any' ? 1 : 0);
+      return as - bs;
+    });
+    return pool[0] || null;
+  }
+
   function injectStylesOnce() {
     if (document.getElementById('fhc-styles')) return;
     var css = '' +
@@ -135,6 +159,8 @@
 
   // Expose as plain globals (no module system).
   global.FORHER_TIPS = FORHER_TIPS;
+  global.FORHER_VIDEOS = FORHER_VIDEOS;
   global.getCommunityHooks = getCommunityHooks;
+  global.getCommunityVideo = getCommunityVideo;
   global.renderCommunity = renderCommunity;
 })(window);
