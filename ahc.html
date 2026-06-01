@@ -1414,6 +1414,14 @@ function renderResults(result) {
       tier,
       positiveDomainCount,
       pedersenCount,
+      // Raw lab markers so the rest of For Her (home nudge, banner.html's
+      // combined PCOS classify) can fold the metabolic domain without
+      // re-asking. Values are mocked here; shape is the contract.
+      markers: {
+        bmi:   { value: AHC.bmi.value,   flagged: AHC.bmi.flagged },
+        hba1c: { value: AHC.hba1c.value, flagged: AHC.hba1c.flagged },
+        tsh:   { value: AHC.tsh.value,   flagged: AHC.tsh.flagged }
+      },
       completedAt: new Date().toISOString()
     }));
   } catch (_) {}

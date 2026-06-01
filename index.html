@@ -1488,8 +1488,45 @@
       bindCardActions();
     }
 
-    // First-time hook copy. Neutral by default; Task 2 makes this AHC-aware.
+    // Metabolic-marker thresholds for the grounded entry nudge.
+    // TODO: confirm with clinical advisor — placeholders only.
+    const AHC_BMI_THRESHOLD = 25;     // kg/m²
+    const AHC_HBA1C_THRESHOLD = 5.7;  // % (pre-diabetes range)
+
+    function loadAhc() {
+      try { return JSON.parse(localStorage.getItem('forher.ahc.v1')) || null; }
+      catch (_) { return null; }
+    }
+
+    // If the user's health check shows a metabolic marker over threshold,
+    // return a short human label for it (used only to surface the user's own
+    // result back to them — not to profile or to score risk on lab data alone).
+    function ahcFlaggedMarker() {
+      const m = (loadAhc() || {}).markers;
+      if (!m) return null;
+      const bmiVal = m.bmi && typeof m.bmi.value === 'number' ? m.bmi.value : null;
+      if ((bmiVal != null && bmiVal >= AHC_BMI_THRESHOLD) || (m.bmi && m.bmi.flagged)) {
+        return 'a raised BMI';
+      }
+      const hbVal = m.hba1c && typeof m.hba1c.value === 'number' ? m.hba1c.value : null;
+      if ((hbVal != null && hbVal >= AHC_HBA1C_THRESHOLD) || (m.hba1c && m.hba1c.flagged)) {
+        return 'a borderline blood-sugar (HbA1c) reading';
+      }
+      return null;
+    }
+
+    // First-time hook copy. Grounded when AHC flags a metabolic marker; neutral
+    // otherwise. The nudge itself stays anchored on observable signs, never on
+    // "stress" or hidden lab profiling.
     function firstTimeHookCopy() {
+      const marker = ahcFlaggedMarker();
+      if (marker) {
+        return {
+          headline: 'Your health check flagged something <em>worth a look</em>',
+          sub: `Your recent health check flagged ${marker}, which can be associated with PCOS. A quick check can tell you more.`,
+          cta: 'Check my PCOS risk'
+        };
+      }
       return {
         headline: 'Your body has a <em>rhythm.</em>',
         sub: 'A quick check can tell you your PCOS risk — then track your cycle from there.',
