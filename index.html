@@ -555,6 +555,46 @@
     font-size: 10.5px; font-weight: 600; line-height: 1.25; color: #5B2A4A;
   }
 
+  /* Compact tip row: recommendation (tappable → community) + small save */
+  .fh-engage-tipwrap {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 9px; position: relative; z-index: 1;
+  }
+  .fh-engage-tipwrap .fh-engage-feature {
+    flex: 1; width: auto; margin: 0; padding: 0; background: none;
+  }
+  .fh-engage-tipwrap .fh-engage-feature:hover { background: none; }
+  .fh-engage-tipwrap .fh-engage-headline.community { margin-bottom: 0; }
+  .fh-engage-save .fh-engage-savemini { font-size: 11px; font-weight: 700; }
+  .fh-engage-tipwrap .fh-engage-save { flex: 0 0 auto; padding: 5px 9px; }
+
+  /* Video as a slim banner with a graphic motif */
+  .fh-engage-vbanner {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    border: none; cursor: pointer; font-family: inherit; text-align: left;
+    border-radius: 14px; padding: 8px 12px 8px 8px; margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--v-accent, #8E5378) 0%, rgba(62,27,51,0.92) 100%);
+    color: #fff; position: relative; overflow: hidden; isolation: isolate;
+    box-shadow: 0 6px 16px rgba(91,42,74,0.2); z-index: 1;
+  }
+  .fh-engage-vbanner::after {
+    content: ""; position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(120% 140% at 100% 0%, rgba(255,255,255,0.18) 0%, transparent 55%);
+  }
+  .fh-engage-vbanner > * { position: relative; z-index: 1; }
+  .vbanner-graphic { flex: 0 0 44px; height: 40px; display: flex; align-items: center; justify-content: center; }
+  .vbanner-graphic svg { width: 44px; height: 40px; }
+  .vbanner-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .vbanner-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: rgba(255,255,255,0.78); }
+  .vbanner-title { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vbanner-play {
+    flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.92); color: var(--v-accent, #8E5378);
+    display: flex; align-items: center; justify-content: center; font-size: 10px; padding-left: 2px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .fh-engage-vbanner:hover { box-shadow: 0 10px 22px rgba(91,42,74,0.28); }
+
   .fh-engage-sub {
     font-size: 11.5px;
     color: #6B5A65;
@@ -1628,32 +1668,36 @@
       const contentIntent = (pcos && (pcos.tier === 'moderate' || pcos.tier === 'high'))
         ? 'pcos' : (loadIntent() || 'cycle');
       const video = (typeof getCommunityVideo === 'function') ? getCommunityVideo(phase, contentIntent) : null;
+      // Video shows as a slim banner with a graphic motif (not a thumbnail tile).
       const videoHtml = video
-        ? `<button class="fh-engage-video" type="button" data-action="video" data-url="${video.url || ''}"
+        ? `<button class="fh-engage-vbanner" type="button" data-action="video" data-url="${video.url || ''}"
                    style="--v-accent:${video.accent}" aria-label="Play ${video.title}">
-             <span class="fh-engage-video-thumb">
-               <span class="fh-engage-video-play">▶</span>
-               <span class="fh-engage-video-dur">${video.duration}</span>
+             <span class="vbanner-graphic" aria-hidden="true">
+               <svg viewBox="0 0 46 42" fill="none">
+                 <circle cx="23" cy="21" r="6" fill="rgba(255,255,255,0.92)"/>
+                 <circle cx="23" cy="21" r="11.5" stroke="rgba(255,255,255,0.55)" stroke-width="1.6"/>
+                 <circle cx="23" cy="21" r="17" stroke="rgba(255,255,255,0.3)" stroke-width="1.6"/>
+               </svg>
              </span>
-             <span class="fh-engage-video-title">${video.title}</span>
+             <span class="vbanner-body">
+               <span class="vbanner-eyebrow">Wellness · ${video.duration}</span>
+               <span class="vbanner-title">${video.title}</span>
+             </span>
+             <span class="vbanner-play">▶</span>
            </button>`
         : '';
       const bodyHtml = hook
-        ? `<div class="fh-engage-split">
+        ? `<div class="fh-engage-tipwrap">
              <button class="fh-engage-feature" type="button" data-action="community" aria-label="${kind.label}: ${hook.text}">
-               <div class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</div>
-               <div class="fh-engage-headline community">${shortTip(hook.text)}</div>
+               <span class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</span>
+               <span class="fh-engage-headline community">${shortTip(hook.text)}</span>
              </button>
-             ${videoHtml}
-           </div>
-           <div class="fh-engage-hookfoot">
              <button class="fh-engage-save ${saved ? 'is-saved' : ''}" type="button" data-action="save"
                      data-tip="${hook.id}" data-base="${hook.savedCount}" aria-pressed="${saved}" aria-label="Save this tip">
-               <span class="fh-engage-save-ic">${saved ? '♥' : '♡'}</span><span class="fh-engage-save-label">${saved ? 'Saved' : 'Save'}</span>
+               <span class="fh-engage-save-ic">${saved ? '♥' : '♡'}</span><span class="fh-engage-savemini">${savedCount.toLocaleString()}</span>
              </button>
-             <span class="fh-engage-savecount">${savedCount.toLocaleString()} saved</span>
-             <button class="fh-engage-morelink" type="button" data-action="community">Open community ›</button>
-           </div>`
+           </div>
+           ${videoHtml}`
         : `<div class="fh-engage-headline">${copy.headline}</div>
            <p class="fh-engage-sub">${copy.sub}</p>`;
 
@@ -1707,12 +1751,12 @@
             const nowSaved = toggleSavedTip(btn.dataset.tip);
             btn.classList.toggle('is-saved', nowSaved);
             btn.setAttribute('aria-pressed', String(nowSaved));
-            btn.querySelector('.fh-engage-save-ic').textContent = nowSaved ? '♥' : '♡';
-            btn.querySelector('.fh-engage-save-label').textContent = nowSaved ? 'Saved' : 'Save';
-            const countEl = card.querySelector('.fh-engage-savecount');
-            if (countEl) {
+            const ic = btn.querySelector('.fh-engage-save-ic');
+            if (ic) ic.textContent = nowSaved ? '♥' : '♡';
+            const mini = btn.querySelector('.fh-engage-savemini');
+            if (mini) {
               const base = parseInt(btn.dataset.base, 10) || 0;
-              countEl.textContent = (base + (nowSaved ? 1 : 0)).toLocaleString() + ' saved';
+              mini.textContent = (base + (nowSaved ? 1 : 0)).toLocaleString();
             }
           }
         });
