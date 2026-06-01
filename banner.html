@@ -654,6 +654,34 @@
     to   { opacity: 1; transform: translateY(0);     }
   }
 
+  /* AHC pre-fill card — shown atop the first question when health-check
+     metabolic markers have already been counted into the result. */
+  .ahc-prefill {
+    border-radius: 14px;
+    padding: 13px 14px;
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, rgba(47,122,122,0.10) 0%, rgba(47,122,122,0.04) 100%);
+    border: 1px solid rgba(47,122,122,0.22);
+    animation: ahcBannerIn 360ms ease-out 60ms backwards;
+  }
+  .ahc-prefill-head {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12.5px; font-weight: 700; color: #1F5C5C;
+    letter-spacing: 0.2px;
+  }
+  .ahc-prefill-ic {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(47,122,122,0.16); color: #2F7A7A; font-size: 11px;
+  }
+  .ahc-prefill-sub { font-size: 11.5px; color: #4A6B6B; line-height: 1.45; margin: 6px 0 9px; }
+  .ahc-prefill-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ahc-prefill-chip {
+    font-size: 11px; font-weight: 600; color: #1F5C5C;
+    background: #fff; border: 1px solid rgba(47,122,122,0.28);
+    border-radius: 999px; padding: 4px 10px;
+  }
+
   /* Intro screen */
   .intro-hero {
     text-align: center;
@@ -2211,8 +2239,23 @@
 // DATA
 // =================================================================
 
-// No AHC pre-fill in this version (user has not taken health check)
-const HAS_AHC = false;
+// AHC lab data feeds the metabolic domain when the user has completed a
+// health check. ahc.html persists raw markers (bmi/hba1c/tsh) into
+// forher.ahc.v1; we read them here for a combined, single PCOS result.
+function readAhcMarkers() {
+  try {
+    const raw = localStorage.getItem('forher.ahc.v1');
+    return raw ? (JSON.parse(raw).markers || null) : null;
+  } catch (_) { return null; }
+}
+const HAS_AHC = !!readAhcMarkers();
+
+// The metabolic Kalra domain is supplied by AHC when present, so we drop the
+// self-report metabolic question and keep menstrual + dermatological from the
+// questionnaire. Without AHC, all questions are asked.
+function activeQuestions() {
+  return HAS_AHC ? QUESTIONS.filter(q => q.domain !== 'metabolic') : QUESTIONS;
+}
 
 const QUESTIONS = [
   {
@@ -2451,9 +2494,25 @@ function renderDiagnosedPath() {
 // QUESTIONNAIRE — one per screen
 // =================================================================
 
+function renderAhcPrefillCard() {
+  const m = readAhcMarkers();
+  if (!m) return '';
+  const items = [];
+  if (m.bmi && m.bmi.flagged)     items.push(`Elevated BMI (${m.bmi.value})`);
+  if (m.hba1c && m.hba1c.flagged)  items.push('Borderline HbA1c');
+  if (!items.length) return '';
+  return `
+    <div class="ahc-prefill">
+      <div class="ahc-prefill-head"><span class="ahc-prefill-ic">✦</span> From your health check</div>
+      <p class="ahc-prefill-sub">We've already counted these metabolic signals — just a few symptom questions to go.</p>
+      <div class="ahc-prefill-chips">${items.map(i => `<span class="ahc-prefill-chip">${i}</span>`).join('')}</div>
+    </div>`;
+}
+
 function renderQuestion() {
-  const total = QUESTIONS.length;
-  const q = QUESTIONS[currentQIndex];
+  const list = activeQuestions();
+  const total = list.length;
+  const q = list[currentQIndex];
   const stage = document.getElementById('qStage');
   const progressFill = document.getElementById('qProgressFill');
   const counter = document.getElementById('qCounter');
@@ -2473,6 +2532,7 @@ function renderQuestion() {
   const currentAns = answers[q.id];
 
   stage.innerHTML = `
+    ${currentQIndex === 0 ? renderAhcPrefillCard() : ''}
     <h2 class="q-question">${q.q}</h2>
     <p class="q-help">${q.help}</p>
     <div class="q-options">
@@ -2522,7 +2582,7 @@ function renderQuestion() {
 
 function qNext() {
   const stage = document.getElementById('qStage');
-  if (currentQIndex < QUESTIONS.length - 1) {
+  if (currentQIndex < activeQuestions().length - 1) {
     stage.classList.add('exit');
     setTimeout(() => {
       currentQIndex++;
@@ -2617,6 +2677,21 @@ function classify() {
 
   let severitySum = 0;
 
+  // Fold AHC lab markers into the metabolic (Kalra Domain II) signals when
+  // present, so the combined result reflects both labs and symptoms.
+  const ahcMarkers = readAhcMarkers();
+  if (ahcMarkers) {
+    if (ahcMarkers.bmi && ahcMarkers.bmi.flagged) {
+      domainSignals.metabolic.push({ source: 'AHC', label: `Elevated BMI (${ahcMarkers.bmi.value})`, level: 2, pedersen: 'obesity' });
+      pedersenPredictors.obesity = true;
+      severitySum += 2;
+    }
+    if (ahcMarkers.hba1c && ahcMarkers.hba1c.flagged) {
+      domainSignals.metabolic.push({ source: 'AHC', label: 'Borderline HbA1c — dysglycaemia', level: 1, pedersen: null });
+      severitySum += 1;
+    }
+  }
+
   QUESTIONS.forEach(q => {
     const ans = answers[q.id];
     if (!ans || ans.level === 0) return;
@@ -2664,7 +2739,9 @@ function classify() {
     pedersenCount,
     severitySum,
     coDiagnoses: [...diagnoses].filter(d => d !== 'none' && d !== 'pcos'),
-    ttcFlag
+    ttcFlag,
+    // Preliminary when we screened on symptoms alone (no health check to fuse).
+    preliminary: !ahcMarkers
   };
 }
 
@@ -2714,7 +2791,10 @@ function renderResults(result) {
   const lvl = document.getElementById('riskLevel');
   lvl.className = 'risk-level ' + tier;
   lvl.textContent = config.level;
-  document.getElementById('riskCaption').textContent = config.caption;
+  document.getElementById('riskCaption').textContent = config.caption +
+    (result.preliminary
+      ? ' This is a preliminary screen based on your symptoms alone — adding your health check data would refine it.'
+      : ' This combines your recent health check and your symptoms into one result.');
 
   // Personalised note based on inputs
   document.getElementById('personalNote').textContent = generatePersonalNote(result);
@@ -2758,7 +2838,7 @@ function renderResults(result) {
         <span class="why-bullet"></span>
         <div class="why-body">
           <span class="why-text">${s.label}</span><br>
-          <span class="why-tag">${domainLabels[s.domainKey].label}${s.pedersen ? ' · Key predictor' : ''}</span>
+          <span class="why-tag">${domainLabels[s.domainKey].label}${s.pedersen ? ' · Key predictor' : ''}${s.source === 'AHC' ? ' · from your health check' : ''}</span>
         </div>
       </div>
     `).join('');
@@ -2786,6 +2866,8 @@ function renderResults(result) {
   document.getElementById('devLog').textContent = JSON.stringify({
     pathway: 'screening',
     classification: tier,
+    usedAhc: HAS_AHC,
+    preliminary: !!result.preliminary,
     positiveDomains: Object.entries(domainPositive).filter(([_, v]) => v).map(([k]) => k),
     pedersenCount,
     ttcFlag,
