@@ -2074,7 +2074,10 @@
       </div>
 
       <div class="cta-wrap" style="padding-left: 0; padding-right: 0;">
-        <button class="btn btn-secondary" onclick="restart()">
+        <button class="btn" onclick="continueToTracking()">
+          Continue — set up your tracking
+        </button>
+        <button class="btn btn-secondary" onclick="restart()" style="margin-top: 10px;">
           Back to Home
         </button>
       </div>
@@ -2164,7 +2167,10 @@
       </div>
 
       <div class="cta-wrap" style="padding-left: 0; padding-right: 0;">
-        <button class="btn btn-secondary" onclick="restart()">
+        <button class="btn" onclick="continueToTracking()">
+          Continue — set up your tracking
+        </button>
+        <button class="btn btn-secondary" onclick="restart()" style="margin-top: 10px;">
           Back to Home
         </button>
       </div>
@@ -2565,8 +2571,30 @@ function runAnalysing() {
   setTimeout(() => {
     const result = classify();
     renderResults(result);
+    persistPcosResult(result);
     goTo(5);
   }, 1900);
+}
+
+// After seeing their PCOS result, the user moves forward into the intent gate
+// and tracking setup (cycle.html), rather than being dropped back at home.
+// The persisted result (FH_PCOS_KEY) is read there to tailor the journey.
+function continueToTracking() {
+  window.location.href = 'cycle.html';
+}
+
+// Persist the assessment result so the rest of For Her (intent gate, home card,
+// pregnancy handoff) can read the user's PCOS risk without re-running the quiz.
+const FH_PCOS_KEY = 'forher.pcos.v1';
+function persistPcosResult(result) {
+  try {
+    localStorage.setItem(FH_PCOS_KEY, JSON.stringify({
+      tier: result.tier,                     // 'low' | 'moderate' | 'high'
+      domainPositive: result.domainPositive, // count of positive Kalra domains
+      ttcFlag: !!result.ttcFlag,
+      assessedAt: new Date().toISOString()
+    }));
+  } catch (_) {}
 }
 
 // =================================================================
