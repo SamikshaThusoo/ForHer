@@ -1384,15 +1384,8 @@
     </div>
     <span class="opt-go">›</span>
   </a>
-
-  <a class="opt" data-go="banner.html">
-    <div class="opt-ic">✦</div>
-    <div class="opt-body">
-      <div class="opt-title">2-min PCOS risk</div>
-      <div class="opt-sub">Folds in your Health Check, if available</div>
-    </div>
-    <span class="opt-go">›</span>
-  </a>
+  <!-- PCOS risk option removed — the assessment is offered via the entry card
+       (banner) and the "Re-check PCOS risk" action inside the cycle flow. -->
 </section>
 
 <script>
@@ -1493,7 +1486,6 @@
 
   <div class="fh-log-actions">
     <button class="fh-log-btn primary" id="fhLogSaveBtn" type="button">Save</button>
-    <button class="fh-log-btn ghost" id="fhLogOpenBtn" type="button">Open full journey →</button>
   </div>
 </section>
 
@@ -2048,16 +2040,6 @@
     document.getElementById('fhLogSaveBtn').addEventListener('click', () => {
       saveSheet();
       closeLogSheet();
-    });
-    document.getElementById('fhLogOpenBtn').addEventListener('click', () => {
-      saveSheet();
-      closeLogSheet();
-      // Hand off to the existing 3-flow chooser (Cycle / AHC / PCOS).
-      // Wait for the log sheet to finish sliding down before opening the
-      // chooser so the two sheets don't visually stack.
-      setTimeout(() => {
-        if (typeof openForHerFlow === 'function') openForHerFlow();
-      }, 280);
     });
 
     // ---------- Saved badge ----------

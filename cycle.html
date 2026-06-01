@@ -3212,12 +3212,9 @@
     </div>
 
     <div class="continue-bar">
-      <div class="btn-row">
-        <a class="btn btn-secondary btn-main" href="index.html">Back to home</a>
-        <button class="btn btn-main" onclick="finishLogging()">
-          Done <span class="arrow">→</span>
-        </button>
-      </div>
+      <button class="btn btn-main" onclick="finishLogging()">
+        Done <span class="arrow">→</span>
+      </button>
     </div>
   </div>
 
@@ -5044,8 +5041,9 @@ function restart() {
 // "Done" on the saved screen returns to the daily companion — NOT the intent
 // gate. The gate is a once-per-flow step; finishing a log shouldn't re-ask it.
 function finishLogging() {
-  const intent = readJourney();
-  if (intent === 'pregnant') goTo('1p'); else goTo(1);
+  // Any completed flow (assessment, tracking, pregnancy, TTC) returns to the
+  // Home page — not the in-app tracker.
+  window.location.href = 'index.html';
 }
 
 let toastTimer;
