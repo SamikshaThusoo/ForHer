@@ -3214,7 +3214,7 @@
     <div class="continue-bar">
       <div class="btn-row">
         <a class="btn btn-secondary btn-main" href="index.html">Back to home</a>
-        <button class="btn btn-main" onclick="restart()">
+        <button class="btn btn-main" onclick="finishLogging()">
           Done <span class="arrow">→</span>
         </button>
       </div>
@@ -4180,7 +4180,7 @@ function updatePhaseAndToday(forDate) {
   // Community / motivation / diet hooks for this phase + the user's intent.
   const cEl = document.getElementById('communityHooks');
   if (cEl && typeof renderCommunity === 'function') {
-    renderCommunity(cEl, phase, readJourney() || 'cycle');
+    renderCommunity(cEl, phase, readJourney() || 'cycle', { cardHref: 'community.html' });
   }
 }
 
@@ -5039,6 +5039,13 @@ function restart() {
   selectedGoal = null;
 
   goTo(0);
+}
+
+// "Done" on the saved screen returns to the daily companion — NOT the intent
+// gate. The gate is a once-per-flow step; finishing a log shouldn't re-ask it.
+function finishLogging() {
+  const intent = readJourney();
+  if (intent === 'pregnant') goTo('1p'); else goTo(1);
 }
 
 let toastTimer;

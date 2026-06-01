@@ -1584,7 +1584,6 @@
             <div class="fh-engage-mark">❀</div>
             <div class="fh-engage-title">For Her</div>
           </div>
-          ${hook.flags.length ? '<span class="fh-engage-flag-tag">Health check</span>' : ''}
         </div>
         <div class="fh-engage-headline">${hook.headline}</div>
         ${flagsHtml}
@@ -1641,9 +1640,9 @@
         : '';
       const bodyHtml = hook
         ? `<div class="fh-engage-split">
-             <button class="fh-engage-feature" type="button" data-action="open" aria-label="${kind.label}: ${hook.text}">
+             <button class="fh-engage-feature" type="button" data-action="community" aria-label="${kind.label}: ${hook.text}">
                <div class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</div>
-               <div class="fh-engage-headline community">${hook.text}</div>
+               <div class="fh-engage-headline community">${shortTip(hook.text)}</div>
              </button>
              ${videoHtml}
            </div>
@@ -1653,7 +1652,7 @@
                <span class="fh-engage-save-ic">${saved ? '♥' : '♡'}</span><span class="fh-engage-save-label">${saved ? 'Saved' : 'Save'}</span>
              </button>
              <span class="fh-engage-savecount">${savedCount.toLocaleString()} saved</span>
-             <button class="fh-engage-morelink" type="button" data-action="open">More in your journey ›</button>
+             <button class="fh-engage-morelink" type="button" data-action="community">Open community ›</button>
            </div>`
         : `<div class="fh-engage-headline">${copy.headline}</div>
            <p class="fh-engage-sub">${copy.sub}</p>`;
@@ -1696,6 +1695,7 @@
           else if (a === 'assess') window.location.href = pcosEntryUrl();
           else if (a === 'result') window.location.href = 'banner.html';
           else if (a === 'track' || a === 'open') window.location.href = 'cycle.html';
+          else if (a === 'community') window.location.href = 'community.html';
           else if (a === 'video') {
             // Real URL opens the recording; placeholder routes into the journey.
             const url = btn.dataset.url;
@@ -1732,6 +1732,15 @@
         const cur = JSON.parse(localStorage.getItem('forher.intent.v1') || 'null');
         return cur && cur.intent ? cur.intent : null;
       } catch (_) { return null; }
+    }
+
+    // Keep the card light: show a teaser of the tip; the rest lives on the
+    // community page.
+    function shortTip(t) {
+      if (!t || t.length <= 52) return t;
+      const cut = t.slice(0, 52);
+      const sp = cut.lastIndexOf(' ');
+      return cut.slice(0, sp > 30 ? sp : 52).replace(/[\s,.;:—-]+$/, '') + '…';
     }
 
     // Community content drives the daily card. Eyebrow label + accent per kind.

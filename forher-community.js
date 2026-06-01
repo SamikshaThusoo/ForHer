@@ -129,7 +129,11 @@
       '.fhc-share{width:100%;border:none;border-radius:12px;padding:11px;font:inherit;font-size:12.5px;font-weight:700;' +
         'color:#fff;background:linear-gradient(135deg,#5B2A4A 0%,#8E5378 100%);cursor:pointer;box-shadow:0 6px 16px rgba(91,42,74,.2)}' +
       '.fhc-share:active{transform:scale(.99)}' +
-      '.fhc-share.ghost{background:#fff;color:#8E5378;border:1px solid rgba(142,83,120,.35);box-shadow:none}';
+      '.fhc-share.ghost{background:#fff;color:#8E5378;border:1px solid rgba(142,83,120,.35);box-shadow:none}' +
+      '.fhc-card--link{display:block;text-decoration:none;cursor:pointer;transition:box-shadow .15s ease,transform .1s ease}' +
+      '.fhc-card--link:hover{box-shadow:0 8px 20px rgba(91,42,74,.12)}' +
+      '.fhc-card--link:active{transform:scale(.995)}' +
+      '.fhc-card-chev{margin-left:auto;font-weight:700;opacity:.5}';
     var s = document.createElement('style');
     s.id = 'fhc-styles';
     s.textContent = css;
@@ -156,11 +160,11 @@
   function contribFormHtml(phase) {
     return '' +
       '<div class="fhc-contrib-head">How are you feeling this <em>' + escapeHtml(phase) + '</em> phase?</div>' +
-      '<p class="fhc-contrib-sub">Tap what fits. Your input helps shape what other women see here — instead of templates.</p>' +
+      '<p class="fhc-contrib-sub">Tap what fits, and share what helped you — other women in your phase will see it, instead of templates.</p>' +
       '<div class="fhc-chips">' +
         FEELING_OPTS.map(function (f) { return '<button class="fhc-chip" type="button" data-feel="' + f + '">' + f + '</button>'; }).join('') +
       '</div>' +
-      '<textarea class="fhc-note" placeholder="Anything you\'d add? (optional)"></textarea>' +
+      '<textarea class="fhc-note" placeholder="What helped you today? Share your thoughts… (optional)"></textarea>' +
       '<button class="fhc-share" type="button">Share with the community</button>';
   }
 
@@ -196,9 +200,12 @@
 
   // Renders the community section: three hook types (peer / pacing / diet) plus
   // a "how are you feeling this phase" contribution panel. Safe to call repeatedly.
-  function renderCommunity(containerEl, phase, intent) {
+  // opts.cardHref: if set, each recommendation card links there (e.g. the full
+  // community page). Omit it on the community page itself so cards aren't links.
+  function renderCommunity(containerEl, phase, intent, opts) {
     if (!containerEl) return;
     injectStylesOnce();
+    opts = opts || {};
     var hooks = getCommunityHooks(phase, intent);
     if (!hooks.length) { containerEl.innerHTML = ''; return; }
 
@@ -207,12 +214,16 @@
       var pick = hooks.filter(function (h) { return h.kind === kind; })[0];
       if (!pick) return;
       var meta = KIND_META[kind];
+      var tag = opts.cardHref ? 'a' : 'div';
+      var hrefAttr = opts.cardHref ? ' href="' + opts.cardHref + '"' : '';
+      var linkCls = opts.cardHref ? ' fhc-card--link' : '';
       cards += '' +
-        '<div class="fhc-card" style="--fhc-accent:' + meta.accent + '">' +
-          '<div class="fhc-kind"><span class="fhc-dot"></span>' + meta.label + '</div>' +
+        '<' + tag + ' class="fhc-card' + linkCls + '"' + hrefAttr + ' style="--fhc-accent:' + meta.accent + '">' +
+          '<div class="fhc-kind"><span class="fhc-dot"></span>' + meta.label +
+            (opts.cardHref ? '<span class="fhc-card-chev">›</span>' : '') + '</div>' +
           '<div class="fhc-text">' + escapeHtml(pick.text) + '</div>' +
           '<div class="fhc-meta">' + pick.savedCount.toLocaleString() + ' women saved this</div>' +
-        '</div>';
+        '</' + tag + '>';
     });
 
     containerEl.innerHTML = '' +
@@ -230,10 +241,50 @@
     if (panel) wireContribution(panel, phase, intent);
   }
 
+  // ---- Phase / intent derived from localStorage (for the standalone page) ----
+  function daysBetween(aIso, bIso) {
+    return Math.floor((new Date(bIso + 'T00:00:00') - new Date(aIso + 'T00:00:00')) / 86400000);
+  }
+
+  // Current cycle phase from forher.cycle.v1 (+ learned length), or null if no data.
+  function currentPhaseFromStorage() {
+    try {
+      var s = JSON.parse(localStorage.getItem('forher.cycle.v1') || 'null');
+      if (!s || !s.periodDays || !s.periodDays.length) return null;
+      var len = 28;
+      var cl = JSON.parse(localStorage.getItem('forher.cyclelen.v1') || 'null');
+      if (cl && cl.length >= 21 && cl.length <= 40) len = cl.length;
+      var sorted = s.periodDays.slice().sort();
+      var starts = [];
+      for (var i = 0; i < sorted.length; i++) {
+        if (i === 0 || daysBetween(sorted[i - 1], sorted[i]) > 1) starts.push(sorted[i]);
+      }
+      var today = new Date(); today.setHours(0, 0, 0, 0);
+      var tkey = today.toISOString().split('T')[0];
+      var last = null;
+      for (var j = 0; j < starts.length; j++) { if (starts[j] <= tkey) last = starts[j]; else break; }
+      if (!last) return null;
+      var day = ((daysBetween(last, tkey) % len) + len) % len + 1;
+      if (day <= 5) return 'menstrual';
+      if (day <= 13) return 'follicular';
+      if (day <= 16) return 'ovulation';
+      return 'luteal';
+    } catch (_) { return null; }
+  }
+
+  function currentIntentFromStorage() {
+    try {
+      var c = JSON.parse(localStorage.getItem('forher.intent.v1') || 'null');
+      return (c && c.intent) ? c.intent : 'cycle';
+    } catch (_) { return 'cycle'; }
+  }
+
   // Expose as plain globals (no module system).
   global.FORHER_TIPS = FORHER_TIPS;
   global.FORHER_VIDEOS = FORHER_VIDEOS;
   global.getCommunityHooks = getCommunityHooks;
   global.getCommunityVideo = getCommunityVideo;
   global.renderCommunity = renderCommunity;
+  global.currentPhaseFromStorage = currentPhaseFromStorage;
+  global.currentIntentFromStorage = currentIntentFromStorage;
 })(window);

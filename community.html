@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Her · Community</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --plum: #5B2A4A; --plum-deep: #3E1B33; --plum-soft: #8E5378;
+    --rose-bg: #FBF3F5; --lavender-bg: #F5F0F6; --ink: #3E1B33; --ink-soft: #6B5A65;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #E9E3EC; color: var(--ink);
+    display: flex; justify-content: center; min-height: 100vh;
+  }
+  .app {
+    width: 100%; max-width: 420px; min-height: 100vh;
+    background: linear-gradient(180deg, var(--rose-bg) 0%, var(--lavender-bg) 100%);
+    box-shadow: 0 0 40px rgba(91,42,74,0.1); position: relative; padding-bottom: 28px;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 18px 6px;
+  }
+  .back-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid rgba(91,42,74,0.16); background: #fff; color: var(--plum);
+    font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--plum) 0%, #C97A8E 100%);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .brand-name { font-size: 14px; font-weight: 700; color: var(--plum); }
+  .hero { padding: 8px 18px 14px; }
+  .hero .eyebrow {
+    display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px;
+    text-transform: uppercase; color: var(--plum-soft);
+    background: rgba(142,83,120,0.1); border-radius: 999px; padding: 4px 10px; margin-bottom: 8px;
+  }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.15; color: var(--plum-deep); }
+  .hero h1 em { color: var(--plum-soft); }
+  .hero .lead { font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; line-height: 1.5; }
+  .wrap { padding: 0 18px; }
+
+  /* Wellness video banner */
+  .cvideo {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    border: none; cursor: pointer; font-family: inherit; text-align: left;
+    background: #fff; border: 1px solid rgba(91,42,74,0.1); border-radius: 16px;
+    padding: 10px; margin-bottom: 14px; box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+  }
+  .cvideo-thumb {
+    position: relative; flex: 0 0 88px; height: 58px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--v-accent, #8E5378) 0%, rgba(62,27,51,0.9) 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cvideo-play {
+    width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.92);
+    color: var(--v-accent, #8E5378); display: flex; align-items: center; justify-content: center;
+    font-size: 9px; padding-left: 2px;
+  }
+  .cvideo-dur { position: absolute; right: 5px; bottom: 5px; font-size: 9px; font-weight: 700; color: #fff; background: rgba(0,0,0,0.32); border-radius: 999px; padding: 2px 6px; }
+  .cvideo-body { display: flex; flex-direction: column; gap: 2px; }
+  .cvideo-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--plum-soft); }
+  .cvideo-title { font-size: 13px; font-weight: 700; color: var(--plum-deep); }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <a class="back-btn" href="cycle.html" aria-label="Back">‹</a>
+      <div class="brand"><div class="brand-mark">❀</div><div class="brand-name">For Her · Community</div></div>
+    </div>
+
+    <div class="hero">
+      <span class="eyebrow" id="phaseEyebrow">Community</span>
+      <h1>Women in your <em id="phaseWord">phase</em></h1>
+      <p class="lead">Real recommendations from women tracking the same phase — and a place to share what's working for you.</p>
+    </div>
+
+    <div class="wrap">
+      <div id="videoMount"></div>
+      <div id="communityMount"></div>
+    </div>
+  </div>
+
+  <script src="forher-community.js"></script>
+  <script>
+    (function () {
+      var phase = (typeof currentPhaseFromStorage === 'function' && currentPhaseFromStorage()) || 'follicular';
+      var intent = (typeof currentIntentFromStorage === 'function' && currentIntentFromStorage()) || 'cycle';
+
+      var cap = phase.charAt(0).toUpperCase() + phase.slice(1);
+      document.getElementById('phaseEyebrow').textContent = cap + ' phase · community';
+      document.getElementById('phaseWord').textContent = phase + ' phase';
+
+      // Wellness video for this phase + intent.
+      if (typeof getCommunityVideo === 'function') {
+        var v = getCommunityVideo(phase, intent);
+        if (v) {
+          var m = document.getElementById('videoMount');
+          var btn = document.createElement('button');
+          btn.className = 'cvideo';
+          btn.style.setProperty('--v-accent', v.accent);
+          btn.innerHTML =
+            '<span class="cvideo-thumb"><span class="cvideo-play">▶</span><span class="cvideo-dur">' + v.duration + '</span></span>' +
+            '<span class="cvideo-body"><span class="cvideo-eyebrow">Wellness session</span><span class="cvideo-title">' + v.title + '</span></span>';
+          btn.addEventListener('click', function () { if (v.url) window.open(v.url, '_blank'); });
+          m.appendChild(btn);
+        }
+      }
+
+      if (typeof renderCommunity === 'function') {
+        renderCommunity(document.getElementById('communityMount'), phase, intent);
+      }
+    })();
+  </script>
+</body>
+</html>
