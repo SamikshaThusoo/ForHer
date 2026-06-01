@@ -77,7 +77,7 @@
 <body>
   <div class="app">
     <div class="topbar">
-      <a class="back-btn" href="cycle.html" aria-label="Back">‹</a>
+      <a class="back-btn" href="index.html" id="fhCBack" aria-label="Back">‹</a>
       <div class="brand"><div class="brand-mark">❀</div><div class="brand-name">For Her · Community</div></div>
     </div>
 
@@ -96,6 +96,13 @@
   <script src="forher-community.js"></script>
   <script>
     (function () {
+      // Back returns to wherever the user came from (home card or cycle view),
+      // not a fresh cycle.html (which would auto-skip into the tracker).
+      var back = document.getElementById('fhCBack');
+      if (back) back.addEventListener('click', function (e) {
+        if (history.length > 1) { e.preventDefault(); history.back(); }
+      });
+
       var phase = (typeof currentPhaseFromStorage === 'function' && currentPhaseFromStorage()) || 'follicular';
       var intent = (typeof currentIntentFromStorage === 'function' && currentIntentFromStorage()) || 'cycle';
 
