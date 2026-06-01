@@ -3286,8 +3286,52 @@
 </div>
 
 <script>
-const CYCLE_LENGTH = 28;
+// Cycle length is a LEARNED value. We start with a population default and
+// switch to the user's own median once we have enough logged period starts.
+const DEFAULT_CYCLE_LENGTH = 28;
 const PERIOD_LENGTH = 5;
+const FH_CYCLE_LEN_KEY = 'forher.cyclelen.v1';
+const MIN_CYCLES_TO_LEARN = 2; // need at least 2 gaps (3 starts) before trusting the learned value
+
+// Reads the learned cycle length if we have one, else the default.
+function getCycleLength() {
+  try {
+    const raw = localStorage.getItem(FH_CYCLE_LEN_KEY);
+    if (raw) {
+      const v = parseInt(JSON.parse(raw).length, 10);
+      if (v >= 21 && v <= 40) return v; // clamp to a clinically plausible range
+    }
+  } catch (_) {}
+  return DEFAULT_CYCLE_LENGTH;
+}
+
+// True once we have learned a personal cycle length (so UI can show it confidently).
+function hasLearnedCycleLength() {
+  try { return !!localStorage.getItem(FH_CYCLE_LEN_KEY); } catch (_) { return false; }
+}
+
+// Given an array of period-start Date objects, compute and persist the median
+// gap as the learned cycle length. Call this whenever period logs change.
+function recomputeCycleLength(periodStarts) {
+  if (!Array.isArray(periodStarts) || periodStarts.length < MIN_CYCLES_TO_LEARN + 1) return;
+  const sorted = periodStarts
+    .map(d => new Date(d)).sort((a, b) => a - b);
+  const gaps = [];
+  for (let i = 1; i < sorted.length; i++) {
+    const g = Math.round((sorted[i] - sorted[i - 1]) / 86400000);
+    if (g >= 21 && g <= 40) gaps.push(g); // ignore implausible gaps (missed logs)
+  }
+  if (gaps.length < MIN_CYCLES_TO_LEARN) return;
+  gaps.sort((a, b) => a - b);
+  const mid = Math.floor(gaps.length / 2);
+  const median = gaps.length % 2 ? gaps[mid] : Math.round((gaps[mid - 1] + gaps[mid]) / 2);
+  try { localStorage.setItem(FH_CYCLE_LEN_KEY, JSON.stringify({ length: median, learnedAt: new Date().toISOString(), fromCycles: gaps.length })); } catch (_) {}
+}
+
+// Backwards-compat shim: all existing code references the bare identifier
+// CYCLE_LENGTH. Expose it as a live getter so those references always resolve
+// to the learned value without having to touch every call site.
+Object.defineProperty(window, 'CYCLE_LENGTH', { get: getCycleLength, configurable: true });
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -3358,6 +3402,20 @@ function getMostRecentPeriodStart(referenceDate) {
     else break;
   }
   return lastStart;
+}
+
+// Returns every period-start date (first day of each contiguous run).
+// Used to learn the user's personal cycle length.
+function getAllPeriodStarts() {
+  if (periodDays.size === 0) return [];
+  const sortedDates = [...periodDays].map(dateFromKey).sort((a, b) => a - b);
+  const starts = [];
+  for (let i = 0; i < sortedDates.length; i++) {
+    if (i === 0 || daysBetween(sortedDates[i - 1], sortedDates[i]) > 1) {
+      starts.push(sortedDates[i]);
+    }
+  }
+  return starts;
 }
 
 function getCycleDayForDate(date) {
@@ -3681,9 +3739,27 @@ function hasAhcData() {
   try { return !!localStorage.getItem(FH_AHC_KEY); } catch (_) { return false; }
 }
 
+function hasPcosResult() {
+  try { return !!localStorage.getItem('forher.pcos.v1'); } catch (_) { return false; }
+}
+
+function readPcosResult() {
+  try {
+    const raw = localStorage.getItem('forher.pcos.v1');
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) { return null; }
+}
+
 function routePcos() {
-  // Prototype mode: always route PCOS through the AHC-driven journey.
-  window.location.href = 'ahc.html';
+  // PCOS-first flow: the assessment now lives ahead of this gate. If the user
+  // somehow reaches the gate having picked "PCOS" without an assessment on
+  // record, send them to take it; otherwise they already have their result
+  // and should just continue into tracking.
+  if (!hasPcosResult()) {
+    window.location.href = 'banner.html';
+  } else {
+    goTo(1);
+  }
 }
 
 function confirmGoal() {
@@ -4000,7 +4076,9 @@ function updatePhaseAndToday(forDate) {
   // Phase description lives in the dynamic insight cards below — no need to
   // repeat it on the current-phase summary tile.
   document.getElementById('phaseBlurb').style.display = 'none';
-  document.getElementById('phaseDayPill').textContent = `Day ${cycleDay} of ${CYCLE_LENGTH}`;
+  document.getElementById('phaseDayPill').textContent = hasLearnedCycleLength()
+    ? `Day ${cycleDay} of ${CYCLE_LENGTH}`
+    : `Around day ${cycleDay} of ${CYCLE_LENGTH}`;
 
   // Today card
   document.getElementById('todayWrap').style.display = 'block';
@@ -4709,6 +4787,9 @@ const FH_STORAGE_KEY = 'forher.cycle.v1';
 
 function persistCycleState() {
   try {
+    // Learn the user's personal cycle length from their logged starts.
+    recomputeCycleLength(getAllPeriodStarts());
+
     const sortedDays = [...periodDays].sort();
     const snapshot = {
       hasData: periodDays.size > 0,
