@@ -1588,7 +1588,7 @@
         </div>
         <div class="fh-engage-headline">${hook.headline}</div>
         ${flagsHtml}
-        <p class="fh-engage-sub">${hook.sub}</p>
+        ${hook.sub ? `<p class="fh-engage-sub">${hook.sub}</p>` : ''}
         <div class="fh-engage-actions">
           <button class="fh-engage-btn primary" type="button" data-action="assess">
             ${hook.cta} <span class="arrow">→</span>
@@ -1868,8 +1868,8 @@
       if (flags.length) {
         return {
           flags,
-          headline: 'A few health-check markers <em>need a look</em>',
-          sub: `Your ${joinMarkers(flags)} came back flagged — these can be linked to PCOS. A quick assessment will tell you your risk.`,
+          headline: 'Flagged in your <em>health check</em>',
+          sub: '', // keep it minimal — the chips carry the message
           cta: 'Check my PCOS risk'
         };
       }
@@ -2037,8 +2037,11 @@
 <!-- ===== Prototype-only demo controls (seed/clear AHC + reset the flow) ===== -->
 <div id="fhDemoBar" role="group" aria-label="Demo controls">
   <span class="fh-demo-lbl">Demo</span>
-  <button id="fhDemoAhc" type="button">With AHC</button>
-  <button id="fhDemoNoAhc" type="button">Without AHC</button>
+  <label class="fh-demo-toggle" title="Toggle AHC health-check data">
+    <input type="checkbox" id="fhAhcToggle">
+    <span class="fh-demo-track"><span class="fh-demo-knob"></span></span>
+    <span class="fh-demo-tlbl">AHC</span>
+  </label>
   <button id="fhResetDemo" type="button" aria-label="Reset demo data">↺ Reset</button>
 </div>
 <style>
@@ -2058,8 +2061,13 @@
   }
   #fhDemoBar button:hover { background: #FBF3F5; }
   #fhDemoBar button:active { transform: scale(0.96); }
-  #fhDemoAhc { border-color: rgba(201,162,74,0.45); color: #8A6B1F; }
-  #fhDemoAhc:hover { background: #FBF4E6; }
+  #fhDemoBar .fh-demo-toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  #fhDemoBar .fh-demo-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+  #fhDemoBar .fh-demo-track { position: relative; width: 34px; height: 20px; border-radius: 999px; background: #D8CDD3; transition: background 0.18s ease; }
+  #fhDemoBar .fh-demo-knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.18s ease; }
+  #fhDemoBar .fh-demo-toggle input:checked + .fh-demo-track { background: #8E5378; }
+  #fhDemoBar .fh-demo-toggle input:checked + .fh-demo-track .fh-demo-knob { transform: translateX(14px); }
+  #fhDemoBar .fh-demo-tlbl { font: 700 11px/1 'DM Sans', system-ui, sans-serif; color: #5B2A4A; }
 </style>
 <script>
   // Prototype demo controls. "With AHC" seeds flagged health-check markers so the
@@ -2083,9 +2091,16 @@
       } catch (_) {}
     }
     var byId = function (id) { return document.getElementById(id); };
+    var toggle = byId('fhAhcToggle');
+    if (toggle) {
+      toggle.checked = !!localStorage.getItem('forher.ahc.v1');
+      toggle.addEventListener('change', function () {
+        clearAll();
+        if (toggle.checked) seedAhc();
+        location.reload();
+      });
+    }
     byId('fhResetDemo').addEventListener('click', function () { clearAll(); location.reload(); });
-    byId('fhDemoNoAhc').addEventListener('click', function () { clearAll(); location.reload(); });
-    byId('fhDemoAhc').addEventListener('click', function () { clearAll(); seedAhc(); location.reload(); });
   })();
 </script>
 </body>
