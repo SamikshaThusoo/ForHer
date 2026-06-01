@@ -67,9 +67,9 @@
   }
 
   var KIND_META = {
-    peer:   { label: 'From the community', accent: '#8E5378' },
-    pacing: { label: 'Keeping your pace',  accent: '#2F7A7A' },
-    recipe: { label: 'In the kitchen',     accent: '#C9772A' }
+    peer:   { label: 'From the community',     accent: '#8E5378' },
+    pacing: { label: 'Keeping your pace',      accent: '#2F7A7A' },
+    recipe: { label: 'Diet from the community', accent: '#C9772A' }
   };
   var KIND_ORDER = ['peer', 'pacing', 'recipe'];
 
@@ -112,7 +112,24 @@
       '.fhc-kind .fhc-dot{width:5px;height:5px;border-radius:50%;background:var(--fhc-accent,#8E5378)}' +
       '.fhc-text{font-size:12.5px;line-height:1.5;color:#4A3A44}' +
       '.fhc-meta{margin-top:8px;font-size:10.5px;color:#9A8A92;font-weight:600}' +
-      '.fhc-disclaimer{font-size:9.5px;line-height:1.4;color:#A99CA3;margin:2px 2px 0;font-style:italic}';
+      '.fhc-disclaimer{font-size:9.5px;line-height:1.4;color:#A99CA3;margin:2px 2px 0;font-style:italic}' +
+      // Contribution panel ("how are you feeling this phase")
+      '.fhc-contrib{background:linear-gradient(135deg,rgba(142,83,120,.08) 0%,rgba(142,83,120,.03) 100%);' +
+        'border:1px solid rgba(142,83,120,.2);border-radius:16px;padding:14px 15px;margin-bottom:10px}' +
+      '.fhc-contrib-head{font-size:13.5px;font-weight:700;color:#5B2A4A}' +
+      '.fhc-contrib-head em{font-style:italic;color:#8E5378}' +
+      '.fhc-contrib-sub{font-size:11px;line-height:1.45;color:#6B5A65;margin:5px 0 10px}' +
+      '.fhc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}' +
+      '.fhc-chip{font-size:11.5px;font-weight:600;color:#5B2A4A;background:#fff;' +
+        'border:1px solid rgba(91,42,74,.2);border-radius:999px;padding:6px 12px;cursor:pointer;font-family:inherit;transition:all .15s ease}' +
+      '.fhc-chip.selected{background:linear-gradient(135deg,#5B2A4A,#8E5378);color:#fff;border-color:transparent}' +
+      '.fhc-note{width:100%;box-sizing:border-box;border:1px solid rgba(91,42,74,.18);border-radius:10px;' +
+        'padding:9px 11px;font:inherit;font-size:12px;color:#3E1B33;resize:vertical;min-height:38px;margin-bottom:10px;background:#fff}' +
+      '.fhc-note:focus{outline:none;border-color:rgba(142,83,120,.5)}' +
+      '.fhc-share{width:100%;border:none;border-radius:12px;padding:11px;font:inherit;font-size:12.5px;font-weight:700;' +
+        'color:#fff;background:linear-gradient(135deg,#5B2A4A 0%,#8E5378 100%);cursor:pointer;box-shadow:0 6px 16px rgba(91,42,74,.2)}' +
+      '.fhc-share:active{transform:scale(.99)}' +
+      '.fhc-share.ghost{background:#fff;color:#8E5378;border:1px solid rgba(142,83,120,.35);box-shadow:none}';
     var s = document.createElement('style');
     s.id = 'fhc-styles';
     s.textContent = css;
@@ -125,8 +142,60 @@
     });
   }
 
-  // Renders the three hook types (one card each, best match per kind) into
-  // containerEl for the given phase + intent. Safe to call repeatedly.
+  // Feeling options offered in the contribution panel.
+  var FEELING_OPTS = ['Energetic', 'Tired', 'Crampy', 'Moody', 'Calm', 'Bloated', 'Motivated', 'Anxious'];
+
+  function saveFeeling(entry) {
+    try {
+      var arr = JSON.parse(localStorage.getItem('forher.feelings.v1') || '[]');
+      arr.push(entry);
+      localStorage.setItem('forher.feelings.v1', JSON.stringify(arr));
+    } catch (_) {}
+  }
+
+  function contribFormHtml(phase) {
+    return '' +
+      '<div class="fhc-contrib-head">How are you feeling this <em>' + escapeHtml(phase) + '</em> phase?</div>' +
+      '<p class="fhc-contrib-sub">Tap what fits. Your input helps shape what other women see here — instead of templates.</p>' +
+      '<div class="fhc-chips">' +
+        FEELING_OPTS.map(function (f) { return '<button class="fhc-chip" type="button" data-feel="' + f + '">' + f + '</button>'; }).join('') +
+      '</div>' +
+      '<textarea class="fhc-note" placeholder="Anything you\'d add? (optional)"></textarea>' +
+      '<button class="fhc-share" type="button">Share with the community</button>';
+  }
+
+  function contribThanksHtml(phase) {
+    return '' +
+      '<div class="fhc-contrib-head">Thank you for sharing 🌸</div>' +
+      '<p class="fhc-contrib-sub">Your ' + escapeHtml(phase) + '-phase note is saved. As more women share, you\'ll see real community insights here instead of templates.</p>' +
+      '<button class="fhc-share ghost" type="button" data-reshare="1">Update my note</button>';
+  }
+
+  // Wire the contribution panel: chip toggles + share/reshare, self-contained.
+  function wireContribution(panel, phase, intent) {
+    var share = panel.querySelector('.fhc-share');
+    if (!share) return;
+    if (share.dataset.reshare) {
+      share.addEventListener('click', function () {
+        panel.innerHTML = contribFormHtml(phase);
+        wireContribution(panel, phase, intent);
+      });
+      return;
+    }
+    panel.querySelectorAll('.fhc-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () { chip.classList.toggle('selected'); });
+    });
+    share.addEventListener('click', function () {
+      var feelings = [].slice.call(panel.querySelectorAll('.fhc-chip.selected')).map(function (c) { return c.dataset.feel; });
+      var noteEl = panel.querySelector('.fhc-note');
+      saveFeeling({ phase: phase, intent: intent, feelings: feelings, note: noteEl ? noteEl.value : '' });
+      panel.innerHTML = contribThanksHtml(phase);
+      wireContribution(panel, phase, intent);
+    });
+  }
+
+  // Renders the community section: three hook types (peer / pacing / diet) plus
+  // a "how are you feeling this phase" contribution panel. Safe to call repeatedly.
   function renderCommunity(containerEl, phase, intent) {
     if (!containerEl) return;
     injectStylesOnce();
@@ -153,8 +222,12 @@
           '<span class="fhc-sub">for your ' + escapeHtml(phase) + ' phase</span>' +
         '</div>' +
         cards +
+        '<div class="fhc-contrib" id="fhcContrib">' + contribFormHtml(phase) + '</div>' +
         '<p class="fhc-disclaimer">Shared by the For Her community for general wellbeing — not medical advice or treatment. Check with your clinician for anything health-related.</p>' +
       '</div>';
+
+    var panel = containerEl.querySelector('#fhcContrib');
+    if (panel) wireContribution(panel, phase, intent);
   }
 
   // Expose as plain globals (no module system).
