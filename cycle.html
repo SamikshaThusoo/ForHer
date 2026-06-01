@@ -5026,30 +5026,57 @@ setupOnboardingChips();
 // Prototype mode: always show the "What brings you here?" chooser on
 // entry, even for returning users. (Auto-skip disabled intentionally.)
 </script>
-<!-- ===== Prototype-only demo reset (clears PCOS risk + period flow) ===== -->
-<button id="fhResetDemo" type="button" aria-label="Reset demo data">↺ Reset demo</button>
+<!-- ===== Prototype-only demo controls (seed/clear AHC + reset the flow) ===== -->
+<div id="fhDemoBar" role="group" aria-label="Demo controls">
+  <span class="fh-demo-lbl">Demo</span>
+  <button id="fhDemoAhc" type="button">With AHC</button>
+  <button id="fhDemoNoAhc" type="button">Without AHC</button>
+  <button id="fhResetDemo" type="button" aria-label="Reset demo data">↺ Reset</button>
+</div>
 <style>
-  #fhResetDemo {
+  #fhDemoBar {
     position: fixed; left: 12px; bottom: 12px; z-index: 9999;
-    font: 700 11px/1 'DM Sans', system-ui, sans-serif; letter-spacing: 0.2px;
-    color: #5B2A4A; background: rgba(255,255,255,0.92);
-    border: 1px solid rgba(91,42,74,0.25); border-radius: 999px;
-    padding: 8px 12px; cursor: pointer; box-shadow: 0 4px 14px rgba(91,42,74,0.15);
-    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 8px; border-radius: 999px;
+    background: rgba(255,255,255,0.92); border: 1px solid rgba(91,42,74,0.22);
+    box-shadow: 0 4px 14px rgba(91,42,74,0.15);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   }
-  #fhResetDemo:hover { background: #fff; }
-  #fhResetDemo:active { transform: scale(0.97); }
+  #fhDemoBar .fh-demo-lbl { font: 800 9.5px/1 'DM Sans', system-ui, sans-serif; letter-spacing: 0.6px; text-transform: uppercase; color: #B0A0AA; padding: 0 2px; }
+  #fhDemoBar button {
+    font: 700 11px/1 'DM Sans', system-ui, sans-serif; letter-spacing: 0.2px;
+    color: #5B2A4A; background: #fff; border: 1px solid rgba(91,42,74,0.22);
+    border-radius: 999px; padding: 7px 11px; cursor: pointer; transition: background .15s ease, transform .1s ease;
+  }
+  #fhDemoBar button:hover { background: #FBF3F5; }
+  #fhDemoBar button:active { transform: scale(0.96); }
+  #fhDemoAhc { border-color: rgba(201,162,74,0.45); color: #8A6B1F; }
+  #fhDemoAhc:hover { background: #FBF4E6; }
 </style>
 <script>
-  // Demo helper: reset the PCOS risk and the entered period flow (plus derived
-  // state). Keeps forher.hookrot.v1 so each run shows a different primary hook.
-  document.getElementById('fhResetDemo').addEventListener('click', function () {
-    ['forher.pcos.v1','forher.cycle.v1','forher.cyclelen.v1','forher.intent.v1',
-     'forher.ahc.v1','forher.journey.v1','forher.savedtips.v1'].forEach(function (k) {
-      try { localStorage.removeItem(k); } catch (_) {}
-    });
-    location.reload();
-  });
+  // Prototype demo controls — same as the homepage bar.
+  (function () {
+    var KEYS = ['forher.pcos.v1','forher.cycle.v1','forher.cyclelen.v1','forher.intent.v1',
+                'forher.ahc.v1','forher.journey.v1','forher.savedtips.v1'];
+    function clearAll() { KEYS.forEach(function (k) { try { localStorage.removeItem(k); } catch (_) {} }); }
+    function seedAhc() {
+      try {
+        localStorage.setItem('forher.ahc.v1', JSON.stringify({
+          tier: 'moderate', positiveDomainCount: 1, pedersenCount: 1,
+          markers: {
+            bmi:   { value: 28.0, flagged: true },
+            hba1c: { value: 'Borderline', flagged: true },
+            tsh:   { value: 'Elevated', flagged: true }
+          },
+          completedAt: new Date().toISOString()
+        }));
+      } catch (_) {}
+    }
+    var byId = function (id) { return document.getElementById(id); };
+    byId('fhResetDemo').addEventListener('click', function () { clearAll(); location.reload(); });
+    byId('fhDemoNoAhc').addEventListener('click', function () { clearAll(); location.reload(); });
+    byId('fhDemoAhc').addEventListener('click', function () { clearAll(); seedAhc(); location.reload(); });
+  })();
 </script>
 </body>
 </html>

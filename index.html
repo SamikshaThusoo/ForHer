@@ -714,6 +714,30 @@
   .risk-high     .fh-engage-risk-pill { background: rgba(232, 168, 183, 0.30); color: #A84458; }
   .risk-high     .fh-engage-risk-pill .dot { background: #E8A8B7; }
 
+  /* First-time AHC variant: flagged health-check markers on the card */
+  .fh-engage.has-flags {
+    background:
+      radial-gradient(140% 160% at 100% 0%, rgba(201,162,74,0.28) 0%, transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FBF4E6 60%, #FAF2E2 100%);
+    border-color: rgba(201,162,74,0.26);
+  }
+  .fh-engage-flag-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+    color: #8A6B1F; background: rgba(201,162,74,0.18);
+    border-radius: 999px; padding: 3px 9px; white-space: nowrap;
+  }
+  .fh-engage-flags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 7px 0 2px; position: relative; z-index: 1;
+  }
+  .fh-engage-flag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10.5px; font-weight: 700; color: #8A6B1F;
+    background: #fff; border: 1px solid rgba(201,162,74,0.4);
+    border-radius: 999px; padding: 4px 10px;
+  }
+  .fh-engage-flag-dot { width: 5px; height: 5px; border-radius: 50%; background: #C9772A; }
+
   .fh-engage-btn.secondary {
     background: #fff;
     color: var(--fh-plum-1);
@@ -1498,17 +1522,24 @@
     };
 
     function renderState1() {
-      // First-time hook: copy adapts to AHC state (see firstTimeHookCopy).
+      // First-time hook: copy + flagged markers adapt to AHC state.
       const hook = firstTimeHookCopy();
-      card.className = 'fh-engage';
+      const flagsHtml = hook.flags.length
+        ? `<div class="fh-engage-flags">
+             ${hook.flags.map(f => `<span class="fh-engage-flag"><span class="fh-engage-flag-dot"></span>${f.label}</span>`).join('')}
+           </div>`
+        : '';
+      card.className = 'fh-engage' + (hook.flags.length ? ' has-flags' : '');
       card.innerHTML = `
         <div class="fh-engage-head">
           <div class="fh-engage-brand">
             <div class="fh-engage-mark">❀</div>
             <div class="fh-engage-title">For Her</div>
           </div>
+          ${hook.flags.length ? '<span class="fh-engage-flag-tag">Health check</span>' : ''}
         </div>
         <div class="fh-engage-headline">${hook.headline}</div>
+        ${flagsHtml}
         <p class="fh-engage-sub">${hook.sub}</p>
         <div class="fh-engage-actions">
           <button class="fh-engage-btn primary" type="button" data-action="assess">
@@ -1731,36 +1762,48 @@
       catch (_) { return null; }
     }
 
-    // If the user's health check shows a metabolic marker over threshold,
-    // return a short human label for it (used only to surface the user's own
-    // result back to them — not to profile or to score risk on lab data alone).
-    function ahcFlaggedMarker() {
+    // Flagged health-check markers, surfaced back to the user as her own result
+    // (not hidden lab profiling). BMI/HbA1c use a threshold OR an explicit
+    // `flagged`; TSH is shown when flagged (thyroid rule-out, relevant context).
+    function flaggedAhcMarkers() {
       const m = (loadAhc() || {}).markers;
-      if (!m) return null;
+      if (!m) return [];
+      const out = [];
       const bmiVal = m.bmi && typeof m.bmi.value === 'number' ? m.bmi.value : null;
       if ((bmiVal != null && bmiVal >= AHC_BMI_THRESHOLD) || (m.bmi && m.bmi.flagged)) {
-        return 'a raised BMI';
+        out.push({ key: 'bmi', label: 'BMI' + (bmiVal != null ? ' ' + bmiVal : '') });
       }
       const hbVal = m.hba1c && typeof m.hba1c.value === 'number' ? m.hba1c.value : null;
       if ((hbVal != null && hbVal >= AHC_HBA1C_THRESHOLD) || (m.hba1c && m.hba1c.flagged)) {
-        return 'a borderline blood-sugar (HbA1c) reading';
+        out.push({ key: 'hba1c', label: 'HbA1c' });
       }
-      return null;
+      if (m.tsh && m.tsh.flagged) {
+        out.push({ key: 'tsh', label: 'TSH' });
+      }
+      return out;
     }
 
-    // First-time hook copy. Grounded when AHC flags a metabolic marker; neutral
-    // otherwise. The nudge itself stays anchored on observable signs, never on
-    // "stress" or hidden lab profiling.
+    // Join marker labels into prose: "BMI, HbA1c and TSH".
+    function joinMarkers(list) {
+      const names = list.map(x => x.label);
+      if (names.length <= 1) return names[0] || '';
+      return names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+    }
+
+    // First-time hook copy. Grounded (with the flagged markers) when a health
+    // check exists; neutral otherwise. Both end on "Check my PCOS risk".
     function firstTimeHookCopy() {
-      const marker = ahcFlaggedMarker();
-      if (marker) {
+      const flags = flaggedAhcMarkers();
+      if (flags.length) {
         return {
-          headline: 'Your health check flagged something <em>worth a look</em>',
-          sub: `Your recent health check flagged ${marker}, which can be associated with PCOS. A quick check can tell you more.`,
+          flags,
+          headline: 'A few health-check markers <em>need a look</em>',
+          sub: `Your ${joinMarkers(flags)} came back flagged — these can be linked to PCOS. A quick assessment will tell you your risk.`,
           cta: 'Check my PCOS risk'
         };
       }
       return {
+        flags: [],
         headline: 'Your body has a <em>rhythm.</em>',
         sub: 'A quick check can tell you your PCOS risk — then track your cycle from there.',
         cta: 'Check my PCOS risk'
@@ -1913,31 +1956,59 @@
     });
   })();
 </script>
-<!-- ===== Prototype-only demo reset (clears PCOS risk + period flow) ===== -->
-<button id="fhResetDemo" type="button" aria-label="Reset demo data">↺ Reset demo</button>
+<!-- ===== Prototype-only demo controls (seed/clear AHC + reset the flow) ===== -->
+<div id="fhDemoBar" role="group" aria-label="Demo controls">
+  <span class="fh-demo-lbl">Demo</span>
+  <button id="fhDemoAhc" type="button">With AHC</button>
+  <button id="fhDemoNoAhc" type="button">Without AHC</button>
+  <button id="fhResetDemo" type="button" aria-label="Reset demo data">↺ Reset</button>
+</div>
 <style>
-  #fhResetDemo {
+  #fhDemoBar {
     position: fixed; left: 12px; bottom: 12px; z-index: 9999;
-    font: 700 11px/1 'DM Sans', system-ui, sans-serif; letter-spacing: 0.2px;
-    color: #5B2A4A; background: rgba(255,255,255,0.92);
-    border: 1px solid rgba(91,42,74,0.25); border-radius: 999px;
-    padding: 8px 12px; cursor: pointer; box-shadow: 0 4px 14px rgba(91,42,74,0.15);
-    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 8px; border-radius: 999px;
+    background: rgba(255,255,255,0.92); border: 1px solid rgba(91,42,74,0.22);
+    box-shadow: 0 4px 14px rgba(91,42,74,0.15);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   }
-  #fhResetDemo:hover { background: #fff; }
-  #fhResetDemo:active { transform: scale(0.97); }
+  #fhDemoBar .fh-demo-lbl { font: 800 9.5px/1 'DM Sans', system-ui, sans-serif; letter-spacing: 0.6px; text-transform: uppercase; color: #B0A0AA; padding: 0 2px; }
+  #fhDemoBar button {
+    font: 700 11px/1 'DM Sans', system-ui, sans-serif; letter-spacing: 0.2px;
+    color: #5B2A4A; background: #fff; border: 1px solid rgba(91,42,74,0.22);
+    border-radius: 999px; padding: 7px 11px; cursor: pointer; transition: background .15s ease, transform .1s ease;
+  }
+  #fhDemoBar button:hover { background: #FBF3F5; }
+  #fhDemoBar button:active { transform: scale(0.96); }
+  #fhDemoAhc { border-color: rgba(201,162,74,0.45); color: #8A6B1F; }
+  #fhDemoAhc:hover { background: #FBF4E6; }
 </style>
 <script>
-  // Demo helper: reset the PCOS risk and the entered period flow (plus derived
-  // state) for a clean run-through. Keeps forher.hookrot.v1 so each run shows a
-  // different primary community hook.
-  document.getElementById('fhResetDemo').addEventListener('click', function () {
-    ['forher.pcos.v1','forher.cycle.v1','forher.cyclelen.v1','forher.intent.v1',
-     'forher.ahc.v1','forher.journey.v1','forher.savedtips.v1'].forEach(function (k) {
-      try { localStorage.removeItem(k); } catch (_) {}
-    });
-    location.reload();
-  });
+  // Prototype demo controls. "With AHC" seeds flagged health-check markers so the
+  // AHC entry flow shows; "Without AHC" clears them for the plain flow; "Reset"
+  // clears everything. All keep forher.hookrot.v1 so each run rotates the hook.
+  (function () {
+    var KEYS = ['forher.pcos.v1','forher.cycle.v1','forher.cyclelen.v1','forher.intent.v1',
+                'forher.ahc.v1','forher.journey.v1','forher.savedtips.v1'];
+    function clearAll() { KEYS.forEach(function (k) { try { localStorage.removeItem(k); } catch (_) {} }); }
+    function seedAhc() {
+      try {
+        localStorage.setItem('forher.ahc.v1', JSON.stringify({
+          tier: 'moderate', positiveDomainCount: 1, pedersenCount: 1,
+          markers: {
+            bmi:   { value: 28.0, flagged: true },
+            hba1c: { value: 'Borderline', flagged: true },
+            tsh:   { value: 'Elevated', flagged: true }
+          },
+          completedAt: new Date().toISOString()
+        }));
+      } catch (_) {}
+    }
+    var byId = function (id) { return document.getElementById(id); };
+    byId('fhResetDemo').addEventListener('click', function () { clearAll(); location.reload(); });
+    byId('fhDemoNoAhc').addEventListener('click', function () { clearAll(); location.reload(); });
+    byId('fhDemoAhc').addEventListener('click', function () { clearAll(); seedAhc(); location.reload(); });
+  })();
 </script>
 </body>
 </html>
