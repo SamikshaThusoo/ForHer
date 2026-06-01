@@ -420,6 +420,28 @@
   }
   .fh-engage-headline em { font-style: italic; color: #8E5378; font-weight: 600; }
 
+  /* Community-driven body: a kind eyebrow + the tip as the card's hero line */
+  .fh-engage-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    position: relative;
+    z-index: 1;
+  }
+  .fh-engage-eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .fh-engage-headline.community {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #3E1B33;
+    margin-bottom: 10px;
+  }
+
   .fh-engage-sub {
     font-size: 11.5px;
     color: #6B5A65;
@@ -1298,6 +1320,8 @@
   </div>
 </section>
 
+<!-- Community / motivation / diet content — also drives the daily card body -->
+<script src="forher-community.js"></script>
 <script>
   /* ============================================================
      FOR HER ENGAGEMENT CARD (compact)
@@ -1452,6 +1476,16 @@
       const phase = getPhase(day);
       const copy = PHASE_COPY[phase] || PHASE_COPY.follicular;
 
+      // Drive the body with phase/risk-aware community content; fall back to the
+      // static phase copy if the community module isn't available.
+      const hook = featuredHook(phase, day, pcos);
+      const kind = hook ? HOOK_KIND[hook.kind] : null;
+      const bodyHtml = hook
+        ? `<div class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</div>
+           <div class="fh-engage-headline community">${hook.text}</div>`
+        : `<div class="fh-engage-headline">${copy.headline}</div>
+           <p class="fh-engage-sub">${copy.sub}</p>`;
+
       card.className = 'fh-engage';
       card.innerHTML = `
         <div class="fh-engage-head">
@@ -1464,8 +1498,7 @@
           </div>
         </div>
         ${riskChipHtml(pcos)}
-        <div class="fh-engage-headline">${copy.headline}</div>
-        <p class="fh-engage-sub">${copy.sub}</p>
+        ${bodyHtml}
         <div class="fh-engage-actions">
           <button class="fh-engage-row" type="button" data-action="log" aria-label="Log how you feel today">
             <span class="row-icon">❤</span>
@@ -1498,6 +1531,35 @@
     function loadPcosResult() {
       try { return JSON.parse(localStorage.getItem(FH_PCOS_KEY)) || null; }
       catch (_) { return null; }
+    }
+
+    // ---------- Intent (written by cycle.html) ----------
+    function loadIntent() {
+      try {
+        const cur = JSON.parse(localStorage.getItem('forher.intent.v1') || 'null');
+        return cur && cur.intent ? cur.intent : null;
+      } catch (_) { return null; }
+    }
+
+    // Community content drives the daily card. Eyebrow label + accent per kind.
+    const HOOK_KIND = {
+      peer:   { label: 'From the community', accent: '#8E5378' },
+      pacing: { label: 'Keeping your pace',  accent: '#2F7A7A' },
+      recipe: { label: 'In the kitchen',     accent: '#C9772A' }
+    };
+
+    // Pick the community hook to feature for this phase. A moderate/high PCOS
+    // result biases content toward the PCOS journey; otherwise we use the
+    // user's stored intent. Rotates by cycle day so it doesn't feel static.
+    function featuredHook(phase, day, pcos) {
+      if (typeof getCommunityHooks !== 'function') return null;
+      const intent = (pcos && (pcos.tier === 'moderate' || pcos.tier === 'high'))
+        ? 'pcos'
+        : (loadIntent() || 'cycle');
+      const hooks = getCommunityHooks(phase, intent);
+      if (!hooks.length) return null;
+      const idx = ((day || 1) - 1) % hooks.length; // gentle rotation through the cycle
+      return hooks[idx];
     }
 
     const PCOS_COPY = {

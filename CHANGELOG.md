@@ -23,8 +23,14 @@ All state is in `localStorage`; no build step.
   with per-tier copy (low / moderate / high), tier-tinted background, risk pill, and
   "Start tracking" / "View my result" CTAs. *(Fixes the reported bug: the home banner
   never changed across PCOS risk stages.)*
-- **Dispatcher priority**: PCOS result → daily cycle card → first-time hook; re-renders
-  on `storage` events for the PCOS key too.
+- **Dispatcher priority**: daily cycle card (when tracking) → PCOS result → first-time
+  hook; re-renders on `storage` events for the PCOS key too. The PCOS result shows as a
+  compact risk chip on the daily card rather than taking it over.
+- **Community-driven daily card**: instead of static phase copy, the daily card body is
+  driven by `getCommunityHooks(phase, intent)` (loads `forher-community.js`). A
+  moderate/high PCOS result biases content to the `pcos` pool; otherwise the stored
+  intent is used. The featured hook rotates by cycle day; falls back to static phase
+  copy if the module is unavailable.
 - **PCOS-first entry**: first-time CTA and the chooser's PCOS option now open
   `banner.html` (was `cycle.html` / `ahc.html`).
 - **Learned cycle length**: reads `forher.cyclelen.v1` (clamped 21–40) via
