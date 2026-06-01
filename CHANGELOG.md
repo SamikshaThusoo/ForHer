@@ -4,6 +4,26 @@ Restructures the For Her flow so **PCOS leads**, fuses the health check into one
 combined risk result, learns cycle length, and adds a net-new community module.
 All state is in `localStorage`; no build step.
 
+## Iteration 2 — demo polish & card redesign
+
+- **Demo bar** (`index.html` + `cycle.html`): "With AHC" / "Without AHC" / "Reset"
+  controls to seed or clear flagged health-check markers and reset the flow. Keeps
+  `forher.hookrot.v1` so each run rotates the featured hook.
+- **AHC-flagged entry card**: first-time card lists the flagged markers (BMI/HbA1c/TSH)
+  with a "Health check" tag; *Check my PCOS risk* routes via `ahc.html` (flagged-params
+  page → `banner.html?source=ahc`) when a health check exists, else straight to the HRA.
+- **Intent gate shows once**: auto-skips on return (intent in `forher.intent.v1`); Reset
+  re-shows it. Removed the "Check PCOS risk" gate option; added a "Re-check my PCOS risk"
+  action on the tracking screen (label flips Check↔Re-check).
+- **Post-result card** nudges tracking in copy across all tiers.
+- **Card redesign**: the home daily card opens into a split — community tip on the left,
+  a phase/risk-relevant **wellness video tile** on the right (`FORHER_VIDEOS`,
+  `getCommunityVideo`; placeholder thumbnails, real URLs drop into `video.url`).
+- **Community contribution**: daily-view section gains "Diet from the community" and a
+  "How are you feeling this phase?" panel (feeling chips + note + Share) stored to
+  `forher.feelings.v1` — the destination for "save", feeding future real community
+  content instead of templates.
+
 ## localStorage keys (canonical)
 
 | Key | Shape | Written by | Read by |
