@@ -2924,6 +2924,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Community / motivation / diet hooks, filtered by phase + intent -->
+      <div id="communityHooks"></div>
     </div>
 
     <div class="continue-bar">
@@ -3310,6 +3313,8 @@
   </div>
 </div>
 
+<!-- Community / motivation / diet content (editable data + embeddable render) -->
+<script src="forher-community.js"></script>
 <script>
 // Cycle length is a LEARNED value. We start with a population default and
 // switch to the user's own median once we have enough logged period starts.
@@ -4096,6 +4101,8 @@ function updatePhaseAndToday(forDate) {
     blurbEmpty.style.display = '';
     document.getElementById('phaseDayPill').textContent = 'No data yet';
     document.getElementById('todayWrap').style.display = 'none';
+    const cEl0 = document.getElementById('communityHooks');
+    if (cEl0) cEl0.innerHTML = ''; // no phase yet → nothing to filter on
     return;
   }
 
@@ -4136,6 +4143,12 @@ function updatePhaseAndToday(forDate) {
   swap('todayWork', content.work);
   swap('todayEmotion', content.emotion);
   swap('todayBody', content.body);
+
+  // Community / motivation / diet hooks for this phase + the user's intent.
+  const cEl = document.getElementById('communityHooks');
+  if (cEl && typeof renderCommunity === 'function') {
+    renderCommunity(cEl, phase, readJourney() || 'cycle');
+  }
 }
 
 // =================================================================
