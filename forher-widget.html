@@ -445,6 +445,38 @@
   </section>
   <p class="demo-note">Warm amber accent + softly pulsing primary CTA. Tone stays supportive, not alarming.</p>
 
+  <!-- ================== STATE 4 — LIVE (reads saved PCOS result) ================== -->
+  <div class="demo-label">State 4 · Live · reflects the user's saved PCOS result</div>
+
+  <section class="fh-widget" data-fh-live data-state="new" aria-label="For Her — women's wellness">
+    <div class="fh-head">
+      <span class="fh-eyebrow"><span class="dot"></span>For Her</span>
+      <span class="fh-badge" data-fh-badge>Recommended</span>
+    </div>
+
+    <h3 class="fh-title" data-fh-headline>
+      Understand your <span class="italic">cycle</span> better
+    </h3>
+    <p class="fh-sub" data-fh-sub>
+      Check PCOS risk, track cycles, and get personalised care.
+    </p>
+
+    <div class="fh-context">
+      <span class="pulse"></span>
+      <span data-fh-context>Your journey starts here</span>
+    </div>
+
+    <div class="fh-ctas">
+      <a class="fh-cta fh-cta--primary" data-fh-primary href="banner.html">
+        Check PCOS Risk <span class="arrow">→</span>
+      </a>
+      <a class="fh-cta fh-cta--secondary" data-fh-secondary href="cycle.html">
+        Track My Cycle
+      </a>
+    </div>
+  </section>
+  <p class="demo-note">Before assessment: generic hook. After assessment: shows the actual risk tier and switches the primary CTA to tracking.</p>
+
 </div>
 
 <script>
@@ -457,6 +489,82 @@
       if (primary) primary.click();
     });
   });
+
+  // =================================================================
+  // LIVE PCOS RESULT → ENTRY CARD
+  // Reads the result saved by banner.html (forher.pcos.v1) and updates
+  // any card marked [data-fh-live]. Degrades silently if no result yet.
+  // =================================================================
+  (function renderLivePcosCard() {
+    const FH_PCOS_KEY = 'forher.pcos.v1';
+
+    let result = null;
+    try {
+      const raw = localStorage.getItem(FH_PCOS_KEY);
+      if (raw) result = JSON.parse(raw);
+    } catch (_) {}
+
+    const cards = document.querySelectorAll('.fh-widget[data-fh-live]');
+    if (!cards.length) return;
+
+    // Copy + styling per risk tier.
+    const tierCopy = {
+      low: {
+        state: 'returning',
+        badge: 'Result ready',
+        headline: 'Your PCOS risk is <span class="italic">low</span>',
+        sub: 'Your current pattern doesn’t strongly suggest PCOS. Keep tracking to stay ahead.',
+        context: 'Assessment complete · low likelihood',
+        primary: { label: 'Start Tracking', href: 'cycle.html' },
+        secondary: { label: 'View My Result', href: 'banner.html' }
+      },
+      moderate: {
+        state: 'high-risk',
+        badge: 'Result ready',
+        headline: 'Further <span class="italic">evaluation</span> suggested',
+        sub: 'Your pattern meets the screening threshold. Tracking now will give your clinician a clearer picture.',
+        context: 'Assessment complete · 2 of 3 domains positive',
+        primary: { label: 'Start Tracking', href: 'cycle.html' },
+        secondary: { label: 'View My Result', href: 'banner.html' }
+      },
+      high: {
+        state: 'high-risk',
+        badge: 'Result ready',
+        headline: 'Clinical <span class="italic">evaluation</span> recommended',
+        sub: 'Your profile shows multiple hallmark features. Early evaluation is recommended — tracking supports it.',
+        context: 'Assessment complete · multiple domains positive',
+        primary: { label: 'Start Tracking', href: 'cycle.html' },
+        secondary: { label: 'View My Result', href: 'banner.html' }
+      }
+    };
+
+    cards.forEach((card) => {
+      const $headline  = card.querySelector('[data-fh-headline]');
+      const $sub       = card.querySelector('[data-fh-sub]');
+      const $context   = card.querySelector('[data-fh-context]');
+      const $badge     = card.querySelector('[data-fh-badge]');
+      const $primary   = card.querySelector('[data-fh-primary]');
+      const $secondary = card.querySelector('[data-fh-secondary]');
+
+      // No result yet → leave the default "take the assessment" hook in place.
+      if (!result || !tierCopy[result.tier]) return;
+
+      const c = tierCopy[result.tier];
+      card.setAttribute('data-state', c.state);
+      if ($badge)   $badge.textContent = c.badge;
+      if ($headline) $headline.innerHTML = c.headline;
+      if ($sub)     $sub.textContent = c.sub;
+      if ($context) $context.textContent = c.context;
+      if ($primary) {
+        $primary.innerHTML = c.primary.label + ' <span class="arrow">→</span>';
+        $primary.setAttribute('href', c.primary.href);
+      }
+      if ($secondary) {
+        $secondary.textContent = c.secondary.label;
+        $secondary.setAttribute('href', c.secondary.href);
+      }
+    });
+  })();
 </script>
 </body>
 </html>
