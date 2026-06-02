@@ -135,7 +135,14 @@
       '.fhc-card--link{display:block;text-decoration:none;cursor:pointer;transition:box-shadow .15s ease,transform .1s ease}' +
       '.fhc-card--link:hover{box-shadow:0 8px 20px rgba(91,42,74,.12)}' +
       '.fhc-card--link:active{transform:scale(.995)}' +
-      '.fhc-card-chev{margin-left:auto;font-weight:700;opacity:.5}';
+      '.fhc-card-chev{margin-left:auto;font-weight:700;opacity:.5}' +
+      '.fhc-mine{margin-top:4px}' +
+      '.fhc-mine-title{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#9A8A92;margin:6px 2px 8px}' +
+      '.fhc-mine-item{background:#fff;border:1px solid rgba(91,42,74,.1);border-radius:14px;padding:11px 13px;margin-bottom:8px}' +
+      '.fhc-mine-text{font-size:12.5px;line-height:1.45;color:#3E1B33}' +
+      '.fhc-mine-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}' +
+      '.fhc-mine-chip{font-size:10px;font-weight:600;color:#8E5378;background:rgba(142,83,120,.1);border-radius:999px;padding:2px 8px}' +
+      '.fhc-mine-likes{margin-top:7px;font-size:11px;font-weight:700;color:#C76B7A}';
     var s = document.createElement('style');
     s.id = 'fhc-styles';
     s.textContent = css;
@@ -194,10 +201,40 @@
     share.addEventListener('click', function () {
       var feelings = [].slice.call(panel.querySelectorAll('.fhc-chip.selected')).map(function (c) { return c.dataset.feel; });
       var noteEl = panel.querySelector('.fhc-note');
-      saveFeeling({ phase: phase, intent: intent, feelings: feelings, note: noteEl ? noteEl.value : '' });
+      // likes are mocked for the prototype (no backend) so the user can see the
+      // engagement their shared thought receives.
+      saveFeeling({
+        id: Date.now(), phase: phase, intent: intent,
+        feelings: feelings, note: noteEl ? noteEl.value : '',
+        likes: Math.floor(Math.random() * 12) + 2, savedAt: new Date().toISOString()
+      });
       panel.innerHTML = contribThanksHtml(phase);
       wireContribution(panel, phase, intent);
+      var mine = document.getElementById('fhcMine');
+      if (mine) renderMyThoughts(mine, phase);
     });
+  }
+
+  function loadFeelings() {
+    try { return JSON.parse(localStorage.getItem('forher.feelings.v1') || '[]'); } catch (_) { return []; }
+  }
+
+  // Lists the user's own shared thoughts for this phase, with the likes received.
+  function renderMyThoughts(el, phase) {
+    if (!el) return;
+    var mine = loadFeelings().filter(function (f) { return f.phase === phase; }).reverse();
+    if (!mine.length) { el.innerHTML = ''; return; }
+    var items = mine.map(function (f) {
+      var body = (f.note && f.note.trim()) ? escapeHtml(f.note)
+        : ((f.feelings && f.feelings.length) ? escapeHtml(f.feelings.join(', ')) : 'Shared a check-in');
+      var chips = (f.feelings || []).map(function (x) { return '<span class="fhc-mine-chip">' + escapeHtml(x) + '</span>'; }).join('');
+      return '<div class="fhc-mine-item">' +
+               '<div class="fhc-mine-text">' + body + '</div>' +
+               (chips ? '<div class="fhc-mine-chips">' + chips + '</div>' : '') +
+               '<div class="fhc-mine-likes">♥ ' + (f.likes || 0) + ' likes</div>' +
+             '</div>';
+    }).join('');
+    el.innerHTML = '<div class="fhc-mine-title">Your shared thoughts</div>' + items;
   }
 
   // Renders the community section: three hook types (peer / pacing / diet) plus
@@ -236,11 +273,13 @@
         '</div>' +
         cards +
         '<div class="fhc-contrib" id="fhcContrib">' + contribFormHtml(phase) + '</div>' +
+        '<div class="fhc-mine" id="fhcMine"></div>' +
         '<p class="fhc-disclaimer">Shared by the For Her community for general wellbeing — not medical advice or treatment. Check with your clinician for anything health-related.</p>' +
       '</div>';
 
     var panel = containerEl.querySelector('#fhcContrib');
     if (panel) wireContribution(panel, phase, intent);
+    renderMyThoughts(containerEl.querySelector('#fhcMine'), phase);
   }
 
   // ---- Phase / intent derived from localStorage (for the standalone page) ----
