@@ -401,13 +401,18 @@
     color: var(--fh-plum-1);
     letter-spacing: 0.2px;
     white-space: nowrap;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s ease;
   }
+  button.fh-engage-cycle:hover { background: rgba(91, 42, 74, 0.12); }
   .fh-engage-cycle .dot {
     width: 4px; height: 4px;
     border-radius: 50%;
     background: var(--fh-plum-1);
     opacity: 0.55;
   }
+  .fh-engage-cycle .cyc-chev { font-weight: 700; opacity: 0.5; margin-left: 1px; }
 
   .fh-engage-headline {
     font-size: 14.5px;
@@ -440,6 +445,10 @@
     line-height: 1.4;
     color: #3E1B33;
     margin-bottom: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* Tappable community hero → opens the full daily journey */
@@ -1085,6 +1094,20 @@
   }
   .fh-log-btn.ghost:hover { background: #fff; border-color: rgba(91, 42, 74, 0.25); }
 
+  /* Post-save confirmation → redirect to period tracking */
+  .fh-log-sheet.is-done .fh-log-section,
+  .fh-log-sheet.is-done .fh-log-actions { display: none; }
+  .fh-log-done { text-align: center; padding: 6px 2px 4px; }
+  .fh-log-done-mark {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, #2F7A7A 0%, #8FC4C4 100%);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 21px; margin: 6px auto 12px; box-shadow: 0 6px 16px rgba(47,122,122,0.28);
+  }
+  .fh-log-done-msg { font-size: 16px; font-weight: 700; color: #3E1B33; }
+  .fh-log-done-sub { font-size: 12px; color: #6B5A65; line-height: 1.5; margin: 6px 0 14px; }
+  .fh-log-done .fh-log-btn { width: 100%; margin-bottom: 8px; text-decoration: none; }
+
   /* ============ QUICK LINKS ============ */
   .section-title {
     margin: 8px 18px 10px;
@@ -1505,6 +1528,14 @@
   <div class="fh-log-actions">
     <button class="fh-log-btn primary" id="fhLogSaveBtn" type="button">Save</button>
   </div>
+
+  <div class="fh-log-done" id="fhLogDone" style="display:none;">
+    <div class="fh-log-done-mark">✓</div>
+    <div class="fh-log-done-msg">Logged for today</div>
+    <p class="fh-log-done-sub">Keeping your period dates current sharpens your phase predictions.</p>
+    <a class="fh-log-btn primary" href="cycle.html">Track my period <span class="arrow">→</span></a>
+    <button class="fh-log-btn ghost" type="button" id="fhLogDoneClose">Not now</button>
+  </div>
 </section>
 
 <!-- Community / motivation / diet content — also drives the daily card body -->
@@ -1684,7 +1715,7 @@
              <div class="fh-engage-half fh-half-tip">
                <button class="fh-engage-feature" type="button" data-action="community" aria-label="${kind.label}: ${hook.text}">
                  <span class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</span>
-                 <span class="fh-engage-headline community">${shortTip(hook.text)}</span>
+                 <span class="fh-engage-headline community">${hook.text}</span>
                </button>
                <div class="fh-engage-tipactions">
                  <button class="fh-engage-save ${saved ? 'is-saved' : ''}" type="button" data-action="save"
@@ -1709,9 +1740,9 @@
             <div class="fh-engage-mark">❀</div>
             <div class="fh-engage-title">For Her</div>
           </div>
-          <div class="fh-engage-cycle">
-            ${hasLearnedCycleLength() ? 'Day' : 'Around day'} ${day}/${getCycleLength()}<span class="dot"></span>${copy.name}
-          </div>
+          <button class="fh-engage-cycle" type="button" data-action="track" aria-label="Open period tracking">
+            ${hasLearnedCycleLength() ? 'Day' : 'Around day'} ${day}/${getCycleLength()}<span class="dot"></span>${copy.name}<span class="cyc-chev">›</span>
+          </button>
         </div>
         ${riskChipHtml(pcos)}
         ${bodyHtml}
@@ -2005,6 +2036,10 @@
 
     // ---------- Bottom sheet logger ----------
     function openLogSheet() {
+      // Reset from any prior "logged" confirmation state.
+      sheet.classList.remove('is-done');
+      const done = document.getElementById('fhLogDone');
+      if (done) done.style.display = 'none';
       hydrateSheetFromState();
       sheet.classList.add('open');
       backdrop.classList.add('open');
@@ -2109,8 +2144,12 @@
     });
     document.getElementById('fhLogSaveBtn').addEventListener('click', () => {
       saveSheet();
-      closeLogSheet();
+      // Show a confirmation that points to period tracking instead of closing.
+      sheet.classList.add('is-done');
+      const done = document.getElementById('fhLogDone');
+      if (done) done.style.display = 'block';
     });
+    document.getElementById('fhLogDoneClose').addEventListener('click', closeLogSheet);
 
     // ---------- Saved badge ----------
     let savedTimer = null;
