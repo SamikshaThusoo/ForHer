@@ -2031,6 +2031,9 @@
         <button class="btn" onclick="goTo(6)">
           See Your Action Plan <span class="arrow">→</span>
         </button>
+        <button class="btn btn-secondary" id="reassessBtn" onclick="reassessPcos()" style="display:none; margin-top:10px;">
+          Reassess PCOS <span class="arrow">→</span>
+        </button>
       </div>
     </div>
   </div>
@@ -2649,10 +2652,19 @@ function continueToTracking() {
 const FH_PCOS_KEY = 'forher.pcos.v1';
 function persistPcosResult(result) {
   try {
+    // Store the FULL result so the "View my result" screen can re-render the
+    // last assessment without re-running the questionnaire.
     localStorage.setItem(FH_PCOS_KEY, JSON.stringify({
       tier: result.tier,                     // 'low' | 'moderate' | 'high'
-      domainPositive: result.domainPositive, // count of positive Kalra domains
+      domainSignals: result.domainSignals,
+      domainPositive: result.domainPositive,
+      positiveDomainCount: result.positiveDomainCount,
+      pedersenPredictors: result.pedersenPredictors,
+      pedersenCount: result.pedersenCount,
+      severitySum: result.severitySum,
+      coDiagnoses: result.coDiagnoses || [],
       ttcFlag: !!result.ttcFlag,
+      preliminary: !!result.preliminary,
       assessedAt: new Date().toISOString()
     }));
   } catch (_) {}
@@ -3029,7 +3041,26 @@ renderQuestion();
       backBtn.setAttribute('title', 'Back to your health check');
     }
   }
+
+  // View mode: show the last saved result directly (no re-running the quiz),
+  // with a "Reassess PCOS" CTA. Reached from the home card's "View" / risk chip.
+  if (params.get('view') === 'result') {
+    try {
+      const saved = JSON.parse(localStorage.getItem(FH_PCOS_KEY) || 'null');
+      if (saved && saved.tier && saved.domainSignals) {
+        renderResults(saved);
+        const rb = document.getElementById('reassessBtn');
+        if (rb) rb.style.display = '';
+        goTo(5);
+      }
+    } catch (_) {}
+  }
 })();
+
+// Reassess = take the assessment again from the top (fresh run).
+function reassessPcos() {
+  window.location.href = 'banner.html';
+}
 </script>
 </body>
 </html>

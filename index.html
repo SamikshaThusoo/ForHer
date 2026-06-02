@@ -569,6 +569,20 @@
   .fh-engage-halves .fh-engage-headline.community { margin-bottom: 0; }
   .fh-engage-save .fh-engage-savemini { font-size: 11px; font-weight: 700; }
   .fh-half-tip .fh-engage-save { padding: 5px 9px; }
+  /* Save + compact "Log today" share the bottom of the left half — no extra row */
+  .fh-engage-tipactions {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: auto;
+  }
+  .fh-engage-logmini {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 11px; border: none; border-radius: 999px;
+    background: linear-gradient(135deg, var(--fh-plum-1) 0%, #8E5378 100%);
+    color: #fff; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(91,42,74,0.22);
+  }
+  .fh-engage-logmini .logmini-ic { font-size: 11px; }
+  .fh-engage-logmini:active { transform: scale(0.96); }
+  .fh-engage-tipactions .fh-engage-saved { margin-left: 0; }
 
   .fh-engage-vthumb {
     border: none; background: none; padding: 0; cursor: pointer; font-family: inherit; text-align: left;
@@ -1672,10 +1686,16 @@
                  <span class="fh-engage-eyebrow" style="color:${kind.accent}"><span class="fh-engage-eyebrow-dot" style="background:${kind.accent}"></span>${kind.label}</span>
                  <span class="fh-engage-headline community">${shortTip(hook.text)}</span>
                </button>
-               <button class="fh-engage-save ${saved ? 'is-saved' : ''}" type="button" data-action="save"
-                       data-tip="${hook.id}" data-base="${hook.savedCount}" aria-pressed="${saved}" aria-label="Save this tip">
-                 <span class="fh-engage-save-ic">${saved ? '♥' : '♡'}</span><span class="fh-engage-savemini">${savedCount.toLocaleString()}</span>
-               </button>
+               <div class="fh-engage-tipactions">
+                 <button class="fh-engage-save ${saved ? 'is-saved' : ''}" type="button" data-action="save"
+                         data-tip="${hook.id}" data-base="${hook.savedCount}" aria-pressed="${saved}" aria-label="Save this tip">
+                   <span class="fh-engage-save-ic">${saved ? '♥' : '♡'}</span><span class="fh-engage-savemini">${savedCount.toLocaleString()}</span>
+                 </button>
+                 <button class="fh-engage-logmini" type="button" data-action="log" aria-label="Log how you feel today">
+                   <span class="logmini-ic">❤</span> Log today
+                 </button>
+                 <span class="fh-engage-saved" id="fhEngageSaved">Saved</span>
+               </div>
              </div>
              ${videoHtml}
            </div>`
@@ -1695,19 +1715,8 @@
         </div>
         ${riskChipHtml(pcos)}
         ${bodyHtml}
-        <div class="fh-engage-actions">
-          <button class="fh-engage-row" type="button" data-action="log" aria-label="Log how you feel today">
-            <span class="row-icon">❤</span>
-            <span class="row-body">
-              <span class="row-label">Log how you feel today</span>
-              <span class="row-hint">Mood · energy · symptoms</span>
-            </span>
-            <span class="row-chev">›</span>
-          </button>
-          <span class="fh-engage-saved" id="fhEngageSaved">Saved</span>
-        </div>
       `;
-      bindCardActions(true);
+      bindCardActions();
     }
 
     function bindCardActions() {
@@ -1718,7 +1727,7 @@
           // PCOS-first: the assessment is the front door. With AHC, go via the
           // flagged-parameters page first; "View my result" always opens banner.
           else if (a === 'assess') window.location.href = pcosEntryUrl();
-          else if (a === 'result') window.location.href = 'banner.html';
+          else if (a === 'result') window.location.href = 'banner.html?view=result';
           else if (a === 'track' || a === 'open') window.location.href = 'cycle.html';
           else if (a === 'community') window.location.href = 'community.html';
           else if (a === 'video') {
