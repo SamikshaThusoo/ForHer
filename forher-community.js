@@ -142,7 +142,22 @@
       '.fhc-mine-text{font-size:12.5px;line-height:1.45;color:#3E1B33}' +
       '.fhc-mine-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}' +
       '.fhc-mine-chip{font-size:10px;font-weight:600;color:#8E5378;background:rgba(142,83,120,.1);border-radius:999px;padding:2px 8px}' +
-      '.fhc-mine-likes{margin-top:7px;font-size:11px;font-weight:700;color:#C76B7A}';
+      '.fhc-mine-likes{margin-top:7px;font-size:11px;font-weight:700;color:#C76B7A}' +
+      // Horizontal swipe rail (calmer than stacked full-width cards)
+      '.fhc-rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;' +
+        'padding:2px 2px 8px;margin:0 -2px}' +
+      '.fhc-rail::-webkit-scrollbar{display:none}' +
+      '.fhc-rail{scrollbar-width:none}' +
+      '.fhc-rail .fhc-card{flex:0 0 82%;scroll-snap-align:start;margin-bottom:0;min-height:118px}' +
+      // Collapsed contribution prompt (expands on tap)
+      '.fhc-contrib-toggle{display:flex;align-items:center;gap:11px;width:100%;text-align:left;cursor:pointer;font-family:inherit;' +
+        'background:linear-gradient(135deg,rgba(142,83,120,.08) 0%,rgba(142,83,120,.03) 100%);' +
+        'border:1px solid rgba(142,83,120,.2);border-radius:16px;padding:13px 15px;margin-bottom:10px;transition:box-shadow .15s ease}' +
+      '.fhc-contrib-toggle:active{box-shadow:0 4px 14px rgba(142,83,120,.14)}' +
+      '.fhc-ct-icon{width:34px;height:34px;border-radius:50%;background:rgba(142,83,120,.14);display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}' +
+      '.fhc-ct-title{display:block;font-size:13px;font-weight:700;color:#5B2A4A;line-height:1.3}' +
+      '.fhc-ct-sub{display:block;font-size:10.5px;color:#9A8A92;margin-top:2px}' +
+      '.fhc-ct-chev{margin-left:auto;font-weight:700;color:#8E5378;opacity:.6;font-size:18px}';
     var s = document.createElement('style');
     s.id = 'fhc-styles';
     s.textContent = css;
@@ -177,6 +192,17 @@
       '<button class="fhc-share" type="button">Share with the community</button>';
   }
 
+  // Compact prompt shown when opts.collapseContrib is set; expands to the form.
+  function contribCollapsedHtml(phase) {
+    return '' +
+      '<button class="fhc-contrib-toggle" type="button" data-expand="1">' +
+        '<span class="fhc-ct-icon">🌸</span>' +
+        '<span><span class="fhc-ct-title">Share how you feel this ' + escapeHtml(phase) + ' phase</span>' +
+        '<span class="fhc-ct-sub">Other women in your phase will see it</span></span>' +
+        '<span class="fhc-ct-chev">›</span>' +
+      '</button>';
+  }
+
   function contribThanksHtml(phase) {
     return '' +
       '<div class="fhc-contrib-head">Thank you for sharing 🌸</div>' +
@@ -186,6 +212,15 @@
 
   // Wire the contribution panel: chip toggles + share/reshare, self-contained.
   function wireContribution(panel, phase, intent) {
+    var expand = panel.querySelector('[data-expand]');
+    if (expand) {
+      expand.addEventListener('click', function () {
+        panel.classList.add('fhc-contrib');
+        panel.innerHTML = contribFormHtml(phase);
+        wireContribution(panel, phase, intent);
+      });
+      return;
+    }
     var share = panel.querySelector('.fhc-share');
     if (!share) return;
     if (share.dataset.reshare) {
@@ -265,14 +300,21 @@
         '</' + tag + '>';
     });
 
+    var rail = opts.layout === 'rail';
+    var cardsBlock = rail ? '<div class="fhc-rail">' + cards + '</div>' : cards;
+    var title = opts.title || 'Community &amp; wellness';
+    var head = opts.hideHead ? '' :
+      '<div class="fhc-head"><span class="fhc-title">' + title + '</span>' +
+      '<span class="fhc-sub">for your ' + escapeHtml(phase) + ' phase</span></div>';
+    var contribInner = opts.collapseContrib ? contribCollapsedHtml(phase) : contribFormHtml(phase);
+    // When collapsed, the toggle is its own card — don't wrap it in the panel styling.
+    var contribCls = opts.collapseContrib ? '' : 'fhc-contrib';
+
     containerEl.innerHTML = '' +
       '<div class="fhc">' +
-        '<div class="fhc-head">' +
-          '<span class="fhc-title">Community &amp; wellness</span>' +
-          '<span class="fhc-sub">for your ' + escapeHtml(phase) + ' phase</span>' +
-        '</div>' +
-        cards +
-        '<div class="fhc-contrib" id="fhcContrib">' + contribFormHtml(phase) + '</div>' +
+        head +
+        cardsBlock +
+        '<div class="' + contribCls + '" id="fhcContrib">' + contribInner + '</div>' +
         '<div class="fhc-mine" id="fhcMine"></div>' +
         '<p class="fhc-disclaimer">Shared by the For Her community for general wellbeing — not medical advice or treatment. Check with your clinician for anything health-related.</p>' +
       '</div>';

@@ -31,7 +31,7 @@
     width: 34px; height: 34px; border-radius: 50%;
     border: 1px solid rgba(91,42,74,0.16); background: #fff; color: var(--plum);
     font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    text-decoration: none;
+    text-decoration: none; flex: 0 0 auto;
   }
   .brand { display: flex; align-items: center; gap: 8px; }
   .brand-mark {
@@ -40,38 +40,50 @@
     color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px;
   }
   .brand-name { font-size: 14px; font-weight: 700; color: var(--plum); }
-  .hero { padding: 8px 18px 14px; }
-  .hero .eyebrow {
-    display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px;
-    text-transform: uppercase; color: var(--plum-soft);
-    background: rgba(142,83,120,0.1); border-radius: 999px; padding: 4px 10px; margin-bottom: 8px;
+
+  /* Compact phase hero — one line, lets content start higher */
+  .hero { padding: 10px 18px 12px; }
+  .hero .phase-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px; color: var(--plum-soft);
+    background: rgba(142,83,120,0.1); border-radius: 999px; padding: 5px 11px;
   }
-  .hero h1 { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.15; color: var(--plum-deep); }
-  .hero h1 em { color: var(--plum-soft); }
-  .hero .lead { font-size: 12.5px; color: var(--ink-soft); margin-top: 6px; line-height: 1.5; }
+  .hero .phase-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--plum-soft); }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: 21px; line-height: 1.18; color: var(--plum-deep); margin-top: 9px; }
+  .hero h1 em { color: var(--plum-soft); font-style: italic; }
+
   .wrap { padding: 0 18px; }
+
+  /* Section eyebrow between zones */
+  .zone-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+    color: #9A8A92; margin: 18px 2px 10px;
+  }
+  .zone-label::after { content: ""; flex: 1; height: 1px; background: rgba(91,42,74,0.08); }
 
   /* Wellness video banner */
   .cvideo {
-    display: flex; align-items: center; gap: 12px; width: 100%;
+    position: relative; display: block; width: 100%;
     border: none; cursor: pointer; font-family: inherit; text-align: left;
-    background: #fff; border: 1px solid rgba(91,42,74,0.1); border-radius: 16px;
-    padding: 10px; margin-bottom: 14px; box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+    border-radius: 18px; overflow: hidden; padding: 0; margin-bottom: 2px;
+    min-height: 124px; box-shadow: 0 8px 22px rgba(91,42,74,0.16);
+    background: linear-gradient(135deg, var(--v-accent, #8E5378) 0%, rgba(62,27,51,0.94) 100%);
   }
-  .cvideo-thumb {
-    position: relative; flex: 0 0 88px; height: 58px; border-radius: 12px;
-    background: linear-gradient(135deg, var(--v-accent, #8E5378) 0%, rgba(62,27,51,0.9) 100%);
-    display: flex; align-items: center; justify-content: center;
+  .cvideo::before {
+    content: ""; position: absolute; right: -20px; bottom: -30px; width: 150px; height: 150px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 70%);
   }
+  .cvideo-inner { position: relative; padding: 16px 16px 15px; color: #fff; height: 100%; display: flex; flex-direction: column; }
+  .cvideo-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; opacity: 0.85; }
+  .cvideo-title { font-size: 17px; font-weight: 800; margin-top: 6px; max-width: 70%; line-height: 1.2; }
+  .cvideo-foot { margin-top: auto; display: flex; align-items: center; gap: 9px; padding-top: 14px; }
   .cvideo-play {
-    width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.92);
+    width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.95);
     color: var(--v-accent, #8E5378); display: flex; align-items: center; justify-content: center;
-    font-size: 9px; padding-left: 2px;
+    font-size: 13px; padding-left: 3px; flex: 0 0 auto;
   }
-  .cvideo-dur { position: absolute; right: 5px; bottom: 5px; font-size: 9px; font-weight: 700; color: #fff; background: rgba(0,0,0,0.32); border-radius: 999px; padding: 2px 6px; }
-  .cvideo-body { display: flex; flex-direction: column; gap: 2px; }
-  .cvideo-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--plum-soft); }
-  .cvideo-title { font-size: 13px; font-weight: 700; color: var(--plum-deep); }
+  .cvideo-dur { font-size: 11.5px; font-weight: 700; opacity: 0.92; }
 </style>
 </head>
 <body>
@@ -82,17 +94,25 @@
     </div>
 
     <div class="hero">
-      <span class="eyebrow" id="phaseEyebrow">Community</span>
-      <h1>Women in your <em id="phaseWord">phase</em></h1>
-      <p class="lead">Real recommendations from women tracking the same phase — and a place to share what's working for you.</p>
+      <span class="phase-chip"><span class="dot"></span><span id="phaseChip">Your phase · community</span></span>
+      <h1>Tools &amp; women in your <em id="phaseWord">phase</em></h1>
     </div>
 
     <div class="wrap">
+      <!-- 1 · Diet scanner (hero tool) -->
+      <div id="scannerMount"></div>
+
+      <!-- 2 · Wellness video -->
+      <div class="zone-label">Wellness session</div>
       <div id="videoMount"></div>
+
+      <!-- 3 · Community tips + your voice -->
+      <div class="zone-label">From your community</div>
       <div id="communityMount"></div>
     </div>
   </div>
 
+  <script src="forher-scanner.js"></script>
   <script src="forher-community.js"></script>
   <script>
     (function () {
@@ -107,10 +127,15 @@
       var intent = (typeof currentIntentFromStorage === 'function' && currentIntentFromStorage()) || 'cycle';
 
       var cap = phase.charAt(0).toUpperCase() + phase.slice(1);
-      document.getElementById('phaseEyebrow').textContent = cap + ' phase · community';
+      document.getElementById('phaseChip').textContent = cap + ' phase · community';
       document.getElementById('phaseWord').textContent = phase + ' phase';
 
-      // Wellness video for this phase + intent.
+      // 1 · Diet scanner — the hero tool.
+      if (typeof renderScannerEntry === 'function') {
+        renderScannerEntry(document.getElementById('scannerMount'), { phase: phase, intent: intent });
+      }
+
+      // 2 · Wellness video for this phase + intent.
       if (typeof getCommunityVideo === 'function') {
         var v = getCommunityVideo(phase, intent);
         if (v) {
@@ -119,15 +144,25 @@
           btn.className = 'cvideo';
           btn.style.setProperty('--v-accent', v.accent);
           btn.innerHTML =
-            '<span class="cvideo-thumb"><span class="cvideo-play">▶</span><span class="cvideo-dur">' + v.duration + '</span></span>' +
-            '<span class="cvideo-body"><span class="cvideo-eyebrow">Wellness session</span><span class="cvideo-title">' + v.title + '</span></span>';
+            '<span class="cvideo-inner">' +
+              '<span class="cvideo-eyebrow">Guided session</span>' +
+              '<span class="cvideo-title">' + v.title + '</span>' +
+              '<span class="cvideo-foot"><span class="cvideo-play">▶</span><span class="cvideo-dur">' + v.duration + ' · For your ' + phase + ' phase</span></span>' +
+            '</span>';
           btn.addEventListener('click', function () { if (v.url) window.open(v.url, '_blank'); });
           m.appendChild(btn);
+        } else {
+          // No video for this phase — drop the label too.
+          var lbl = document.querySelector('.zone-label');
+          if (lbl) lbl.style.display = 'none';
         }
       }
 
+      // 3 · Community tips (swipe rail) + collapsed share + your thoughts.
       if (typeof renderCommunity === 'function') {
-        renderCommunity(document.getElementById('communityMount'), phase, intent);
+        renderCommunity(document.getElementById('communityMount'), phase, intent, {
+          layout: 'rail', collapseContrib: true, hideHead: true
+        });
       }
     })();
   </script>
