@@ -28,6 +28,8 @@ const ROUTE_HREF: Partial<Record<RouteTarget, string>> = {
   ask: "/cares/ask",
   consult: "/cares/care-team",
   "cycle-log": "/log/mood",
+  activity: "/log/move",
+  learn: "/learn",
 };
 
 function fmtTarget(t: TaskTarget): string {

@@ -216,6 +216,23 @@ export const TASK_CATALOG: TaskDef[] = [
     },
   },
   {
+    id: "sleep", category: "mind", title: "Wind down for sleep",
+    detail: "A consistent wind-down and wake time steadies insulin and curbs cravings — a real PMOS lever.",
+    routeTo: "placeholder", source: "careplan",
+    byTrack: {
+      none:   daily("boolean", 1, undefined, 2), low: daily("boolean", 1, undefined, 2),
+      medium: daily("boolean", 1), high: daily("boolean", 1),
+    },
+  },
+  {
+    id: "protein-breakfast", category: "nourish", title: "Protein-first breakfast",
+    detail: "Starting the day with protein + fibre blunts the morning blood-sugar spike.",
+    routeTo: "food-logger", source: "careplan", phaseEmphasis: ["menstrual", "luteal"],
+    byTrack: {
+      low:    daily("boolean", 1), medium: daily("boolean", 1), high: daily("boolean", 1),
+    },
+  },
+  {
     id: "bbt", category: "track", title: "Log basal body temperature",
     detail: "BBT helps map your fertile window.",
     routeTo: "cycle-log", source: "careplan", clinicalNote: "TTC only.",
