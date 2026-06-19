@@ -1,8 +1,9 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
-import type { JourneyTask, TaskTarget } from "@/types/journey";
+import type { JourneyTask, TaskTarget, RouteTarget } from "@/types/journey";
 import {
   resolveTasksForDay, pickThreeThings, getPhase, getCyclePhase,
   getTouchpointsDue, personaTrack, TRACK_LABELS,
@@ -17,6 +18,16 @@ const PHASE_LABEL: Record<string, string> = {
 const CAT_LABEL: Record<JourneyTask["category"], string> = {
   move: "Move", nourish: "Nourish", track: "Track", mind: "Mind",
   learn: "Learn", connect: "Connect", clinical: "Clinical",
+};
+
+// Where a task's "log it" action goes. Surfaces that exist get a real route;
+// the rest fall back to the mood/cycle log so every task is actionable.
+const ROUTE_HREF: Partial<Record<RouteTarget, string>> = {
+  "food-logger": "/cares/food",
+  scanner: "/cares/scan",
+  ask: "/cares/ask",
+  consult: "/cares/care-team",
+  "cycle-log": "/log/mood",
 };
 
 function fmtTarget(t: TaskTarget): string {
@@ -39,6 +50,7 @@ const PRESETS = [
 
 export default function PlanPage() {
   const { persona } = usePersona();
+  const router = useRouter();
   const [day, setDay] = useState(30);
   const [done, setDone] = useState<Set<string>>(new Set());
 
@@ -137,19 +149,24 @@ export default function PlanPage() {
         {tasks.map((t) => {
           const checked = done.has(t.id);
           const target = fmtTarget(t.target);
+          const href = ROUTE_HREF[t.routeTo];
           return (
-            <button key={t.id} type="button"
-              className={`${styles.task} ${checked ? styles.taskDone : ""} ${top3.includes(t.id) ? styles.taskTop : ""}`}
-              onClick={() => toggle(t.id)}>
-              <span className={`${styles.check} ${checked ? styles.checkOn : ""}`} aria-hidden>{checked ? "✓" : ""}</span>
-              <span className={styles.taskBody}>
+            <div key={t.id}
+              className={`${styles.task} ${checked ? styles.taskDone : ""} ${top3.includes(t.id) ? styles.taskTop : ""}`}>
+              <button type="button" className={`${styles.check} ${checked ? styles.checkOn : ""}`}
+                onClick={() => toggle(t.id)} aria-label={checked ? "Mark not done" : "Mark done"}>
+                {checked ? "✓" : ""}
+              </button>
+              <button type="button" className={styles.taskBody}
+                onClick={() => (href ? router.push(href) : toggle(t.id))}>
                 <span className={styles.taskTitle}>
                   {t.title}{target && <span className={styles.taskTarget}>{target}</span>}
+                  {href && <span className={styles.taskGo}>Log ›</span>}
                 </span>
                 <span className={styles.taskDetail}>{t.detail}</span>
-              </span>
+              </button>
               <span className={`${styles.cat} ${styles["cat_" + t.category]}`}>{CAT_LABEL[t.category]}</span>
-            </button>
+            </div>
           );
         })}
       </div>

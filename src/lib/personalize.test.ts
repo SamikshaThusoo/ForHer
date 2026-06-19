@@ -3,31 +3,40 @@ import { verdictFor } from "./personalize";
 import type { FoodItem } from "@/types/food";
 import type { Persona } from "@/types/persona";
 
-const priya: Pick<Persona, "smartReport" | "cares"> = {
+const aanyaLike: Pick<Persona, "smartReport" | "cares"> = {
   smartReport: {
-    healthScore: 620, band: "warm", bandLabel: "Fair",
-    chronologicalAge: 34, biologicalAge: 38, heartAge: 40,
-    cvdRiskPct: 4.2, diabetesRiskPct: 12.0, hypertensionRiskPct: 8.0,
-    populationAvgScore: 738, topDrivers: ["prediabetes", "vitamin D", "borderline BP"],
-    labs: [
-      { key: "hba1c", label: "HbA1c", value: 5.9, unit: "%", status: "flagged" },
-      { key: "sbp",   label: "Systolic BP", value: 134, unit: "mmHg", status: "borderline" },
-    ],
+    healthScore: 560, band: "warm", bandLabel: "Fair",
+    chronologicalAge: 28, biologicalAge: 31, heartAge: 30,
+    cvdRiskPct: 2, diabetesRiskPct: 8, hypertensionRiskPct: 6,
+    populationAvgScore: 738, topDrivers: [],
+    labs: [{ key: "hba1c", label: "HbA1c", value: 6.0, unit: "%", status: "flagged" }],
   },
-  cares: { enrolled: true, primaryProgram: "prediabetes-reversal", weekOfTwelve: 3 },
+  cares: { enrolled: true, primaryProgram: "pcos-care", weekOfTwelve: 1 },
 };
 
-const biryani: FoodItem = {
-  id: "f-biryani", name: "Chicken Biryani", category: "indian-meal",
-  per100g: { energyKcal: 290, carbsG: 38, sugarG: 1, proteinG: 12, fatG: 10, fiberG: 1, sodiumMg: 550 },
-  diseaseTags: { diabetes: "flagged", hypertension: "borderline", cvd: "borderline", pcos: "borderline" },
+const sugaryBiscuit: FoodItem = {
+  id: "f-biscuit", name: "Cream Biscuits", category: "packaged",
+  per100g: { energyKcal: 480, carbsG: 64, sugarG: 30, proteinG: 5, fatG: 22, fiberG: 1, sodiumMg: 300 },
+  diseaseTags: { diabetes: "flagged", hypertension: "normal", cvd: "borderline", pcos: "flagged" },
 };
 
-describe("verdictFor", () => {
-  it("flags biryani for prediabetic Priya with HbA1c-anchored reason", () => {
-    const v = verdictFor(biryani, priya as Persona);
-    expect(v.forYou).toBe("watch");
-    expect(v.oneLineReason).toMatch(/HbA1c/);
+const dalBowl: FoodItem = {
+  id: "f-dal", name: "Dal Bowl", category: "indian-meal",
+  per100g: { energyKcal: 180, carbsG: 20, sugarG: 2, proteinG: 11, fatG: 5, fiberG: 6, sodiumMg: 320 },
+  diseaseTags: { diabetes: "normal", hypertension: "normal", cvd: "normal", pcos: "normal" },
+};
+
+describe("verdictFor (PCOS-centric)", () => {
+  it("flags a high-sugar food with an insulin/sugar-anchored reason + swap", () => {
+    const v = verdictFor(sugaryBiscuit, aanyaLike as Persona);
+    expect(v.forYou).toBe("avoid"); // sugar >= 15 → worst score
+    expect(v.oneLineReason).toMatch(/sugar/i);
     expect(v.swap).toBeDefined();
+  });
+
+  it("rates a protein + fibre meal as a good choice", () => {
+    const v = verdictFor(dalBowl, aanyaLike as Persona);
+    expect(["great", "ok"]).toContain(v.forYou);
+    expect(v.swap).toBeUndefined();
   });
 });
