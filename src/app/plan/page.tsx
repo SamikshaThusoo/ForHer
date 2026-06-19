@@ -16,7 +16,7 @@ const PHASE_LABEL: Record<string, string> = {
   consolidate: "Consolidate", review: "Review",
 };
 const CAT_LABEL: Record<JourneyTask["category"], string> = {
-  move: "Move", nourish: "Nourish", track: "Track", mind: "Mind",
+  move: "Move", nourish: "Nourish", track: "Track", sleep: "Sleep", mind: "Mind",
   learn: "Learn", connect: "Connect", clinical: "Clinical",
 };
 

@@ -105,6 +105,7 @@
 .cat_move { background: rgba(47,122,122,0.12); color: #2F7A7A; }
 .cat_nourish { background: rgba(201,119,42,0.12); color: #B5532F; }
 .cat_track { background: rgba(142,83,120,0.12); color: var(--plum-soft); }
+.cat_sleep { background: rgba(74,91,138,0.14); color: #4A5B8A; }
 .cat_mind { background: rgba(122,90,160,0.14); color: #6B4E9E; }
 .cat_learn { background: rgba(47,120,160,0.12); color: #2F6FA0; }
 .cat_connect { background: rgba(199,107,122,0.14); color: #C76B7A; }

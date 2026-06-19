@@ -10,7 +10,7 @@ export type CareTrack = RiskOutcome;
 /** Tiers that route into a care plan (excludes 'none'). */
 export type RiskTier = Exclude<RiskOutcome, "none">;
 
-export type TaskCategory = "move" | "nourish" | "track" | "mind" | "learn" | "connect" | "clinical";
+export type TaskCategory = "move" | "nourish" | "track" | "sleep" | "mind" | "learn" | "connect" | "clinical";
 export type Cadence = "daily" | "weekly" | "fortnightly" | "monthly" | "once" | "scheduled";
 export type Source = "companion" | "careplan" | "clinical";
 

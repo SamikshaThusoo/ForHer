@@ -216,7 +216,7 @@ export const TASK_CATALOG: TaskDef[] = [
     },
   },
   {
-    id: "sleep", category: "mind", title: "Wind down for sleep",
+    id: "sleep", category: "sleep", title: "Wind down for sleep",
     detail: "A consistent wind-down and wake time steadies insulin and curbs cravings — a real PMOS lever.",
     routeTo: "placeholder", source: "careplan",
     byTrack: {
