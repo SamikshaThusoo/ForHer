@@ -6,3 +6,4 @@ export * from "./touchpoints";
 export * from "./tasks";
 export * from "./markers";
 export * from "./entryFraming";
+export * from "./scenario";

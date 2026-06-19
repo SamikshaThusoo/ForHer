@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import styles from "./Frame.module.css";
 import { PersonaSwitcher } from "@/components/PersonaSwitcher/PersonaSwitcher";
 import { ProductToggle } from "@/components/ProductToggle/ProductToggle";
+import { ScenarioCaption } from "@/components/ScenarioCaption/ScenarioCaption";
 
 export function Frame({ children }: { children: ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export function Frame({ children }: { children: ReactNode }) {
         </div>
         <PersonaSwitcher />
       </header>
+      <ScenarioCaption />
       <div className={styles.deviceWrap}>
         <div className={styles.device}>
           <div className={styles.notch} aria-hidden />
