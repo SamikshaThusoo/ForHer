@@ -9,7 +9,7 @@ const QUESTIONS: { key: keyof AssessmentAnswers; domain: string; q: string }[] =
   { key: "acneSkin", domain: "Skin", q: "Do you get persistent acne or oily skin?" },
   { key: "hairChanges", domain: "Skin", q: "Noticed extra facial/body hair, or scalp thinning?" },
   { key: "weightDifficulty", domain: "Metabolic", q: "Do you find it hard to manage your weight?" },
-  { key: "familyHistory", domain: "Family", q: "Family history of diabetes or PCOS?" },
+  { key: "familyHistory", domain: "Family", q: "Family history of diabetes or PMOS (PCOS)?" },
 ];
 
 export function Assessment({

@@ -27,12 +27,12 @@ export function verdictFor(food: FoodItem, persona: Persona): Verdict {
 
   const reasons: string[] = [];
   if (sugarG >= 15) {
-    reasons.push("High in sugar — quick spikes hit insulin harder with PCOS");
+    reasons.push("High in sugar — quick spikes hit insulin harder with PMOS");
   } else if (carbsG >= 40 && fiberG < 3) {
     reasons.push("Refined carbs digest fast — pair with protein or fibre to steady blood sugar");
   }
   if (proteinG >= 8 && fiberG >= 4) {
-    reasons.push("Good protein and fibre — keeps blood sugar steady, which helps with PCOS");
+    reasons.push("Good protein and fibre — keeps blood sugar steady, which helps with PMOS");
   }
   if (hba1c && score >= 2) {
     reasons.push(`Worth easing up — your HbA1c is ${hba1c.value}%`);
