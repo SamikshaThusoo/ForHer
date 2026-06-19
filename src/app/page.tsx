@@ -1,15 +1,10 @@
 "use client";
-import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntryCard";
-import { personaTrack, TRACK_LABELS } from "@/lib/journey";
-import { ArrowRight } from "lucide-react";
 import styles from "./home.module.css";
 
 export default function Home() {
   const { persona } = usePersona();
-  const eligible = !!persona.pmos?.eligible;
-  const track = personaTrack(persona);
 
   return (
     <main className={`${styles.home} fhTheme`}>
@@ -24,20 +19,8 @@ export default function Home() {
         <p className={styles.aka}><strong>PMOS</strong> (Polyendocrine Metabolic Ovarian Syndrome) — the condition you may know as <strong>PCOS</strong>.</p>
       </section>
 
+      {/* Single entry card — adapts to the persona's state (flagged AHC / cold start). */}
       <ForHerEntryCard />
-
-      {eligible && (
-        <Link href="/plan" className={styles.planCard}>
-          <div className={styles.planBody}>
-            <span className={styles.planEyebrow}>{track === "none" ? "Engagement track" : TRACK_LABELS[track]}</span>
-            <span className={styles.planTitle}>{track === "none" ? "Your daily companion" : "Your plan"}</span>
-            <span className={styles.planSub}>
-              {track === "none" ? "Cycle, mood and habit tracking" : "Today's tasks and your 6-month journey"}
-            </span>
-          </div>
-          <span className={styles.planArrow}><ArrowRight size={18} /></span>
-        </Link>
-      )}
     </main>
   );
 }
