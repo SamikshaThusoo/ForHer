@@ -1,0 +1,41 @@
+/* ManualMode.module.css */
+.wrap { padding: 16px; }
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  box-shadow: var(--sh-sm);
+  border: 1px solid transparent;
+  outline: 0;
+  font-size: 13px;
+  transition: border-color 0.12s var(--ease), box-shadow 0.12s var(--ease);
+}
+.input:focus {
+  border-color: var(--color-blue);
+  box-shadow: var(--sh-sm), 0 0 0 3px var(--color-blue-soft);
+}
+.list {
+  list-style: none;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  width: 100%;
+  background: var(--color-surface);
+  border-radius: 14px;
+  box-shadow: var(--sh-sm);
+  text-align: left;
+  transition: transform 0.12s var(--ease);
+}
+.item:active { transform: scale(0.985); }
+.emoji { font-size: 22px; }
+.name { font-size: 13px; font-weight: 500; color: var(--color-text); }
+.kcal { font-size: 11px; color: var(--color-text-muted); }

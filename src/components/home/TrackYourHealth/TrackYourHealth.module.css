@@ -1,0 +1,11 @@
+/* TrackYourHealth.module.css */
+.section { padding: 4px 16px 12px; }
+.head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.heading { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-muted); }
+.viewAll { font-size: var(--font-size-xs); color: var(--color-brand); font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tile { background: var(--color-surface); border-radius: var(--radius-lg); padding: 12px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow-card); }
+.emoji { font-size: 16px; }
+.value { font-size: var(--font-size-md); font-weight: 600; }
+.unit { font-size: var(--font-size-xs); color: var(--color-text-muted); font-weight: 400; }
+.label { font-size: 10px; color: var(--color-text-muted); }

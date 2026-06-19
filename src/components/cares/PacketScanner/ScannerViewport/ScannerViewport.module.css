@@ -1,0 +1,83 @@
+/* ScannerViewport.module.css */
+.viewport {
+  position: relative;
+  margin: 16px;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%);
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Corner brackets — write each as a 4-value shorthand so the parent's
+   `border-width: 0` can't outspecificity-win. */
+.corner {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-style: solid;
+  border-color: #FFFFFF;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.18));
+}
+.tl {
+  top: 14%; left: 9%;
+  border-width: 4px 0 0 4px;
+  border-radius: 14px 0 0 0;
+}
+.tr {
+  top: 14%; right: 9%;
+  border-width: 4px 4px 0 0;
+  border-radius: 0 14px 0 0;
+}
+.bl {
+  bottom: 22%; left: 9%;
+  border-width: 0 0 4px 4px;
+  border-radius: 0 0 0 14px;
+}
+.br {
+  bottom: 22%; right: 9%;
+  border-width: 0 4px 4px 0;
+  border-radius: 0 0 14px 0;
+}
+
+/* Scanning beam */
+.line {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 18%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #34D399, transparent);
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.65);
+  pointer-events: none;
+}
+
+/* Shutter pill stack */
+.shutterStack {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.shutterIcon {
+  color: #fff;
+  display: inline-flex;
+  opacity: 0.75;
+}
+.shutter {
+  background: #fff;
+  color: #161616;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+}
+.shutter:disabled { opacity: 0.85; cursor: default; }

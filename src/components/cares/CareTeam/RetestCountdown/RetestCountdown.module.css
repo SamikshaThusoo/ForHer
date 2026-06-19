@@ -1,0 +1,51 @@
+/* RetestCountdown.module.css — ref 07 */
+.card {
+  margin: 16px;
+  background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-blue-bright) 100%);
+  color: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 12px 28px -6px rgba(32, 96, 176, 0.5);
+}
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  opacity: 0.95;
+}
+.detail {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.daysGroup {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  line-height: 1;
+}
+.days {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.unit {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+.chev { opacity: 0.85; }

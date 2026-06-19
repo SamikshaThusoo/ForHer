@@ -1,0 +1,81 @@
+/* VerdictCard.module.css — ref 04-food-log */
+.card {
+  margin: 16px;
+  border-radius: var(--r-card-lg);
+  background: var(--color-surface);
+  box-shadow: var(--sh-md);
+  overflow: hidden;
+}
+
+.toneBand {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.card[data-tone="great"] .toneBand { background: var(--band-excellent); }
+.card[data-tone="ok"]    .toneBand { background: var(--band-fair); }
+.card[data-tone="watch"] .toneBand { background: var(--band-watch); }
+.card[data-tone="avoid"] .toneBand { background: var(--band-avoid); }
+
+.cardBody { padding: 18px 20px 18px; }
+
+.food {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.reason {
+  font-size: 14px;
+  color: var(--color-text);
+  line-height: 1.45;
+  margin-top: 7px;
+}
+
+.swap {
+  background: var(--color-blue-soft);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-top: 14px;
+}
+.swapHead {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-blue-deep);
+}
+.swapHead svg { color: var(--color-blue); }
+.swapText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-blue-deep);
+  margin-top: 7px;
+  line-height: 1.35;
+}
+.swapWhy {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-blue-deep);
+  opacity: 0.82;
+  margin-top: 3px;
+}
+
+.detail {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 13px;
+  line-height: 1.5;
+}

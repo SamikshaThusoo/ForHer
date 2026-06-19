@@ -1,0 +1,14 @@
+/* EngageBanner.module.css */
+.banner {
+  margin: 0 16px 12px;
+  background: linear-gradient(135deg, #2D4A7C 0%, #15837D 100%);
+  border-radius: var(--radius-xl); padding: 16px;
+  color: white; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.title { font-size: var(--font-size-md); font-weight: 600; line-height: var(--line-snug); }
+.sub { font-size: var(--font-size-xs); opacity: 0.85; margin-top: 4px; }
+.illustration {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  display: grid; place-items: center; flex-shrink: 0;
+}

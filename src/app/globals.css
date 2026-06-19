@@ -1,0 +1,254 @@
+/* =====================================================================
+   Habit Cares — Design Tokens (blue + orange + Poppins)
+   Source of truth: design-tokens.css from the real Habit Health app.
+   Legacy aliases keep older v3 components rendering during the rework.
+   ===================================================================== */
+
+/* Resets */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button { font: inherit; cursor: pointer; background: none; border: 0; color: inherit; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+input, textarea { font: inherit; }
+
+:root {
+  /* =====================================================================
+     === NEW system (from /Users/nikhildubey/Downloads/Cares/design-tokens.css)
+     ===================================================================== */
+
+  /* ---- Brand ---------------------------------------------------------- */
+  --color-blue:        #2060B0;
+  --color-blue-bright: #2E78D6;
+  --color-blue-deep:   #173F73;
+  --color-blue-soft:   #EAF1FB;
+  --color-blue-soft-2: #DCE9F8;
+
+  --color-orange:      #F67F1B;
+  --color-orange-soft: #FDEBD8;
+  --color-orange-deep: #B85806;
+
+  --color-cream:       #FCF0E4;
+  --color-green-hc:    #7DAA4A;
+
+  --color-gold-a:      #FBD37A;
+  --color-gold-b:      #EFB23E;
+  --color-gold-text:   #6B4A05;
+
+  /* ---- Surfaces & text ------------------------------------------------ */
+  --color-page:        #F4F6F9;
+  --color-surface:     #FFFFFF;
+  --color-line:        #ECEEF2;
+
+  --color-text:        #1B2A3D;
+  --color-text-muted:  #5A6473;
+  --color-text-soft:   #9AA1AC;
+
+  /* ---- Health-score band system -------------------------------------- */
+  --band-excellent:    #2EAE6B;
+  --band-fair:         #F2A024;
+  --band-watch:        #F67F1B;
+  --band-avoid:        #E24B4A;
+  --band-excellent-soft:#DBF3E7;
+  --band-fair-soft:    #FCEFD6;
+  --band-watch-soft:   #FDEBD8;
+  --band-avoid-soft:   #FBE3E3;
+
+  /* ---- Typography ----------------------------------------------------- */
+  --font-sans: 'Poppins', -apple-system, system-ui, sans-serif;
+
+  --fz-eyebrow: 11px;
+  --fz-caption: 12px;
+  --fz-body:    14px;
+  --fz-label:   13px;
+  --fz-h3:      16px;
+  --fz-h2:      18px;
+  --fz-title:   22px;
+  --fz-score:   34px;
+
+  /* ---- Radius --------------------------------------------------------- */
+  --r-chip:    12px;
+  --r-btn:     14px;
+  --r-card:    16px;
+  --r-card-lg: 18px;
+  --r-hero:    22px;
+  --r-pill:    999px;
+
+  /* ---- Shadow --------------------------------------------------------- */
+  --sh-sm:   0 1px 2px rgba(27,42,61,.05), 0 4px 12px rgba(27,42,61,.05);
+  --sh-md:   0 1px 2px rgba(27,42,61,.05), 0 8px 22px rgba(27,42,61,.07);
+  --sh-hero: 0 1px 2px rgba(27,42,61,.05), 0 14px 34px -8px rgba(32,96,176,.20);
+  --sh-cta:  0 8px 18px -5px rgba(32,96,176,.50);
+
+  /* ---- Layout & motion ------------------------------------------------ */
+  --page-pad: 16px;
+  --ease:     cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* =====================================================================
+     === LEGACY aliases — keep v3 components rendering until they migrate.
+     Map old token names to new equivalents so the rework can be staged.
+     ===================================================================== */
+
+  /* Brand */
+  --color-brand:           var(--color-blue);
+  --color-brand-elevated:  var(--color-blue-bright);
+  --color-brand-deep:      var(--color-blue-deep);
+  --color-brand-soft:      var(--color-blue-soft);
+  --color-brand-tint:      #F3F7FC;
+  --color-accent:          var(--color-orange);
+  --color-accent-soft:     var(--color-orange-soft);
+  --color-accent-tint:     #FFF6EC;
+
+  /* Surfaces */
+  --color-page-bg:         var(--color-page);
+  --color-page-bg-bottom:  var(--color-page);
+  --color-surface-soft:    #FAFBFD;
+  --color-surface-sunk:    #F0F2F6;
+  --color-divider:         var(--color-line);
+  --color-divider-strong:  #D9DDE3;
+  --color-text-faint:      var(--color-text-soft);
+  --color-frame-chrome:    #1A1A1A;
+
+  /* Page gradient — flat now */
+  --page-gradient:         none;
+
+  /* Score / status taxonomy */
+  --color-score-poor:      var(--band-avoid);
+  --color-score-fair:      var(--band-watch);
+  --color-score-warm:      var(--band-fair);
+  --color-score-good:      var(--band-excellent);
+  --color-normal:          var(--band-excellent);
+  --color-borderline:      var(--band-fair);
+  --color-flagged:         var(--band-watch);
+  --color-severe:          var(--band-avoid);
+  --color-normal-soft:     var(--band-excellent-soft);
+  --color-borderline-soft: var(--band-fair-soft);
+  --color-flagged-soft:    var(--band-watch-soft);
+  --color-severe-soft:     var(--band-avoid-soft);
+
+  /* Shadows */
+  --shadow-card:    var(--sh-sm);
+  --shadow-lifted:  var(--sh-md);
+  --shadow-glass:   var(--sh-hero);
+  --shadow-1:       var(--sh-sm);
+  --shadow-2:       var(--sh-md);
+  --shadow-3:       var(--sh-hero);
+
+  /* Motion */
+  --ease-out:    var(--ease);
+  --ease-spring: var(--ease);
+  --ease-snappy: var(--ease);
+  --dur-fast:    180ms;
+  --dur-base:    240ms;
+  --dur-slow:    420ms;
+  --dur-hero:    600ms;
+
+  /* Radii (legacy names) */
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    var(--r-card);
+  --radius-xl:    20px;
+  --radius-2xl:   24px;
+  --radius-pill:  var(--r-pill);
+
+  /* Type scale (legacy names) */
+  --font-size-xs:   11px;
+  --font-size-sm:   13px;
+  --font-size-md:   14px;
+  --font-size-lg:   16px;
+  --font-size-xl:   18px;
+  --font-size-2xl:  22px;
+  --font-size-3xl:  28px;
+  --font-size-4xl:  34px;
+
+  /* Spacing */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+
+  --line-tight:  1.15;
+  --line-snug:   1.3;
+  --line-normal: 1.5;
+
+  /* Fonts (legacy variables) — both redirect to Poppins */
+  --font-geist:   var(--font-sans);
+  --font-display: var(--font-sans);
+}
+
+/* =====================================================================
+   Recurring pattern primitives (from reference tokens)
+   ===================================================================== */
+.eyebrow {
+  font-size: var(--fz-eyebrow);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--r-pill);
+  padding: 7px 13px;
+  font-size: var(--fz-caption);
+  font-weight: 600;
+}
+.pill-blue { background: var(--color-blue-soft); color: var(--color-blue-deep); }
+.cta-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%; border: none; cursor: pointer; color: #fff;
+  font-family: var(--font-sans); font-size: 15px; font-weight: 600;
+  padding: 14px 18px; border-radius: var(--r-btn);
+  background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-blue-bright) 100%);
+  box-shadow: var(--sh-cta); transition: transform .12s var(--ease);
+}
+.cta-primary:active { transform: scale(.985); }
+
+/* =====================================================================
+   Legacy utilities preserved for v3 components
+   ===================================================================== */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(140%) blur(14px);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow-glass);
+}
+.glass-strong {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(160%) blur(22px);
+  -webkit-backdrop-filter: saturate(160%) blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-glass);
+}
+
+/* Display utility — now Poppins (was Instrument Serif). Kept so v3
+   components calling .display still work; they just lose the italic feel. */
+.display {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: var(--line-tight);
+}
+.display-italic {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: -0.005em;
+  line-height: var(--line-tight);
+}

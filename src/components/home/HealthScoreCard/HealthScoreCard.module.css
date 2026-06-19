@@ -1,0 +1,364 @@
+/* =====================================================================
+   State A — small Health Score card (unchanged)
+   ===================================================================== */
+.hs {
+  margin: 16px 16px 0;
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: var(--sh-sm);
+  padding: 15px 16px;
+}
+.hsTop { display: flex; align-items: center; justify-content: space-between; }
+.hsLbl {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+.hsLbl svg { color: var(--color-orange); }
+.hsWord { font-size: 14px; font-weight: 700; color: #9A6206; }
+.hsBarrow { display: flex; align-items: center; gap: 10px; margin-top: 11px; }
+.hsBar {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: #EDEFF3;
+  position: relative;
+  overflow: hidden;
+}
+.hsBar i {
+  position: absolute;
+  inset: 0 28% 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #F8C24A, #F2A024);
+}
+.hsV {
+  font-weight: 700;
+  font-size: 20px;
+  color: #9A6206;
+  line-height: 1;
+}
+.hsV small {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-soft);
+}
+.hsCap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 9px;
+}
+.hsCap svg { color: var(--color-green-hc); }
+
+/* =====================================================================
+   State B — compact whole-card ("Journey spine")
+   One card holds: score · 12-week journey · today's action · coach.
+   Apple-grade: weight-contrast numerals, hairline rules, 4/8 rhythm.
+   ===================================================================== */
+.hero {
+  position: relative;
+  margin: 14px 16px 0;
+  border-radius: 22px;
+  padding: 15px 15px 14px;
+  background: var(--color-surface);
+  border: 1px solid #E8EBF0;
+  box-shadow:
+    0 0.5px 1.5px rgba(27, 42, 61, 0.03),
+    0 12px 26px -16px rgba(27, 42, 61, 0.22);
+  overflow: hidden;
+}
+
+/* Semantic-state tint — faint green/orange wash bottom-right by trend. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+  background: radial-gradient(160% 90% at 110% 110%, rgba(34, 197, 94, 0.07), transparent 55%);
+}
+.hero[data-trend="up"]::before { opacity: 1; }
+.hero[data-trend="down"]::before {
+  opacity: 1;
+  background: radial-gradient(160% 90% at 110% 110%, rgba(246, 127, 27, 0.10), transparent 55%);
+}
+.hero > * { position: relative; z-index: 1; }
+
+/* ---- Eyebrow: program name + streak ---- */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.eyebrowLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px 2px 7px;
+  border-radius: 999px;
+  background: var(--color-orange-soft);
+  color: var(--color-orange-deep);
+  font-size: 10.5px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.streak svg { color: var(--color-orange); }
+.streak b { font-weight: 800; margin-left: 1px; }
+
+/* ---- Hero score ---- */
+.scoreRow {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-top: 7px;
+}
+.scoreBig {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-sans);
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.scoreDenom {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-sans);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--color-text-soft);
+  letter-spacing: -0.01em;
+}
+.spark { margin-left: auto; align-self: center; }
+
+/* ---- Trend row (tap to reveal cause) ---- */
+.trendRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 5px;
+  margin-left: -5px;
+  padding: 3px 8px 3px 5px;
+  border-radius: 999px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.16s var(--ease);
+}
+.trendRow:hover { background: rgba(27, 42, 61, 0.04); }
+.delta,
+.deltaDown {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-sans);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: -0.01em;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+.delta { color: #1B7A4E; background: #E1F4EA; }
+.deltaDown { color: var(--color-orange-deep); background: var(--color-orange-soft); }
+.vs {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--color-text-soft);
+  min-width: 0;
+}
+.trendInfo { color: var(--color-text-soft); opacity: 0.7; flex-shrink: 0; }
+
+/* Cause reveal */
+.causeReveal {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #F4F6FA;
+  border: 1px solid #E4E8EE;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--color-text);
+  overflow: hidden;
+}
+.causeIcon { color: var(--color-blue); flex-shrink: 0; margin-top: 2px; }
+
+/* ---- The 12-week journey (slim milestone track) ---- */
+.journeyLabels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+  margin-bottom: 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+.journeyWeek { color: var(--color-text); }
+.journeyNext { color: var(--color-orange-deep); white-space: nowrap; }
+.journeyTrack { position: relative; height: 8px; }
+.jRail { position: absolute; inset: 0; background: #EAEDF2; border-radius: 6px; }
+.jFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 8px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #3F92E8, #2060B0);
+}
+.jPip {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fff;
+}
+.jPipStart { width: 8px; height: 8px; background: var(--color-blue); }
+.jPipMid { width: 12px; height: 12px; border: 2.5px solid var(--color-orange); }
+.jPipEnd { width: 12px; height: 12px; border: 2.5px solid #D5DBE3; }
+
+/* ---- Hairline divider ---- */
+.hair { height: 1px; background: #F0F2F5; margin: 13px -15px; }
+
+/* ---- Today's action ---- */
+.todayRow,
+.todayRowDone {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+.todayIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--color-blue-soft);
+  color: var(--color-blue-deep);
+  display: grid;
+  place-items: center;
+}
+.todayRowDone .todayIcon { background: #C9EBD8; color: #1B7A4E; }
+.todayBody { min-width: 0; }
+.todayLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+}
+.todayRowDone .todayLabel { color: #1B7A4E; }
+.todayDots { display: inline-flex; gap: 3px; }
+.todayDots i { width: 6px; height: 6px; border-radius: 50%; background: #D5DBE3; }
+.todayDots i.on { background: var(--color-blue); }
+.todayTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+.todayRowDone .todayTitle {
+  text-decoration: line-through;
+  text-decoration-color: rgba(27, 122, 78, 0.4);
+  color: #1B7A4E;
+}
+.todayBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--color-blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.todayRowDone .todayBtn { background: #1B7A4E; }
+
+/* ---- Coach line (compact) ---- */
+.coachLine {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 13px;
+}
+.coachAv {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.coachAvFallback {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--color-blue-soft);
+  color: var(--color-blue-deep);
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.coachLineText {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  letter-spacing: -0.005em;
+}
+.coachLineText b { color: var(--color-text); font-weight: 600; }
+
+/* ---- CTA ---- */
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 46px;
+  margin-top: 13px;
+  border-radius: 14px;
+  background: #2060B0;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: background 0.16s var(--ease);
+}
+.cta:hover { background: #1B548F; }
+.cta:active { background: #173F73; }

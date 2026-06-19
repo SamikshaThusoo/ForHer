@@ -1,0 +1,11 @@
+/* QuickLinks.module.css */
+.wrap { padding: 4px 16px 12px; }
+.title { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: 8px; font-weight: 600; }
+.row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.card {
+  background: var(--color-surface); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card); padding: 14px 10px;
+  display: flex; flex-direction: column; gap: 6px; align-items: flex-start;
+}
+.icon { font-size: 18px; }
+.label { font-size: var(--font-size-sm); font-weight: 500; }

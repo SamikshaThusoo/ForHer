@@ -1,0 +1,6 @@
+/* FAQCard.module.css */
+.card { margin: 0 16px 24px; background: var(--color-surface); border-radius: var(--radius-lg); padding: 14px; box-shadow: var(--shadow-card); display: grid; grid-template-columns: 36px 1fr 24px; gap: 12px; align-items: center; }
+.icon { width: 36px; height: 36px; border-radius: 50%; background: var(--color-brand-soft); display: grid; place-items: center; font-size: 16px; }
+.title { font-size: var(--font-size-sm); font-weight: 600; }
+.sub { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px; }
+.arrow { font-size: 24px; color: var(--color-text-soft); }

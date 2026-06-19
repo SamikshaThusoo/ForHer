@@ -1,0 +1,51 @@
+/* Habit Health lockup — "HABIT" with yoga-figure A, "HEALTH" tracked below.
+   Sizes scale off the .word font-size; .sub is locked to the new --color-blue. */
+
+.lockup {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1;
+}
+
+.word {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-serif-logo), 'Playfair Display', 'Times New Roman', serif;
+  font-weight: 900;
+  color: var(--color-blue, #2060B0);
+  line-height: 0.85;
+  letter-spacing: 0.01em;
+}
+
+.letter { display: inline-block; }
+
+.figureA {
+  display: inline-block;
+  width: 0.78em;
+  height: 0.95em;
+  margin: 0 -0.02em;
+  vertical-align: baseline;
+}
+
+.sub {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-blue, #2060B0);
+  letter-spacing: 0.44em;
+  /* sub size is set per-size below */
+  margin-top: 3px;
+  /* compensate for trailing letter-spacing so text appears centered */
+  text-indent: 0.44em;
+}
+
+/* Size variants — drive .word font-size; .sub scales proportionally. */
+.lockup[data-size="sm"] .word { font-size: 18px; }
+.lockup[data-size="sm"] .sub  { font-size: 7px;  margin-top: 2px; }
+
+.lockup[data-size="md"] .word { font-size: 22px; }
+.lockup[data-size="md"] .sub  { font-size: 8.5px; margin-top: 3px; }
+
+.lockup[data-size="lg"] .word { font-size: 36px; }
+.lockup[data-size="lg"] .sub  { font-size: 13px;  margin-top: 5px; }
