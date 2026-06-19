@@ -7,7 +7,7 @@ export function ProductToggle({ active }: { active: "cares" | "forher" }) {
   return (
     <div className={styles.toggle} role="tablist" aria-label="Switch product">
       <a className={`${styles.opt} ${active === "cares" ? styles.on : ""}`} href="/" role="tab" aria-selected={active === "cares"}>
-        Habit Cares
+        PCOS Program
       </a>
       <a className={`${styles.opt} ${active === "forher" ? styles.on : ""}`} href="/forher/index.html" role="tab" aria-selected={active === "forher"}>
         For Her

@@ -84,8 +84,9 @@ export default function ForHerPage() {
               ? "We'll keep you on the engagement track and re-check over time."
               : `You're on the ${TRACK_LABELS[outcome]}. Your daily companion is where it all comes together.`}
           </p>
-          {/* TODO(plan3): route into the real journey/Today view + roadmap. */}
-          <Link href="/cares" className={styles.doneCta}>Go to my companion</Link>
+          <Link href="/plan" className={styles.doneCta}>
+            {outcome === "none" ? "Go to my companion" : "See my plan"}
+          </Link>
           <Link href="/" className={styles.homeLink}>Back to home</Link>
         </div>
       )}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Playfair_Display } from "next/font/google";
+import { Poppins, Playfair_Display, DM_Serif_Display, DM_Sans } from "next/font/google";
 import { PersonaProvider } from "@/context/PersonaContext";
 import { Frame } from "@/components/Frame/Frame";
 import "./globals.css";
@@ -22,6 +22,20 @@ const playfair = Playfair_Display({
   variable: "--font-serif-logo",
 });
 
+// For Her theme fonts — used by the PCOS program screens to match the prototype.
+const dmSerif = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-forher-serif",
+});
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-forher-sans",
+});
+
 export const metadata: Metadata = {
   title: "Habit Cares",
   description: "Hyper-personalised digital care for Habit Health Smart Reports users",
@@ -29,7 +43,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${poppins.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${poppins.variable} ${playfair.variable} ${dmSerif.variable} ${dmSans.variable}`}>
       <body>
         <PersonaProvider>
           <Frame>{children}</Frame>
