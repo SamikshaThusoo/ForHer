@@ -18,7 +18,7 @@ export function Greeting() {
     persona.cares.primaryProgram === "prediabetes-reversal"
       ? "Prediabetes Reversal"
       : persona.cares.primaryProgram === "pcos-care"
-      ? "PCOS Care"
+      ? "PMOS Care"
       : persona.cares.primaryProgram === "cvd-risk-reduction"
       ? "CVD Risk Reduction"
       : persona.cares.primaryProgram === "hypertension-control"

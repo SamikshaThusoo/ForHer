@@ -62,7 +62,7 @@ export default function PlanPage() {
     return (
       <main className={styles.page}>
         <div className={styles.empty}>
-          <p>The PCOS plan isn&apos;t available for this profile.</p>
+          <p>The PMOS plan isn&apos;t available for this profile.</p>
           <Link href="/" className={styles.back2}>Back</Link>
         </div>
       </main>
@@ -74,7 +74,7 @@ export default function PlanPage() {
       <main className={styles.page}>
         <header className={styles.head}>
           <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
-          <span className={styles.brandline}>For Her · PCOS</span>
+          <span className={styles.brandline}>For Her · PMOS</span>
         </header>
         <div className={styles.empty}>
           <h1 className={styles.h1}>You&apos;re on the engagement track</h1>
@@ -90,13 +90,13 @@ export default function PlanPage() {
     <main className={styles.page}>
       <header className={styles.head}>
         <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
-        <span className={styles.brandline}>For Her · PCOS</span>
+        <span className={styles.brandline}>For Her · PMOS</span>
       </header>
 
       <div className={styles.hero}>
         <span className={styles.eyebrow}>{TRACK_LABELS[track]}</span>
         <h1 className={styles.h1}>Your <em>{maxDay === 30 ? "30-day" : "6-month"}</em> plan</h1>
-        <p className={styles.heroSub}>Daily lifestyle steps, tuned to your PCOS risk and where you are in your cycle. Check them off as you go.</p>
+        <p className={styles.heroSub}>Daily lifestyle steps, tuned to your PMOS risk and where you are in your cycle. Check them off as you go.</p>
       </div>
 
       {/* Day scrubber */}

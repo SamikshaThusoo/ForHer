@@ -29,7 +29,7 @@ export function RiskResult({
     <div className={styles.wrap}>
       <span className={styles.eyebrow}>Your result · a screen, not a diagnosis</span>
       <h2 className={styles.title}>
-        {outcome === "none" ? "No PMOS signals right now" : `${meta.label} likelihood of PMOS (PCOS)`}
+        {outcome === "none" ? "No PMOS signals right now" : `${meta.label} likelihood of PMOS`}
       </h2>
 
       <div className={styles.meter} data-outcome={outcome}>

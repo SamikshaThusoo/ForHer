@@ -1,11 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { entryFraming } from "./entryFraming";
 import { AANYA, SANA, RIYA } from "@/data/pmosPersonas";
-import { NIKHIL } from "@/data/personas";
+import type { Persona } from "@/types/persona";
+
+// A persona with no PMOS profile (e.g. not women's-health eligible).
+const NOT_ELIGIBLE = { pmos: undefined } as unknown as Persona;
 
 describe("entryFraming", () => {
   it("returns null for non-eligible personas", () => {
-    expect(entryFraming(NIKHIL)).toBeNull();
+    expect(entryFraming(NOT_ELIGIBLE)).toBeNull();
   });
   it("frames State A with flagged markers + high urgency", () => {
     const f = entryFraming(AANYA)!;

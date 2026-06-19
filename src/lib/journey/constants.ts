@@ -5,7 +5,7 @@ import type {
 export const PMOS_LABEL = "PMOS";
 export const PMOS_FULL = "Polyendocrine Metabolic Ovarian Syndrome";
 /** Use on first mention in any surface. */
-export const PMOS_LABEL_FIRST_MENTION = "PMOS (PCOS)";
+export const PMOS_LABEL_FIRST_MENTION = "PMOS";
 
 /** Inclusive day bounds per journey phase. */
 export const PHASE_BOUNDS: { phase: JourneyPhase; from: number; to: number }[] = [
@@ -199,7 +199,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "micro-learning", category: "learn", title: "Today's learning card",
-    detail: "A 30-second card on living well with PMOS (PCOS).",
+    detail: "A 30-second card on living well with PMOS.",
     routeTo: "learn", source: "companion",
     byTrack: {
       none: daily("boolean", 1), low: daily("boolean", 1),
