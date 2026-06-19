@@ -1,4 +1,30 @@
 /* =====================================================================
+   For Her theme — re-skins the Cares-tokened PMOS components to the
+   ForHer prototype look (plum/rose + DM Serif). Apply `.fhTheme` to a
+   container; child components keep their structure, tokens resolve to ForHer.
+   ===================================================================== */
+.fhTheme {
+  --color-blue: #5B2A4A;
+  --color-blue-bright: #8E5378;
+  --color-blue-deep: #3E1B33;
+  --color-blue-soft: #F5ECF1;
+  --color-surface: #FFFFFF;
+  --color-text: #3E1B33;
+  --color-text-soft: #6B5A65;
+  --color-text-muted: #9A8A92;
+  --color-orange: #C9772A;
+  --color-orange-deep: #B5532F;
+  min-height: 100%;
+  background: linear-gradient(180deg, #FBF3F5 0%, #F5F0F6 100%);
+  font-family: var(--font-forher-sans), system-ui, sans-serif;
+}
+.fhTheme h1, .fhTheme h2, .fhTheme h3 {
+  font-family: var(--font-forher-serif), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* =====================================================================
    Habit Cares — Design Tokens (blue + orange + Poppins)
    Source of truth: design-tokens.css from the real Habit Health app.
    Legacy aliases keep older v3 components rendering during the rework.

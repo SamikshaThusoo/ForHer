@@ -30,7 +30,7 @@ export default function ForHerPage() {
 
   if (!pmos?.eligible) {
     return (
-      <main className={styles.page}>
+      <main className={`${styles.page} fhTheme`}>
         <div className={styles.notAvail}>
           <p>For Her isn&apos;t available for this profile.</p>
           <Link href="/" className={styles.homeLink}>Back to home</Link>
@@ -40,7 +40,7 @@ export default function ForHerPage() {
   }
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page} fhTheme`}>
       <header className={styles.header}>
         <Link href="/" className={styles.back} aria-label="Back to home"><ChevronLeft size={20} /></Link>
         <span className={styles.brand}>For Her</span>

@@ -1,0 +1,43 @@
+.home {
+  min-height: 100%;
+  padding-bottom: 28px;
+  color: #3E1B33;
+}
+.top { padding: 16px 18px 4px; }
+.wordmark {
+  font-family: var(--font-forher-serif), Georgia, serif;
+  font-size: 19px; color: #5B2A4A; display: inline-flex; align-items: center; gap: 8px;
+}
+.tag {
+  font-family: var(--font-forher-sans), system-ui, sans-serif;
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #8E5378; background: rgba(142,83,120,0.12); border-radius: 999px; padding: 3px 8px;
+}
+
+.hero { padding: 12px 18px 16px; }
+.hi { font-size: 12.5px; font-weight: 600; color: #8E5378; }
+.h1 {
+  font-family: var(--font-forher-serif), Georgia, serif;
+  font-size: 28px; line-height: 1.15; color: #3E1B33; margin-top: 6px; font-weight: 400;
+}
+.h1 em { font-style: italic; color: #8E5378; }
+.lead { font-size: 13px; line-height: 1.55; color: #6B5A65; margin-top: 9px; }
+
+.planCard {
+  display: flex; align-items: center; gap: 12px; text-decoration: none;
+  margin: 14px 18px 0; padding: 15px 16px;
+  background: #fff; border: 1px solid rgba(91,42,74,0.1); border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(91,42,74,0.06); transition: box-shadow 0.15s ease;
+}
+.planCard:active { box-shadow: 0 6px 20px rgba(91,42,74,0.12); }
+.planBody { display: flex; flex-direction: column; flex: 1; }
+.planEyebrow {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #8E5378;
+}
+.planTitle { font-size: 15px; font-weight: 700; color: #3E1B33; margin-top: 3px; }
+.planSub { font-size: 11.5px; color: #9A8A92; margin-top: 2px; }
+.planArrow {
+  width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); color: #fff;
+}

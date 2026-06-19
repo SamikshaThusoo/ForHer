@@ -1,51 +1,42 @@
 "use client";
+import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
-import { StatusBar } from "@/components/home/StatusBar/StatusBar";
-import { TopBar } from "@/components/home/TopBar/TopBar";
-import { Greeting } from "@/components/home/Greeting/Greeting";
-import { PromoCard } from "@/components/home/PromoCard/PromoCard";
-import { HealthScoreCard } from "@/components/home/HealthScoreCard/HealthScoreCard";
-import { QuickActions } from "@/components/home/QuickActions/QuickActions";
-import { CareBanner } from "@/components/home/CareBanner/CareBanner";
-import { WellnessSolutions } from "@/components/home/WellnessSolutions/WellnessSolutions";
-import { StepCounterCard } from "@/components/home/StepCounterCard/StepCounterCard";
-import { LeaderboardCard } from "@/components/home/LeaderboardCard/LeaderboardCard";
-import { BottomNav } from "@/components/home/BottomNav/BottomNav";
 import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntryCard";
+import { personaTrack, TRACK_LABELS } from "@/lib/journey";
+import { ArrowRight } from "lucide-react";
+import styles from "./home.module.css";
 
 export default function Home() {
   const { persona } = usePersona();
-  const enrolled = persona.cares.enrolled;
+  const eligible = !!persona.pmos?.eligible;
+  const track = personaTrack(persona);
 
   return (
-    <main>
-      <StatusBar />
-      <TopBar />
-      <Greeting />
-      {enrolled ? (
-        <>
-          {/* STATE B — Cares-enrolled */}
-          <HealthScoreCard />
-          <ForHerEntryCard />
-          <QuickActions />
-          <CareBanner />
-          <WellnessSolutions />
-          <StepCounterCard />
-          <LeaderboardCard />
-        </>
-      ) : (
-        <>
-          {/* STATE A — not enrolled */}
-          <PromoCard />
-          <ForHerEntryCard />
-          <QuickActions />
-          <WellnessSolutions />
-          <HealthScoreCard />
-          <StepCounterCard />
-          <LeaderboardCard />
-        </>
+    <main className={`${styles.home} fhTheme`}>
+      <header className={styles.top}>
+        <div className={styles.wordmark}>For Her <span className={styles.tag}>PMOS</span></div>
+      </header>
+
+      <section className={styles.hero}>
+        <p className={styles.hi}>Hi {persona.shortName}</p>
+        <h1 className={styles.h1}>Your women&apos;s health, <em>handled with care</em></h1>
+        <p className={styles.lead}>A guided PMOS program — understand your risk, then follow a plan that fits your everyday.</p>
+      </section>
+
+      <ForHerEntryCard />
+
+      {eligible && (
+        <Link href="/plan" className={styles.planCard}>
+          <div className={styles.planBody}>
+            <span className={styles.planEyebrow}>{track === "none" ? "Engagement track" : TRACK_LABELS[track]}</span>
+            <span className={styles.planTitle}>{track === "none" ? "Your daily companion" : "Your plan"}</span>
+            <span className={styles.planSub}>
+              {track === "none" ? "Cycle, mood and habit tracking" : "Today's tasks and your 6-month journey"}
+            </span>
+          </div>
+          <span className={styles.planArrow}><ArrowRight size={18} /></span>
+        </Link>
       )}
-      <BottomNav />
     </main>
   );
 }
