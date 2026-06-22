@@ -1,0 +1,17 @@
+/* HRACard.module.css */
+.card {
+  margin: 0 16px 16px;
+  background: linear-gradient(135deg, #2D4A7C 0%, #1B3258 100%);
+  color: white;
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  display: grid; grid-template-columns: 36px 1fr; gap: 12px;
+}
+.icon { width: 36px; height: 36px; border-radius: var(--radius-md); background: rgba(255,255,255,0.12); display: grid; place-items: center; font-size: 18px; }
+.title { font-size: var(--font-size-md); font-weight: 600; }
+.sub { font-size: var(--font-size-xs); opacity: 0.8; margin-top: 4px; line-height: var(--line-snug); }
+.cta {
+  margin-top: 10px; background: rgba(255,255,255,0.16); color: white;
+  border-radius: var(--radius-md); padding: 8px 14px; font-size: var(--font-size-sm); font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px;
+}

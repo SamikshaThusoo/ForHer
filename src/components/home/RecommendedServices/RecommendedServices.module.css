@@ -1,0 +1,9 @@
+/* RecommendedServices.module.css */
+.section { padding: 4px 16px 12px; }
+.heading { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: 8px; }
+.row { display: grid; grid-auto-flow: column; grid-auto-columns: 75%; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.row::-webkit-scrollbar { display: none; }
+.card { border-radius: var(--radius-lg); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-pill); align-self: flex-start; }
+.title { font-size: var(--font-size-sm); line-height: var(--line-snug); }
+.cta { font-size: var(--font-size-sm); color: var(--color-brand); font-weight: 600; align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; }

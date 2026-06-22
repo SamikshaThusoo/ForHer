@@ -1,0 +1,64 @@
+.page {
+  min-height: 100%;
+  padding-bottom: 24px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 10px;
+}
+.back {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid rgba(32, 96, 176, 0.14);
+  color: var(--color-blue);
+  text-decoration: none;
+}
+.brand {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-blue);
+}
+
+.notAvail { padding: 40px 24px; text-align: center; color: var(--color-text-muted); }
+.homeLink {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-blue);
+  text-decoration: none;
+}
+
+.done { padding: 40px 24px; text-align: center; }
+.doneMark { color: var(--band-excellent, #2e8b57); }
+.doneTitle {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 12px 0 0;
+}
+.doneSub {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 8px auto 20px;
+  max-width: 280px;
+}
+.doneCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--color-blue), var(--color-blue-bright));
+  border-radius: 999px;
+  padding: 13px 16px;
+  box-shadow: 0 6px 14px -5px rgba(32, 96, 176, 0.55);
+}

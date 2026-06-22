@@ -1,0 +1,22 @@
+/* ask.module.css — ref 06 */
+.main {
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100% - 56px);
+}
+.title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  padding: 8px 18px 0;
+  line-height: 1.1;
+}
+.sub {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  padding: 4px 18px 0;
+  line-height: 1.4;
+}

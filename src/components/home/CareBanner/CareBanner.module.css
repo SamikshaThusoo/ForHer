@@ -1,0 +1,60 @@
+.care {
+  margin: 16px 16px 0;
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--sh-md);
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+.tile {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: var(--color-blue-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-blue);
+}
+.eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+.nm {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-top: 1px;
+}
+.mt {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  display: flex;
+  gap: 10px;
+}
+.mt span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.join {
+  background: linear-gradient(135deg, var(--color-blue), var(--color-blue-bright));
+  color: #fff;
+  border: none;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 6px 14px -5px rgba(32, 96, 176, 0.55);
+}

@@ -1,0 +1,46 @@
+.page { min-height: 100%; padding-bottom: 28px; color: #3E1B33; }
+.head { display: flex; align-items: center; gap: 9px; padding: 14px 18px 8px; }
+.back {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid rgba(91,42,74,0.16); color: #5B2A4A; text-decoration: none;
+}
+.brandline { font-size: 13px; font-weight: 700; color: #5B2A4A; }
+
+.body { padding: 6px 18px 28px; }
+.h1 { font-family: var(--font-forher-serif), Georgia, serif; font-size: 26px; color: #3E1B33; font-weight: 400; }
+.h1 em { font-style: italic; color: #8E5378; }
+.lead { font-size: 12.5px; line-height: 1.5; color: #6B5A65; margin: 7px 0 4px; }
+
+.section {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #9A8A92; margin: 20px 0 10px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-family: inherit; font-size: 12.5px; font-weight: 600; color: #5B2A4A;
+  background: #fff; border: 1px solid rgba(91,42,74,0.2); border-radius: 999px;
+  padding: 8px 14px; cursor: pointer; transition: all 0.15s ease;
+}
+.chipOn { background: linear-gradient(135deg, #5B2A4A, #8E5378); color: #fff; border-color: transparent; }
+
+.save {
+  width: 100%; margin-top: 22px; border: none; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); border-radius: 999px; padding: 13px;
+  box-shadow: 0 6px 16px rgba(91,42,74,0.22); transition: opacity 0.15s ease;
+}
+.save:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.doneWrap { padding: 48px 26px; text-align: center; }
+.doneMark {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(142,83,120,0.12); color: #5B2A4A;
+}
+.doneTitle { font-family: var(--font-forher-serif), Georgia, serif; font-size: 22px; color: #3E1B33; font-weight: 400; }
+.doneSub { font-size: 13px; line-height: 1.5; color: #6B5A65; margin: 8px auto 20px; max-width: 260px; }
+.doneCta {
+  display: inline-block; text-decoration: none; font-weight: 700; font-size: 13.5px; color: #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); border-radius: 999px; padding: 12px 22px;
+}

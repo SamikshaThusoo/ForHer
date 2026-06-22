@@ -1,0 +1,57 @@
+.secH {
+  margin: 20px 18px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+.wellrow {
+  display: flex;
+  gap: 8px;
+  padding: 14px 14px 4px;
+  overflow-x: auto;
+}
+.wellrow::-webkit-scrollbar { display: none; }
+
+.well {
+  flex: 0 0 auto;
+  width: 80px;
+  text-align: center;
+  position: relative;
+  padding: 4px 0;
+}
+.ic {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F4F6FA;
+  border-radius: 16px;
+  color: var(--color-blue);
+}
+.l {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-top: 8px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.active .ic {
+  background: var(--color-blue-soft);
+}
+.active .l {
+  color: var(--color-blue);
+  font-weight: 600;
+}
+.active::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--color-blue);
+  margin: 8px auto 0;
+}

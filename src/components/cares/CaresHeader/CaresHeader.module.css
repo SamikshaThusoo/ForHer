@@ -1,0 +1,24 @@
+/* CaresHeader.module.css — ported from reference 03 .chead */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 4px;
+}
+.back {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(27, 42, 61, 0.05);
+  display: grid;
+  place-items: center;
+  color: var(--color-text);
+}
+.wordmark {
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+.blue { color: var(--color-blue); }
+.orange { color: var(--color-orange); }
+.spacer { width: 36px; }

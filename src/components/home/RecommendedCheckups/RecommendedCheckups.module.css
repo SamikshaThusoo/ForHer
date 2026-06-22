@@ -1,0 +1,70 @@
+/* RecommendedCheckups.module.css */
+.section { padding: 4px 16px 12px; }
+.heading {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #DDE5E4;
+  box-shadow: var(--shadow-2);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  display: block;
+}
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 35%,
+    rgba(0, 0, 0, 0.55) 80%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+  pointer-events: none;
+}
+.captions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.label {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+.age {
+  font-size: 9px;
+  opacity: 0.92;
+  font-weight: 500;
+  line-height: 1.1;
+}

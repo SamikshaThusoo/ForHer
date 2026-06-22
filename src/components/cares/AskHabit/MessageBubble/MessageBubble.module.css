@@ -1,0 +1,66 @@
+/* MessageBubble.module.css — ref 06 */
+.habitRow {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 9px;
+  align-items: start;
+  align-self: flex-start;
+  max-width: 88%;
+}
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-blue-soft);
+  color: var(--color-blue);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.habit {
+  background: var(--color-surface);
+  box-shadow: var(--sh-sm);
+  border-radius: 16px;
+  border-bottom-left-radius: 6px;
+  padding: 12px 14px;
+  white-space: pre-wrap;
+}
+.brandLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-blue);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.text {
+  font-size: 14px;
+  color: var(--color-text);
+  line-height: 1.45;
+}
+.citation {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--color-text-soft);
+  margin-top: 7px;
+}
+
+.user {
+  align-self: flex-end;
+  max-width: 84%;
+  background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-blue-bright) 100%);
+  color: #fff;
+  border-radius: 16px;
+  border-bottom-right-radius: 6px;
+  padding: 12px 14px;
+  white-space: pre-wrap;
+  box-shadow: 0 6px 14px -5px rgba(32, 96, 176, 0.5);
+}
+.user .text {
+  font-size: 14px;
+  color: #fff;
+  line-height: 1.4;
+}
+.user .citation {
+  color: rgba(255, 255, 255, 0.78);
+}

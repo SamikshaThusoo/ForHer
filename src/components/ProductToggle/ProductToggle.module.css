@@ -1,0 +1,24 @@
+.toggle {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.opt {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.62);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+.opt:hover { color: rgba(255, 255, 255, 0.85); }
+.on {
+  color: #1A1A1A;
+  background: #fff;
+}
+.on:hover { color: #1A1A1A; }
