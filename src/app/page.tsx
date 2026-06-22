@@ -14,7 +14,7 @@ export default function Home() {
 
       <section className={styles.hero}>
         <p className={styles.hi}>Hi {persona.shortName}</p>
-        <h1 className={styles.h1}>Your women&apos;s health, <em>handled with care</em></h1>
+        <h1 className={styles.h1}>Your cycle &amp; hormones, <em>handled with care</em></h1>
         <p className={styles.lead}>A guided PMOS program — understand your risk, then follow a plan that fits your everyday.</p>
         <p className={styles.aka}><strong>PMOS</strong> (Polyendocrine Metabolic Ovarian Syndrome) — the condition you may know as <strong>PCOS</strong>.</p>
       </section>
