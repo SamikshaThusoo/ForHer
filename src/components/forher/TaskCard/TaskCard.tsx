@@ -27,7 +27,7 @@ export function TaskCard({
         onClick={onToggle}
         aria-label={done ? "Mark not done" : "Mark done"}
       >
-        {done && <Check size={14} strokeWidth={3} />}
+        {done && <span className={styles.checkMark}><Check size={14} strokeWidth={3} /></span>}
       </button>
       <button
         type="button"

@@ -68,7 +68,7 @@ export default function ForHerHome() {
           <p className={styles.lead}>No daily plan needed right now — keep tracking your cycle and we&apos;ll re-check over time.</p>
         </section>
 
-        <div className={styles.quickGrid}>
+        <div className={`${styles.quickGrid} fhReveal`}>
           <Link href="/cycle" className={styles.quick}><CalendarHeart size={20} /><span>Cycle</span></Link>
           <Link href="/hormones" className={styles.quick}><Activity size={20} /><span>Hormones</span></Link>
           <Link href="/community" className={styles.quick}><MessagesSquare size={20} /><span>Community</span></Link>
@@ -118,13 +118,15 @@ export default function ForHerHome() {
         <span className={styles.sectionCount}>{three.filter((t) => fh.isDone(t.id)).length}/{three.length}</span>
       </div>
       <div className={styles.tasks}>
-        {three.map((t) => (
-          <TaskCard key={t.id} task={t} done={fh.isDone(t.id)} onToggle={() => fh.toggleDone(t.id)} highlight />
+        {three.map((t, i) => (
+          <div key={t.id} className="fhReveal" style={{ animationDelay: `${i * 70}ms` }}>
+            <TaskCard task={t} done={fh.isDone(t.id)} onToggle={() => fh.toggleDone(t.id)} highlight />
+          </div>
         ))}
       </div>
       <Link href="/plan" className={styles.seeAll}>See all {tasks.length} tasks <ArrowRight size={15} /></Link>
 
-      <div className={styles.quickGrid}>
+      <div className={`${styles.quickGrid} fhReveal`}>
         <Link href="/cares/scan" className={styles.quick}><ScanLine size={20} /><span>Scan food</span></Link>
         <Link href="/log/mood" className={styles.quick}><Moon size={20} /><span>Track mood</span></Link>
         <Link href="/log/move" className={styles.quick}><Activity size={20} /><span>Log movement</span></Link>

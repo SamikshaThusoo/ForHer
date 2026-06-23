@@ -13,7 +13,7 @@ export function ForHerPromo() {
   if (!f) return null;
 
   return (
-    <Link href="/forher" className={styles.card}>
+    <Link href="/forher" className={`${styles.card} fhReveal`}>
       <div className={styles.glow} aria-hidden />
       <div className={styles.head}>
         <span className={styles.brand}>For Her</span>

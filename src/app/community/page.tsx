@@ -119,7 +119,7 @@ export default function CommunityPage() {
       <div className={styles.sectionTitle}>What&apos;s working for women now</div>
       <div className={styles.tips}>
         {TIPS[phase].map((t, i) => (
-          <div key={i} className={styles.tip}>
+          <div key={i} className={`${styles.tip} fhReveal`} style={{ animationDelay: `${i * 70}ms` }}>
             <span className={`${styles.kind} ${styles["kind" + t.kind]}`}>{t.kind === "Peer" ? "From the community" : t.kind === "Pacing" ? "Keeping your pace" : "Diet from the community"}</span>
             <p className={styles.tipText}>{t.text}</p>
             <span className={styles.saved}>{t.saved.toLocaleString()} women saved this</span>
@@ -131,7 +131,7 @@ export default function CommunityPage() {
       <div className={styles.sectionTitle}>Phase check-ins</div>
       <div className={styles.posts}>
         {POSTS[phase].map((p, i) => (
-          <div key={i} className={styles.post}>
+          <div key={i} className={`${styles.post} fhReveal`} style={{ animationDelay: `${i * 70}ms` }}>
             <div className={styles.postTop}><span className={styles.avatar} aria-hidden /><span className={styles.name}>In your {PHASE_LABEL[phase].toLowerCase()} phase</span></div>
             <p className={styles.postText}>{p.text}</p>
             <span className={styles.likes}><Heart size={12} /> {p.likes}</span>

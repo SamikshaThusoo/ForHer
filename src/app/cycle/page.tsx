@@ -5,7 +5,7 @@ import { usePersona } from "@/context/PersonaContext";
 import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import {
   cycleDayForDate, cycleLengthFor, phaseForCycleDay, nextPeriodDate,
-  PHASE_COLOR, PHASE_LABEL,
+  PHASE_COLOR, PHASE_LABEL, PHASE_PROSE,
 } from "@/lib/forher/cycleview";
 import type { CyclePhase } from "@/types/journey";
 import { ChevronLeft, Plus, Check } from "lucide-react";
@@ -23,6 +23,7 @@ export default function CyclePage() {
   const { persona } = usePersona();
   const today = new Date();
   const [logged, setLogged] = useState<string[]>(() => (typeof window === "undefined" ? [] : readLogged(persona.id)));
+  const [selected, setSelected] = useState<number>(today.getDate());
 
   const L = cycleLengthFor(persona);
   const todayPhase = phaseForCycleDay(cycleDayForDate(persona, today), L);
@@ -45,6 +46,11 @@ export default function CyclePage() {
     try { localStorage.setItem(`forher.${persona.id}.loggedperiods`, JSON.stringify(next)); } catch { /* ignore */ }
   };
   const loggedToday = logged.includes(iso(today));
+
+  const selDate = new Date(year, month, selected);
+  const selCd = cycleDayForDate(persona, selDate);
+  const selPhase = phaseForCycleDay(selCd, L);
+  const selPeriod = selPhase === "menstrual" || logged.includes(iso(selDate));
 
   return (
     <main className={`${styles.page} fhTheme`}>
@@ -73,16 +79,29 @@ export default function CyclePage() {
             const isToday = d === today.getDate();
             const isPeriod = phase === "menstrual" || logged.includes(iso(date));
             return (
-              <span
+              <button
                 key={i}
-                className={`${styles.day} ${isToday ? styles.dayToday : ""}`}
+                type="button"
+                onClick={() => setSelected(d)}
+                className={`${styles.day} ${isToday ? styles.dayToday : ""} ${selected === d ? styles.daySel : ""}`}
                 style={{ background: isPeriod ? PHASE_COLOR.menstrual : `${PHASE_COLOR[phase]}22`, color: isPeriod ? "#fff" : "#3E1B33" }}
               >
                 {d}
-              </span>
+              </button>
             );
           })}
         </div>
+      </div>
+
+      {/* Tapped-day detail */}
+      <div className={styles.detail} style={{ borderLeftColor: PHASE_COLOR[selPhase] }}>
+        <div className={styles.detailTop}>
+          <span className={styles.detailDate}>{selDate.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
+          <span className={styles.detailPhase} style={{ color: PHASE_COLOR[selPhase] }}>
+            Cycle day {selCd} · {PHASE_LABEL[selPhase]}
+          </span>
+        </div>
+        <p className={styles.detailBody}>{selPeriod ? "Period likely on this day. " : ""}{PHASE_PROSE[selPhase]}</p>
       </div>
 
       <button type="button" className={styles.logBtn} onClick={logToday} disabled={loggedToday}>

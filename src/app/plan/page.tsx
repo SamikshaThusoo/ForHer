@@ -116,17 +116,17 @@ export default function PlanPage() {
 
       {/* 3 things today */}
       <div className={styles.catHead}><span className={styles.catHi}>★</span> 3 things today</div>
-      <div className={styles.tasks}>
+      <div className={`${styles.tasks} fhReveal`}>
         {three.map((t) => (
           <TaskCard key={t.id} task={t} done={fh.isDone(t.id)} onToggle={() => fh.toggleDone(t.id)} highlight />
         ))}
       </div>
 
       {/* Everything else, grouped by category */}
-      {groups.map(({ cat, items }) => {
+      {groups.map(({ cat, items }, gi) => {
         const Icon = CAT_ICON[cat];
         return (
-          <div key={cat}>
+          <div key={cat} className="fhReveal" style={{ animationDelay: `${Math.min(gi * 80, 400)}ms` }}>
             <div className={styles.catHead}><Icon size={15} /> {CAT_LABEL[cat]}</div>
             <div className={styles.tasks}>
               {items.map((t) => (
