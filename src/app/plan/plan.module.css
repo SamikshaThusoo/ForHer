@@ -116,3 +116,29 @@
 /* Empty / engagement states */
 .empty { padding: 36px 26px; text-align: center; }
 .emptySub { font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin-top: 8px; }
+
+/* Phase pills + progress + category headers (Step 1 polish) */
+.phaseRow { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.jphasePill {
+  font-size: 11px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); border-radius: 999px; padding: 4px 11px;
+}
+.cyclePill {
+  font-size: 11px; font-weight: 700; color: #8E5378;
+  background: rgba(142,83,120,0.1); border-radius: 999px; padding: 4px 11px;
+}
+.progressText { font-size: 12px; font-weight: 700; color: #8E5378; }
+.progressTrack {
+  height: 5px; border-radius: 999px; background: rgba(91,42,74,0.1); overflow: hidden; margin-top: 11px;
+}
+.progressTrack > i {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, #5B2A4A, #8E5378); transition: width 0.25s ease;
+}
+.catHead {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #9A8A92; margin: 20px 20px 9px;
+}
+.catHead svg { color: #8E5378; }
+.catHi { color: #C9A24A; font-size: 13px; }
