@@ -49,7 +49,7 @@ export default function CyclePage() {
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
-        <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+        <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · Cycle</span>
       </header>
 

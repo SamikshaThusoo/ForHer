@@ -7,7 +7,7 @@ import { Home, Activity, Moon, BookOpen, Users } from "lucide-react";
 import styles from "./BottomNav.module.css";
 
 const TABS = [
-  { href: "/", label: "Home", icon: Home, carePlanOnly: false },
+  { href: "/forher", label: "Home", icon: Home, carePlanOnly: false },
   { href: "/plan", label: "Plan", icon: Activity, carePlanOnly: true },
   { href: "/log/mood", label: "Track", icon: Moon, carePlanOnly: false },
   { href: "/learn", label: "Learn", icon: BookOpen, carePlanOnly: false },

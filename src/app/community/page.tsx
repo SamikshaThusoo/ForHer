@@ -71,13 +71,14 @@ export default function CommunityPage() {
   const carePlan = personaTrack(persona) !== "none";
 
   const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [note, setNote] = useState("");
   const [shared, setShared] = useState(false);
   const toggle = (f: string) => setPicked((p) => { const n = new Set(p); n.has(f) ? n.delete(f) : n.add(f); return n; });
 
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
-        <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+        <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · Community</span>
       </header>
 
@@ -98,10 +99,19 @@ export default function CommunityPage() {
                 <button key={f} type="button" className={`${styles.chip} ${picked.has(f) ? styles.chipOn : ""}`} onClick={() => toggle(f)}>{f}</button>
               ))}
             </div>
-            <button type="button" className={styles.share} onClick={() => setShared(true)} disabled={picked.size === 0}>Share with the community</button>
+            <textarea
+              className={styles.note}
+              placeholder="Add a prompt to share — what helped you today? (optional)"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+            <button type="button" className={styles.share} onClick={() => setShared(true)} disabled={picked.size === 0 && !note.trim()}>Share with the community</button>
           </>
         ) : (
-          <div className={styles.thanks}><Check size={18} /> Shared with women in your phase</div>
+          <div className={styles.thanksWrap}>
+            <div className={styles.thanks}><Check size={18} /> Shared with women in your phase</div>
+            {note.trim() && <p className={styles.yourNote}>&ldquo;{note.trim()}&rdquo;</p>}
+          </div>
         )}
       </div>
 
@@ -122,7 +132,7 @@ export default function CommunityPage() {
       <div className={styles.posts}>
         {POSTS[phase].map((p, i) => (
           <div key={i} className={styles.post}>
-            <div className={styles.postTop}><span className={styles.avatar}>{p.name[0]}</span><span className={styles.name}>{p.name}</span></div>
+            <div className={styles.postTop}><span className={styles.avatar} aria-hidden /><span className={styles.name}>In your {PHASE_LABEL[phase].toLowerCase()} phase</span></div>
             <p className={styles.postText}>{p.text}</p>
             <span className={styles.likes}><Heart size={12} /> {p.likes}</span>
           </div>

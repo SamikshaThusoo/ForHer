@@ -36,7 +36,18 @@
   transition: opacity 0.15s ease;
 }
 .share:disabled { opacity: 0.5; cursor: default; }
+.note {
+  width: 100%; box-sizing: border-box; margin: 0 0 10px;
+  border: 1px solid rgba(91,42,74,0.18); border-radius: 11px; padding: 9px 11px;
+  font: inherit; font-size: 12px; color: #3E1B33; resize: vertical; min-height: 44px; background: #fff;
+}
+.note:focus { outline: none; border-color: rgba(142,83,120,0.5); }
+.thanksWrap { display: flex; flex-direction: column; gap: 8px; }
 .thanks { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #5B2A4A; }
+.yourNote {
+  font-size: 12.5px; font-style: italic; line-height: 1.5; color: #6B5A65;
+  border-left: 3px solid rgba(142,83,120,0.3); padding-left: 10px;
+}
 
 .sectionTitle {
   font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;

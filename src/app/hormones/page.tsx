@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
@@ -15,8 +16,9 @@ export default function HormonesPage() {
   const { persona } = usePersona();
   const today = new Date();
   const L = cycleLengthFor(persona);
-  const cd = cycleDayForDate(persona, today);
-  const phase = phaseForCycleDay(cd, L);
+  const todayCd = cycleDayForDate(persona, today);
+  const [day, setDay] = useState(todayCd);
+  const phase = phaseForCycleDay(day, L);
   const carePlan = personaTrack(persona) !== "none";
 
   const x = (d: number) => PAD + ((d - 1) / (L - 1)) * (W - 2 * PAD);
@@ -24,30 +26,47 @@ export default function HormonesPage() {
   const pathFor = (fn: (d: number) => number) =>
     "M " + Array.from({ length: L }, (_, i) => `${x(i + 1).toFixed(1)} ${y(fn(i + 1)).toFixed(1)}`).join(" L ");
 
+  // Dominant hormone at the scrubbed day.
+  const dominant = [...HORMONES].sort((a, b) => b.fn(day) - a.fn(day))[0];
+  const dv = dominant.fn(day);
+  const verb = dv > 0.7 ? "peaking" : dv > 0.4 ? "rising" : "easing";
+
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
-        <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+        <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · Hormones</span>
       </header>
 
       <div className={styles.hero}>
         <h1 className={styles.h1}>Your hormone <em>rhythm</em></h1>
-        <p className={styles.sub}>Day {cd} · {PHASE_LABEL[phase]} phase</p>
+        <p className={styles.sub}>
+          Day {day}{day === todayCd ? " · today" : ""} · {PHASE_LABEL[phase]} phase
+        </p>
       </div>
 
       <div className={styles.chartCard}>
+        <div className={styles.dominant} style={{ color: dominant.color }}>{dominant.label} {verb}</div>
         <svg viewBox={`0 0 ${W} ${H}`} className={styles.chart} preserveAspectRatio="none" aria-hidden>
-          {/* current-day marker */}
-          <line x1={x(cd)} y1={PAD} x2={x(cd)} y2={H - PAD} stroke="rgba(91,42,74,0.18)" strokeWidth="1.5" strokeDasharray="3 3" />
+          <line x1={x(day)} y1={PAD} x2={x(day)} y2={H - PAD} stroke="rgba(91,42,74,0.22)" strokeWidth="1.5" strokeDasharray="3 3" />
           {HORMONES.map((h) => (
-            <path key={h.key} d={pathFor(h.fn)} fill="none" stroke={h.color} strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
+            <path key={h.key} d={pathFor(h.fn)} fill="none" stroke={h.color} strokeWidth="2.2"
+              strokeLinejoin="round" strokeLinecap="round" opacity={h.key === dominant.key ? 1 : 0.55} />
           ))}
           {HORMONES.map((h) => (
-            <circle key={h.key} cx={x(cd)} cy={y(h.fn(cd))} r="3.4" fill={h.color} stroke="#fff" strokeWidth="1.5" />
+            <circle key={h.key} cx={x(day)} cy={y(h.fn(day))} r={h.key === dominant.key ? 4.5 : 3.2}
+              fill={h.color} stroke="#fff" strokeWidth="1.5" />
           ))}
         </svg>
         <div className={styles.axis}><span>Day 1</span><span>Ovulation</span><span>Day {L}</span></div>
+
+        {/* Scrubber — drag through the cycle */}
+        <input
+          className={styles.range} type="range" min={1} max={L} value={day}
+          onChange={(e) => setDay(Number(e.target.value))} aria-label="Scrub cycle day"
+        />
+        <p className={styles.scrubHint}>Drag to explore any day in your cycle</p>
+
         <div className={styles.legend}>
           {HORMONES.map((h) => (
             <span key={h.key} className={styles.legItem}><span className={styles.legDot} style={{ background: h.color }} />{h.label}</span>
@@ -56,13 +75,13 @@ export default function HormonesPage() {
       </div>
 
       <div className={styles.phaseBox}>
-        <span className={styles.phaseTag}>{PHASE_LABEL[phase]} phase, right now</span>
+        <span className={styles.phaseTag}>{PHASE_LABEL[phase]} phase{day === todayCd ? ", right now" : ""}</span>
         <p className={styles.phaseProse}>{PHASE_PROSE[phase]}</p>
       </div>
 
       <div className={styles.hList}>
         {HORMONES.map((h) => {
-          const v = Math.round(h.fn(cd) * 100);
+          const v = Math.round(h.fn(day) * 100);
           return (
             <div key={h.key} className={styles.hRow}>
               <span className={styles.hLabel}><span className={styles.hDot} style={{ background: h.color }} />{h.label}</span>

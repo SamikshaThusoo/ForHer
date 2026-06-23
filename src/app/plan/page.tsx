@@ -36,7 +36,7 @@ export default function PlanPage() {
       <main className={`${styles.page} fhTheme`}>
         <div className={styles.empty}>
           <p>The PMOS plan isn&apos;t available for this profile.</p>
-          <Link href="/" className={styles.back2}>Back</Link>
+          <Link href="/forher" className={styles.back2}>Back</Link>
         </div>
       </main>
     );
@@ -46,7 +46,7 @@ export default function PlanPage() {
     return (
       <main className={`${styles.page} fhTheme`}>
         <header className={styles.head}>
-          <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+          <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
           <span className={styles.brandline}>For Her · PMOS</span>
         </header>
         <div className={styles.empty}>
@@ -75,7 +75,7 @@ export default function PlanPage() {
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
-        <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+        <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · PMOS</span>
       </header>
 
