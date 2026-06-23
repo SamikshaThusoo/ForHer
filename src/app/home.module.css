@@ -48,6 +48,13 @@
   background: linear-gradient(135deg, #5B2A4A, #8E5378); color: #fff;
 }
 
+.backHabit {
+  display: inline-flex; align-items: center; gap: 3px;
+  margin: 12px 0 0 14px; padding: 5px 11px 5px 8px;
+  font-size: 11px; font-weight: 600; color: #8E5378; text-decoration: none;
+  background: rgba(142,83,120,0.08); border-radius: 999px;
+}
+
 /* ---- Dashboard / companion states ---- */
 .dashTop {
   display: flex; align-items: center; justify-content: space-between;

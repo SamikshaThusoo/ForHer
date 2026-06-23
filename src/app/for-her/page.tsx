@@ -35,7 +35,7 @@ export default function ForHerPage() {
       <main className={`${styles.page} fhTheme`}>
         <div className={styles.notAvail}>
           <p>For Her isn&apos;t available for this profile.</p>
-          <Link href="/" className={styles.homeLink}>Back to home</Link>
+          <Link href="/forher" className={styles.homeLink}>Back to home</Link>
         </div>
       </main>
     );
@@ -44,7 +44,7 @@ export default function ForHerPage() {
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.header}>
-        <Link href="/" className={styles.back} aria-label="Back to home"><ChevronLeft size={20} /></Link>
+        <Link href="/forher" className={styles.back} aria-label="Back to home"><ChevronLeft size={20} /></Link>
         <span className={styles.brand}>For Her</span>
       </header>
 
@@ -95,7 +95,7 @@ export default function ForHerPage() {
               ? "We'll keep you on the engagement track and re-check over time."
               : `You're on the ${TRACK_LABELS[outcome]}. Your daily companion is where it all comes together.`}
           </p>
-          <Link href="/" className={styles.doneCta}>
+          <Link href="/forher" className={styles.doneCta}>
             {outcome === "none" ? "Go to my companion" : "Go to my dashboard"}
           </Link>
           {outcome !== "none" && <Link href="/plan" className={styles.homeLink}>See the full plan</Link>}
