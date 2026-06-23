@@ -14,7 +14,7 @@ import {
 import styles from "./home.module.css";
 
 const PHASE_LABEL: Record<string, string> = {
-  entry: "Entry", foundation: "Foundation", build: "Build", consolidate: "Consolidate", review: "Review",
+  foundation: "Foundation", build: "Build", milestone: "Milestone",
 };
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 

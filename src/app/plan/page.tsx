@@ -15,7 +15,7 @@ import {
 import styles from "./plan.module.css";
 
 const PHASE_LABEL: Record<string, string> = {
-  entry: "Entry", foundation: "Foundation", build: "Build", consolidate: "Consolidate", review: "Review",
+  foundation: "Foundation", build: "Build", milestone: "Milestone",
 };
 const CAT_ICON: Record<TaskCategory, React.ComponentType<{ size?: number }>> = {
   move: Activity, nourish: Salad, track: ClipboardCheck, sleep: Moon,

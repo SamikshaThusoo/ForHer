@@ -1,7 +1,8 @@
 import type { Persona } from "@/types/persona";
-import type { CyclePhase, JourneyTask, TaskTarget } from "@/types/journey";
-import { TASK_CATALOG, type TaskDef } from "./constants";
+import type { CyclePhase, JourneyTask } from "@/types/journey";
+import { TASK_CATALOG, STEP_TARGETS, type TaskDef } from "./constants";
 import { getCyclePhase } from "./cycle";
+import { getPhase } from "./phase";
 import { getTouchpointsDue, personaTrack } from "./touchpoints";
 
 function dueToday(everyDays: number, onDay: number | undefined, dayIndex: number): boolean {
@@ -19,17 +20,10 @@ function phaseNudge(phase: CyclePhase): string {
   }
 }
 
-function progressiveSteps(base: TaskTarget, dayIndex: number): TaskTarget {
-  // high track: ramp 6000 → 10000 across days 1–90.
-  const start = 6000, end = 10000;
-  const t = Math.max(0, Math.min(1, dayIndex / 90));
-  const value = Math.round((start + (end - start) * t) / 500) * 500;
-  return { ...base, value: Math.min(end, value) };
-}
-
 export function resolveTasksForDay(persona: Persona, dayIndex: number): JourneyTask[] {
   const track = personaTrack(persona);
   const { phase } = getCyclePhase(persona, dayIndex);
+  const programPhase = getPhase(dayIndex);
   const ttc = !!persona.pmos?.ttc;
   const out: JourneyTask[] = [];
 
@@ -40,7 +34,10 @@ export function resolveTasksForDay(persona: Persona, dayIndex: number): JourneyT
     if (!dueToday(entry.everyDays, entry.onDay, dayIndex)) continue;
 
     let target = entry.target;
-    if (def.id === "steps" && track === "high") target = progressiveSteps(entry.target, dayIndex);
+    // Steps scale by program phase × tier (spec §3.1).
+    if (def.id === "steps" && track !== "none") {
+      target = { ...entry.target, value: STEP_TARGETS[programPhase][track] };
+    }
 
     const emphasised = !!def.phaseEmphasis?.includes(phase);
     const detail = emphasised ? phaseNudge(phase) + def.detail : def.detail;

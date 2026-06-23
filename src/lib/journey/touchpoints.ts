@@ -1,7 +1,7 @@
 import type { Persona } from "@/types/persona";
 import type { CareTrack, Specialist, Touchpoint } from "@/types/journey";
 import { CC_CADENCE_DAYS, TOUCHPOINT_SCHEDULE } from "./constants";
-import { getRiskOutcome } from "./risk";
+import { getDomainSignals, getRiskOutcome } from "./risk";
 
 export function personaTrack(persona: Persona): CareTrack {
   if (!persona.pmos || !persona.pmos.eligible) return "none";
@@ -10,8 +10,11 @@ export function personaTrack(persona: Persona): CareTrack {
 
 export function getTouchpointsDue(persona: Persona, dayIndex: number): Touchpoint[] {
   const track = personaTrack(persona);
+  const androgenic = persona.pmos
+    ? getDomainSignals(persona.pmos.assessment, persona.pmos.ahcMarkers).androgenic
+    : false;
   const scheduled: Touchpoint[] = TOUCHPOINT_SCHEDULE
-    .filter((row) => row.day === dayIndex && row.tracks.includes(track))
+    .filter((row) => row.day === dayIndex && row.tracks.includes(track) && (!row.ifAndrogenic || androgenic))
     .map((row) => ({ day: row.day, kind: row.kind, services: row.services, label: row.label, retest: row.retest }));
 
   const cadence = CC_CADENCE_DAYS[track];

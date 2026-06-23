@@ -1,6 +1,7 @@
 // Deterministic 6-month PMOS (PCOS) care-journey domain types.
 
-export type JourneyPhase = "entry" | "foundation" | "build" | "consolidate" | "review";
+// 90-day program (spec v1.1): Foundation 1-30, Build 31-60, Milestone 61-90.
+export type JourneyPhase = "foundation" | "build" | "milestone";
 export type CyclePhase = "menstrual" | "follicular" | "ovulatory" | "luteal";
 
 /** Risk outcome === care track. 'none' = engagement only; 'low' = 30-day self-guided;
