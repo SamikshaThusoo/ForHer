@@ -47,3 +47,61 @@
   display: flex; align-items: center; justify-content: center;
   background: linear-gradient(135deg, #5B2A4A, #8E5378); color: #fff;
 }
+
+/* ---- Dashboard / companion states ---- */
+.dashTop {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 4px;
+}
+.streak {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; color: #B5532F;
+  background: rgba(201,119,42,0.1); border: 1px solid rgba(201,119,42,0.22);
+  border-radius: 999px; padding: 4px 10px;
+}
+.dashHero { padding: 8px 18px 12px; }
+.phaseRow { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+.jphasePill {
+  font-size: 11px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); border-radius: 999px; padding: 4px 11px;
+}
+.cyclePill {
+  font-size: 11px; font-weight: 700; color: #8E5378;
+  background: rgba(142,83,120,0.1); border-radius: 999px; padding: 4px 11px;
+}
+.dashH2 {
+  font-family: var(--font-forher-serif), Georgia, serif; font-weight: 400;
+  font-size: 24px; color: #3E1B33; margin-top: 12px;
+}
+.dashH2 em { font-style: italic; color: #8E5378; }
+
+.scrub {
+  margin: 4px 18px 0; background: #fff; border: 1px solid rgba(91,42,74,0.1);
+  border-radius: 16px; padding: 12px 14px; box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+}
+.scrubTop { display: flex; align-items: baseline; justify-content: space-between; }
+.dayNum { font-size: 15px; font-weight: 800; color: #3E1B33; }
+.dayTot { font-size: 12px; font-weight: 600; color: #9A8A92; }
+.range { width: 100%; margin-top: 9px; accent-color: #5B2A4A; }
+
+.sectionHead {
+  display: flex; align-items: baseline; justify-content: space-between; margin: 20px 20px 9px;
+}
+.sectionTitle { font-size: 13px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; color: #9A8A92; }
+.sectionCount { font-size: 12px; font-weight: 700; color: #8E5378; }
+.tasks { display: flex; flex-direction: column; gap: 9px; padding: 0 18px; }
+.seeAll {
+  display: inline-flex; align-items: center; gap: 6px; margin: 12px 20px 0;
+  font-size: 12.5px; font-weight: 700; color: #8E5378; text-decoration: none;
+}
+
+.quickGrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 18px 18px 8px;
+}
+.quick {
+  display: flex; flex-direction: column; gap: 8px;
+  background: #fff; border: 1px solid rgba(91,42,74,0.1); border-radius: 16px;
+  padding: 15px; text-decoration: none; color: #5B2A4A;
+  box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+}
+.quick span { font-size: 12.5px; font-weight: 700; color: #3E1B33; }

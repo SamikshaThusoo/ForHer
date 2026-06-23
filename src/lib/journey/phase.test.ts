@@ -1,26 +1,22 @@
 import { describe, it, expect } from "vitest";
 import { getPhase } from "./phase";
 
-describe("getPhase", () => {
-  it("maps day 0 to entry", () => { expect(getPhase(0)).toBe("entry"); });
-  it("maps the foundation window", () => {
+describe("getPhase (90-day, 3 phases)", () => {
+  it("maps the foundation window (1-30)", () => {
     expect(getPhase(1)).toBe("foundation");
-    expect(getPhase(28)).toBe("foundation");
+    expect(getPhase(30)).toBe("foundation");
   });
-  it("maps the build window", () => {
-    expect(getPhase(29)).toBe("build");
-    expect(getPhase(90)).toBe("build");
+  it("maps the build window (31-60)", () => {
+    expect(getPhase(31)).toBe("build");
+    expect(getPhase(60)).toBe("build");
   });
-  it("maps the consolidate window", () => {
-    expect(getPhase(91)).toBe("consolidate");
-    expect(getPhase(150)).toBe("consolidate");
-  });
-  it("maps the review window", () => {
-    expect(getPhase(151)).toBe("review");
-    expect(getPhase(182)).toBe("review");
+  it("maps the milestone window (61-90)", () => {
+    expect(getPhase(61)).toBe("milestone");
+    expect(getPhase(90)).toBe("milestone");
   });
   it("clamps out-of-range days", () => {
-    expect(getPhase(-5)).toBe("entry");
-    expect(getPhase(999)).toBe("review");
+    expect(getPhase(0)).toBe("foundation");
+    expect(getPhase(-5)).toBe("foundation");
+    expect(getPhase(120)).toBe("milestone");
   });
 });

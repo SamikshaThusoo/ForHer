@@ -1,4 +1,5 @@
 import { CaresHeader } from "@/components/cares/CaresHeader/CaresHeader";
+import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 
 export default function CaresLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,11 +7,14 @@ export default function CaresLayout({ children }: { children: React.ReactNode })
       className="fhTheme"
       style={{
         minHeight: "100%",
+        display: "flex",
+        flexDirection: "column",
         background: "linear-gradient(180deg, #FBF3F5 0%, #F5F0F6 100%)",
       }}
     >
       <CaresHeader />
-      {children}
+      <div style={{ flex: 1 }}>{children}</div>
+      <BottomNav />
     </div>
   );
 }

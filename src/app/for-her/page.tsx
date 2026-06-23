@@ -4,13 +4,15 @@ import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import type { AssessmentAnswers } from "@/types/journey";
 import { getDomainSignals, getRiskOutcome, TRACK_LABELS } from "@/lib/journey";
+import { markAssessed, saveSchedule } from "@/lib/forher/state";
+import { ScheduleCollection } from "@/components/forher/ScheduleCollection/ScheduleCollection";
 import { Assessment } from "@/components/forher/Assessment/Assessment";
 import { RiskResult } from "@/components/forher/RiskResult/RiskResult";
 import { Routing } from "@/components/forher/Routing/Routing";
 import { ChevronLeft, CheckCircle2 } from "lucide-react";
 import styles from "./for-her.module.css";
 
-type Step = "questions" | "result" | "routing" | "done";
+type Step = "questions" | "result" | "routing" | "schedule" | "done";
 
 const BLANK: AssessmentAnswers = {
   irregularPeriods: false, acneSkin: false, hairChanges: false, weightDifficulty: false, familyHistory: false,
@@ -69,7 +71,16 @@ export default function ForHerPage() {
           outcome={outcome}
           signals={signals}
           persona={persona}
-          onConsent={() => setStep("done")}
+          onConsent={() => {
+            if (outcome === "none") { markAssessed(persona.id); setStep("done"); }
+            else setStep("schedule");
+          }}
+        />
+      )}
+
+      {step === "schedule" && (
+        <ScheduleCollection
+          onComplete={(s) => { saveSchedule(persona.id, s); markAssessed(persona.id); setStep("done"); }}
         />
       )}
 
@@ -84,10 +95,10 @@ export default function ForHerPage() {
               ? "We'll keep you on the engagement track and re-check over time."
               : `You're on the ${TRACK_LABELS[outcome]}. Your daily companion is where it all comes together.`}
           </p>
-          <Link href="/plan" className={styles.doneCta}>
-            {outcome === "none" ? "Go to my companion" : "See my plan"}
+          <Link href="/" className={styles.doneCta}>
+            {outcome === "none" ? "Go to my companion" : "Go to my dashboard"}
           </Link>
-          <Link href="/" className={styles.homeLink}>Back to home</Link>
+          {outcome !== "none" && <Link href="/plan" className={styles.homeLink}>See the full plan</Link>}
         </div>
       )}
     </main>

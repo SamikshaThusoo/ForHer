@@ -7,20 +7,20 @@ export const PMOS_FULL = "Polyendocrine Metabolic Ovarian Syndrome";
 /** Use on first mention in any surface. */
 export const PMOS_LABEL_FIRST_MENTION = "PMOS";
 
-/** Inclusive day bounds per journey phase. */
+/** Inclusive day bounds per program phase (90-day spec v1.1). */
 export const PHASE_BOUNDS: { phase: JourneyPhase; from: number; to: number }[] = [
-  { phase: "entry",       from: 0,   to: 0 },
-  { phase: "foundation",  from: 1,   to: 28 },
-  { phase: "build",       from: 29,  to: 90 },
-  { phase: "consolidate", from: 91,  to: 150 },
-  { phase: "review",      from: 151, to: 182 },
+  { phase: "foundation", from: 1,  to: 30 },
+  { phase: "build",      from: 31, to: 60 },
+  { phase: "milestone",  from: 61, to: 90 },
 ];
 
+export const PROGRAM_LAST_DAY = 90;
+
 export const TRACK_LABELS: Record<CareTrack, string> = {
-  none:   "Engagement track",
-  low:    "30-day self-guided track",
-  medium: "Structured 6-month plan",
-  high:   "Structured + supervised 6-month plan",
+  none:   "Companion mode",
+  low:    "90-day plan · reduced intensity",
+  medium: "90-day plan · structured",
+  high:   "90-day plan · full supervised",
 };
 
 /** Care-Coordinator connect cadence (days between connects) by track. */
@@ -28,8 +28,16 @@ export const CC_CADENCE_DAYS: Record<CareTrack, number | null> = {
   none: null, low: 30, medium: 14, high: 14,
 };
 
-/** Scheduled clinical touchpoints (6-month arc = medium/high). `tracks` lists which
- *  tracks receive this touchpoint; retest variations are encoded per row. */
+/** Daily step targets by program phase × tier (spec v1.1 §3.1). High ramps across phases. */
+export const STEP_TARGETS: Record<JourneyPhase, Record<"low" | "medium" | "high", number>> = {
+  foundation: { low: 6000, medium: 7000, high: 6000 },
+  build:      { low: 7000, medium: 8000, high: 8000 },
+  milestone:  { low: 8000, medium: 9000, high: 10000 },
+};
+
+/** Scheduled clinical touchpoints for the 90-day program (spec v1.1 §3.8).
+ *  `tracks` lists which tracks receive it; `ifAndrogenic` rows only apply when
+ *  skin/hair signs are present (dermatology). CC connects are synthesized by cadence. */
 export const TOUCHPOINT_SCHEDULE: {
   day: number;
   kind: "baseline" | "consult" | "retest" | "review";
@@ -37,19 +45,22 @@ export const TOUCHPOINT_SCHEDULE: {
   label: string;
   retest?: "partial" | "full";
   tracks: CareTrack[];
+  ifAndrogenic?: boolean;
 }[] = [
-  { day: 0,   kind: "baseline", services: ["baseline"],                 label: "Baseline capture",                       tracks: ["low", "medium", "high"] },
-  { day: 5,   kind: "consult",  services: ["doctor", "diet"],           label: "Doctor + diet consult",                  tracks: ["low", "medium", "high"] },
-  { day: 5,   kind: "consult",  services: ["nutritionist"],             label: "Nutritionist intake",                    tracks: ["medium", "high"] },
-  { day: 5,   kind: "consult",  services: ["psychologist"],             label: "Psychologist intake",                    tracks: ["high"] },
-  { day: 30,  kind: "consult",  services: ["diet"],                     label: "Diet consult + review",                  tracks: ["low", "medium", "high"] },
-  { day: 60,  kind: "consult",  services: ["diet"],                     label: "Diet consult",                           tracks: ["medium", "high"] },
-  { day: 60,  kind: "consult",  services: ["dermatology"],              label: "Dermatology (acne / hirsutism)",         tracks: ["medium", "high"] },
-  { day: 90,  kind: "retest",   services: ["doctor", "diet"],           label: "Doctor + diet + partial retest",         retest: "partial", tracks: ["low", "medium", "high"] },
-  { day: 120, kind: "consult",  services: ["gynae", "diet"],            label: "Gynae + diet consult",                   tracks: ["medium", "high"] },
-  { day: 120, kind: "consult",  services: ["hormone-panel"],            label: "Hormone panel (if indicated)",           tracks: ["high"] },
-  { day: 150, kind: "consult",  services: ["diet"],                     label: "Diet consult",                           tracks: ["medium", "high"] },
-  { day: 180, kind: "retest",   services: ["doctor", "gynae"],          label: "Doctor + gynae + full retest + outcomes", retest: "full", tracks: ["low", "medium", "high"] },
+  { day: 5,  kind: "baseline", services: ["doctor"],          label: "Doctor baseline consult",        tracks: ["low", "medium", "high"] },
+  { day: 7,  kind: "consult",  services: ["nutritionist"],    label: "Nutritionist intake",            tracks: ["medium", "high"] },
+  { day: 21, kind: "consult",  services: ["psychologist"],    label: "Psychologist check-in",          tracks: ["high"] },
+  { day: 28, kind: "consult",  services: ["nutritionist"],    label: "Nutritionist follow-up",         tracks: ["medium", "high"] },
+  { day: 35, kind: "consult",  services: ["dermatology"],     label: "Dermatology (skin / hair)",      tracks: ["high"] },
+  { day: 35, kind: "consult",  services: ["dermatology"],     label: "Dermatology (skin / hair)",      tracks: ["low", "medium"], ifAndrogenic: true },
+  { day: 45, kind: "consult",  services: ["nutritionist"],    label: "Nutritionist review",            tracks: ["medium", "high"] },
+  { day: 63, kind: "consult",  services: ["nutritionist"],    label: "Nutritionist review",            tracks: ["medium", "high"] },
+  { day: 80, kind: "consult",  services: ["gynae"],           label: "Gynaecologist consult",          tracks: ["high"] },
+  { day: 80, kind: "consult",  services: ["gynae"],           label: "Gynaecologist consult",          tracks: ["medium"], ifAndrogenic: true },
+  { day: 85, kind: "consult",  services: ["prep"],            label: "Pre-retest preparation",         tracks: ["low", "medium", "high"] },
+  { day: 90, kind: "retest",   services: ["doctor", "labs"],  label: "Day 90 retest + outcomes",       retest: "partial", tracks: ["low"] },
+  { day: 90, kind: "retest",   services: ["doctor", "labs"],  label: "Day 90 retest + outcomes",       retest: "full",    tracks: ["medium"] },
+  { day: 90, kind: "retest",   services: ["doctor", "labs", "hormone-panel"], label: "Day 90 retest + outcomes", retest: "full", tracks: ["high"] },
 ];
 
 /** A task template; the per-track entry carries the resolved target + how often it
@@ -91,7 +102,7 @@ export const TASK_CATALOG: TaskDef[] = [
     byTrack: {
       none:   daily("duration_min", 150, "min/week", 7),
       low:    daily("duration_min", 150, "min/week", 7),
-      medium: daily("duration_min", 195, "min/week", 7),
+      medium: daily("duration_min", 200, "min/week", 7),
       high:   daily("duration_min", 230, "min/week", 7),
     },
   },
@@ -122,7 +133,6 @@ export const TASK_CATALOG: TaskDef[] = [
     detail: "Swap a refined carb for a low-GI option — millet for white rice, say.",
     routeTo: "scanner", source: "careplan", phaseEmphasis: ["luteal"],
     byTrack: {
-      low:    daily("count", 1, "swap"),
       medium: daily("count", 1, "swap"),
       high:   daily("count", 2, "swap"),
     },
@@ -135,7 +145,7 @@ export const TASK_CATALOG: TaskDef[] = [
       none:   daily("count", 6, "glasses"),
       low:    daily("count", 6, "glasses"),
       medium: daily("count", 8, "glasses"),
-      high:   daily("count", 8, "glasses"),
+      high:   daily("count", 9, "glasses"),
     },
   },
   {

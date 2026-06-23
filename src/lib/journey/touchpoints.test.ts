@@ -25,12 +25,12 @@ describe("personaTrack", () => {
 });
 
 describe("getTouchpointsDue", () => {
-  it("returns the baseline on day 0", () => {
-    expect(getTouchpointsDue(HIGH, 0).some((t) => t.kind === "baseline")).toBe(true);
+  it("returns the doctor baseline on day 5", () => {
+    expect(getTouchpointsDue(HIGH, 5).some((t) => t.kind === "baseline")).toBe(true);
   });
-  it("returns the partial retest on day 90", () => {
+  it("returns the Day-90 retest (full for high)", () => {
     const due = getTouchpointsDue(HIGH, 90);
-    expect(due.some((t) => t.retest === "partial")).toBe(true);
+    expect(due.some((t) => t.kind === "retest" && t.retest === "full")).toBe(true);
   });
   it("synthesizes a CC connect on a fortnightly day with nothing scheduled", () => {
     // day 14: no scheduled touchpoint, high track cadence 14 → cc-connect

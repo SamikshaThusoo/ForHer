@@ -1,80 +1,39 @@
 "use client";
-import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
-import type { JourneyTask, TaskTarget, RouteTarget } from "@/types/journey";
+import { useForHer, PLAN_LAST_DAY } from "@/lib/forher/state";
+import type { TaskCategory } from "@/types/journey";
 import {
-  resolveTasksForDay, pickThreeThings, getPhase, getCyclePhase,
-  getTouchpointsDue, personaTrack, TRACK_LABELS,
+  resolveTasksForDay, pickThreeThings, getPhase, getCyclePhase, getTouchpointsDue, personaTrack,
 } from "@/lib/journey";
-import { ChevronLeft } from "lucide-react";
+import { CAT_LABEL, CAT_ORDER } from "@/lib/forher/taskmeta";
+import { TaskCard } from "@/components/forher/TaskCard/TaskCard";
+import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
+import {
+  ChevronLeft, Activity, Salad, ClipboardCheck, Moon, Brain, BookOpen, MessagesSquare, Stethoscope,
+} from "lucide-react";
 import styles from "./plan.module.css";
 
 const PHASE_LABEL: Record<string, string> = {
-  entry: "Entry", foundation: "Foundation", build: "Build",
-  consolidate: "Consolidate", review: "Review",
+  foundation: "Foundation", build: "Build", milestone: "Milestone",
 };
-const CAT_LABEL: Record<JourneyTask["category"], string> = {
-  move: "Move", nourish: "Nourish", track: "Track", sleep: "Sleep", mind: "Mind",
-  learn: "Learn", connect: "Connect", clinical: "Clinical",
+const CAT_ICON: Record<TaskCategory, React.ComponentType<{ size?: number }>> = {
+  move: Activity, nourish: Salad, track: ClipboardCheck, sleep: Moon,
+  mind: Brain, learn: BookOpen, connect: MessagesSquare, clinical: Stethoscope,
 };
-
-// Where a task's "log it" action goes. Surfaces that exist get a real route;
-// the rest fall back to the mood/cycle log so every task is actionable.
-const ROUTE_HREF: Partial<Record<RouteTarget, string>> = {
-  "food-logger": "/cares/food",
-  scanner: "/cares/scan",
-  ask: "/cares/ask",
-  consult: "/cares/care-team",
-  "cycle-log": "/log/mood",
-  activity: "/log/move",
-  learn: "/learn",
-};
-
-function fmtTarget(t: TaskTarget): string {
-  switch (t.kind) {
-    case "steps": return `${t.value.toLocaleString()} steps`;
-    case "duration_min": return `${t.value} ${t.unit ?? "min"}`;
-    case "count": return `${t.value}${t.unit ? " " + t.unit : ""}`;
-    case "sessions_week": return `${t.value}×/week`;
-    case "boolean": return "";
-  }
-}
-
-const PRESETS = [
-  { label: "Day 1", day: 1 },
-  { label: "Day 30", day: 30 },
-  { label: "Day 90", day: 90 },
-  { label: "Day 120", day: 120 },
-  { label: "Day 180", day: 180 },
-];
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const PRESETS = [1, 30, 60, 90];
 
 export default function PlanPage() {
   const { persona } = usePersona();
-  const router = useRouter();
-  const [day, setDay] = useState(30);
-  const [done, setDone] = useState<Set<string>>(new Set());
-
+  const fh = useForHer(persona.id);
   const track = personaTrack(persona);
-  const maxDay = track === "low" ? 30 : 182;
 
-  const tasks = useMemo(() => resolveTasksForDay(persona, day), [persona, day]);
-  const phase = getPhase(day);
-  const cycle = getCyclePhase(persona, day);
-  const due = getTouchpointsDue(persona, day);
-  const top3 = useMemo(() => pickThreeThings(tasks).map((t) => t.id), [tasks]);
-
-  const toggle = (id: string) =>
-    setDone((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+  if (!fh.hydrated) return <main className={`${styles.page} fhTheme`} />;
 
   if (!persona.pmos?.eligible) {
     return (
-      <main className={styles.page}>
+      <main className={`${styles.page} fhTheme`}>
         <div className={styles.empty}>
           <p>The PMOS plan isn&apos;t available for this profile.</p>
           <Link href="/" className={styles.back2}>Back</Link>
@@ -85,7 +44,7 @@ export default function PlanPage() {
 
   if (track === "none") {
     return (
-      <main className={styles.page}>
+      <main className={`${styles.page} fhTheme`}>
         <header className={styles.head}>
           <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
           <span className={styles.brandline}>For Her · PMOS</span>
@@ -94,47 +53,60 @@ export default function PlanPage() {
           <h1 className={styles.h1}>You&apos;re on the engagement track</h1>
           <p className={styles.emptySub}>No daily care plan needed right now — keep tracking your cycle, mood and habits, and we&apos;ll re-check over time.</p>
         </div>
+        <BottomNav />
       </main>
     );
   }
 
-  const completedCount = tasks.filter((t) => done.has(t.id)).length;
+  const tasks = resolveTasksForDay(persona, fh.day);
+  const three = pickThreeThings(tasks);
+  const threeIds = new Set(three.map((t) => t.id));
+  const rest = tasks.filter((t) => !threeIds.has(t.id));
+  const phase = getPhase(fh.day);
+  const cycle = getCyclePhase(persona, fh.day);
+  const due = getTouchpointsDue(persona, fh.day);
+  const completed = tasks.filter((t) => fh.isDone(t.id)).length;
+  const pct = Math.round((completed / Math.max(1, tasks.length)) * 100);
+
+  const groups = CAT_ORDER
+    .map((cat) => ({ cat, items: rest.filter((t) => t.category === cat) }))
+    .filter((g) => g.items.length > 0);
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
         <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · PMOS</span>
       </header>
 
       <div className={styles.hero}>
-        <span className={styles.eyebrow}>{TRACK_LABELS[track]}</span>
-        <h1 className={styles.h1}>Your <em>{maxDay === 30 ? "30-day" : "6-month"}</em> plan</h1>
-        <p className={styles.heroSub}>Daily lifestyle steps, tuned to your PMOS risk and where you are in your cycle. Check them off as you go.</p>
+        <h1 className={styles.h1}>Your <em>90-day</em> plan</h1>
+        <div className={styles.phaseRow}>
+          <span className={styles.jphasePill}>{PHASE_LABEL[phase]} phase</span>
+          <span className={styles.cyclePill}>{cap(cycle.phase)} phase{cycle.confidence === "low" ? " (est.)" : ""}</span>
+        </div>
       </div>
 
       {/* Day scrubber */}
       <div className={styles.scrub}>
         <div className={styles.scrubTop}>
-          <span className={styles.dayNum}>Day {day}<span className={styles.dayTot}> / {maxDay}</span></span>
-          <span className={styles.phasePill}>{PHASE_LABEL[phase]} · {cycle.phase}{cycle.confidence === "low" ? " ?" : ""}</span>
+          <span className={styles.dayNum}>Day {fh.day}<span className={styles.dayTot}> / {PLAN_LAST_DAY}</span></span>
+          <span className={styles.progressText}>{completed}/{tasks.length} done</span>
         </div>
         <input
-          className={styles.range}
-          type="range" min={0} max={maxDay} value={Math.min(day, maxDay)}
-          onChange={(e) => setDay(Number(e.target.value))}
-          aria-label="Day in plan"
+          className={styles.range} type="range" min={1} max={PLAN_LAST_DAY} value={fh.day}
+          onChange={(e) => fh.setDay(Number(e.target.value))} aria-label="Day in plan"
         />
+        <div className={styles.progressTrack}><i style={{ width: `${pct}%` }} /></div>
         <div className={styles.presets}>
-          {PRESETS.filter((p) => p.day <= maxDay).map((p) => (
-            <button key={p.day} type="button"
-              className={`${styles.preset} ${day === p.day ? styles.presetOn : ""}`}
-              onClick={() => setDay(p.day)}>{p.label}</button>
+          {PRESETS.map((d) => (
+            <button key={d} type="button"
+              className={`${styles.preset} ${fh.day === d ? styles.presetOn : ""}`}
+              onClick={() => fh.setDay(d)}>Day {d}</button>
           ))}
         </div>
       </div>
 
-      {/* Clinical touchpoint due today */}
       {due.length > 0 && (
         <div className={styles.clinical}>
           <span className={styles.clinicalTag}>Scheduled today</span>
@@ -142,38 +114,31 @@ export default function PlanPage() {
         </div>
       )}
 
-      {/* Today's tasks */}
-      <div className={styles.tasksHead}>
-        <span className={styles.tasksTitle}>Today&apos;s tasks</span>
-        <span className={styles.tasksCount}>{completedCount}/{tasks.length} done</span>
-      </div>
+      {/* 3 things today */}
+      <div className={styles.catHead}><span className={styles.catHi}>★</span> 3 things today</div>
       <div className={styles.tasks}>
-        {tasks.map((t) => {
-          const checked = done.has(t.id);
-          const target = fmtTarget(t.target);
-          const href = ROUTE_HREF[t.routeTo];
-          return (
-            <div key={t.id}
-              className={`${styles.task} ${checked ? styles.taskDone : ""} ${top3.includes(t.id) ? styles.taskTop : ""}`}>
-              <button type="button" className={`${styles.check} ${checked ? styles.checkOn : ""}`}
-                onClick={() => toggle(t.id)} aria-label={checked ? "Mark not done" : "Mark done"}>
-                {checked ? "✓" : ""}
-              </button>
-              <button type="button" className={styles.taskBody}
-                onClick={() => (href ? router.push(href) : toggle(t.id))}>
-                <span className={styles.taskTitle}>
-                  {t.title}{target && <span className={styles.taskTarget}>{target}</span>}
-                  {href && <span className={styles.taskGo}>Log ›</span>}
-                </span>
-                <span className={styles.taskDetail}>{t.detail}</span>
-              </button>
-              <span className={`${styles.cat} ${styles["cat_" + t.category]}`}>{CAT_LABEL[t.category]}</span>
-            </div>
-          );
-        })}
+        {three.map((t) => (
+          <TaskCard key={t.id} task={t} done={fh.isDone(t.id)} onToggle={() => fh.toggleDone(t.id)} highlight />
+        ))}
       </div>
 
+      {/* Everything else, grouped by category */}
+      {groups.map(({ cat, items }) => {
+        const Icon = CAT_ICON[cat];
+        return (
+          <div key={cat}>
+            <div className={styles.catHead}><Icon size={15} /> {CAT_LABEL[cat]}</div>
+            <div className={styles.tasks}>
+              {items.map((t) => (
+                <TaskCard key={t.id} task={t} done={fh.isDone(t.id)} onToggle={() => fh.toggleDone(t.id)} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
       <p className={styles.disclaimer}>Lifestyle support for general wellbeing — not medical advice. Your care team makes any clinical calls.</p>
+      <BottomNav />
     </main>
   );
 }
