@@ -1,0 +1,41 @@
+.page { min-height: 100%; padding-bottom: 28px; color: #3E1B33; }
+.head { display: flex; align-items: center; gap: 9px; padding: 14px 18px 8px; }
+.back {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid rgba(91,42,74,0.16); color: #5B2A4A; text-decoration: none;
+}
+.brandline { font-size: 13px; font-weight: 700; color: #5B2A4A; }
+
+.hero { padding: 6px 18px 14px; }
+.h1 { font-family: var(--font-forher-serif), Georgia, serif; font-size: 26px; color: #3E1B33; font-weight: 400; }
+.h1 em { font-style: italic; color: #8E5378; }
+.summary { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 9px; }
+.todayPill { font-size: 11px; font-weight: 700; color: #fff; border-radius: 999px; padding: 4px 11px; }
+.nextNote { font-size: 12px; color: #6B5A65; }
+
+.calendar {
+  margin: 0 18px; background: #fff; border: 1px solid rgba(91,42,74,0.1);
+  border-radius: 18px; padding: 14px; box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+}
+.monthLabel { font-size: 13px; font-weight: 700; color: #5B2A4A; text-align: center; margin-bottom: 11px; }
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.wd { text-align: center; font-size: 10px; font-weight: 700; color: #9A8A92; padding-bottom: 3px; }
+.day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; font-size: 12.5px; font-weight: 600;
+}
+.dayToday { box-shadow: 0 0 0 2px #5B2A4A; font-weight: 800; }
+
+.logBtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  margin: 16px 18px 0; width: calc(100% - 36px);
+  font-family: inherit; font-size: 13.5px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); border: none; border-radius: 999px; padding: 12px;
+  cursor: pointer; box-shadow: 0 6px 16px rgba(91,42,74,0.22); transition: opacity 0.15s ease;
+}
+.logBtn:disabled { opacity: 0.55; cursor: default; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 16px 18px 0; }
+.legItem { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #6B5A65; }
+.legDot { width: 10px; height: 10px; border-radius: 50%; }
