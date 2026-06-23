@@ -1,0 +1,27 @@
+.nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(91, 42, 74, 0.1);
+  padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+  margin-top: 8px;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 600;
+  color: #9A8A92;
+  padding: 4px 0;
+  transition: color 0.15s ease;
+}
+.active { color: #5B2A4A; }
