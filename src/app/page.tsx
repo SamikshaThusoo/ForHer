@@ -9,7 +9,7 @@ import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntry
 import { TaskCard } from "@/components/forher/TaskCard/TaskCard";
 import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import {
-  Flame, Moon, ScanLine, BookOpen, Users, CalendarHeart, Activity, MessagesSquare, ArrowRight,
+  Flame, Moon, ScanLine, BookOpen, Users, CalendarHeart, Activity, MessagesSquare, ArrowRight, TrendingUp,
 } from "lucide-react";
 import styles from "./home.module.css";
 
@@ -124,7 +124,9 @@ export default function Home() {
       <div className={styles.quickGrid}>
         <Link href="/cares/scan" className={styles.quick}><ScanLine size={20} /><span>Scan food</span></Link>
         <Link href="/log/mood" className={styles.quick}><Moon size={20} /><span>Track mood</span></Link>
+        <Link href="/log/move" className={styles.quick}><Activity size={20} /><span>Log movement</span></Link>
         <Link href="/learn" className={styles.quick}><BookOpen size={20} /><span>Learn</span></Link>
+        <Link href="/progress" className={styles.quick}><TrendingUp size={20} /><span>Progress</span></Link>
         <Link href="/cares/care-team" className={styles.quick}><Users size={20} /><span>Care team</span></Link>
       </div>
 

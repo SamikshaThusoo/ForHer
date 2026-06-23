@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Check } from "lucide-react";
+import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import styles from "./move.module.css";
 
 const KINDS = ["Walk", "Yoga", "Strength", "Cardio", "Dance", "Cycling"];
@@ -76,6 +77,7 @@ export default function MoveLogPage() {
           <Link href="/plan" className={styles.doneCta}>Back to my plan</Link>
         </div>
       )}
+      <BottomNav />
     </main>
   );
 }

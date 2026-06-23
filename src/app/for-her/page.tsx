@@ -4,14 +4,15 @@ import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import type { AssessmentAnswers } from "@/types/journey";
 import { getDomainSignals, getRiskOutcome, TRACK_LABELS } from "@/lib/journey";
-import { markAssessed } from "@/lib/forher/state";
+import { markAssessed, saveSchedule } from "@/lib/forher/state";
+import { ScheduleCollection } from "@/components/forher/ScheduleCollection/ScheduleCollection";
 import { Assessment } from "@/components/forher/Assessment/Assessment";
 import { RiskResult } from "@/components/forher/RiskResult/RiskResult";
 import { Routing } from "@/components/forher/Routing/Routing";
 import { ChevronLeft, CheckCircle2 } from "lucide-react";
 import styles from "./for-her.module.css";
 
-type Step = "questions" | "result" | "routing" | "done";
+type Step = "questions" | "result" | "routing" | "schedule" | "done";
 
 const BLANK: AssessmentAnswers = {
   irregularPeriods: false, acneSkin: false, hairChanges: false, weightDifficulty: false, familyHistory: false,
@@ -70,7 +71,16 @@ export default function ForHerPage() {
           outcome={outcome}
           signals={signals}
           persona={persona}
-          onConsent={() => { markAssessed(persona.id); setStep("done"); }}
+          onConsent={() => {
+            if (outcome === "none") { markAssessed(persona.id); setStep("done"); }
+            else setStep("schedule");
+          }}
+        />
+      )}
+
+      {step === "schedule" && (
+        <ScheduleCollection
+          onComplete={(s) => { saveSchedule(persona.id, s); markAssessed(persona.id); setStep("done"); }}
         />
       )}
 

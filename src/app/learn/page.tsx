@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import styles from "./learn.module.css";
 
 // PCOS/PMOS micro-learning, grounded in the 2023 International Evidence-based
@@ -69,6 +70,7 @@ export default function LearnPage() {
       </div>
 
       <p className={styles.disclaimer}>General education for wellbeing — not medical advice. Check with your clinician for anything health-related.</p>
+      <BottomNav />
     </main>
   );
 }
