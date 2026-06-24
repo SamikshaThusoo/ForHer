@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, PLAN_LAST_DAY } from "@/lib/forher/state";
 import {
-  resolveTasksForDay, pickThreeThings, getPhase, getCyclePhase, personaTrack,
+  resolveDailyPlan, pickThreeThings, getPhase, getCyclePhase, personaTrack,
 } from "@/lib/journey";
 import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntryCard";
 import { TaskCard } from "@/components/forher/TaskCard/TaskCard";
@@ -81,7 +81,7 @@ export default function ForHerHome() {
   }
 
   // ---- STATE 2: assessed, on care plan → daily dashboard ----
-  const tasks = resolveTasksForDay(persona, fh.day);
+  const tasks = resolveDailyPlan(persona, fh.day);
   const three = pickThreeThings(tasks);
   const jphase = getPhase(fh.day);
 
