@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import {
   cycleDayForDate, cycleLengthFor, phaseForCycleDay, nextPeriodDate,
   PHASE_COLOR, PHASE_LABEL, PHASE_PROSE,
@@ -116,7 +115,6 @@ export default function CyclePage() {
         ))}
       </div>
 
-      <BottomNav />
     </main>
   );
 }

@@ -7,7 +7,6 @@ import {
 } from "@/lib/journey";
 import { WINDOW_FOR_CAT, WINDOW_ORDER, WINDOW_LABEL, WINDOW_TIME } from "@/lib/forher/taskmeta";
 import { TaskCard } from "@/components/forher/TaskCard/TaskCard";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import { ChevronLeft, Clock } from "lucide-react";
 import styles from "./plan.module.css";
 
@@ -46,7 +45,6 @@ export default function PlanPage() {
           <h1 className={styles.h1}>You&apos;re on the engagement track</h1>
           <p className={styles.emptySub}>No daily care plan needed right now — keep tracking your cycle, mood and habits, and we&apos;ll re-check over time.</p>
         </div>
-        <BottomNav />
       </main>
     );
   }
@@ -123,7 +121,6 @@ export default function PlanPage() {
       ))}
 
       <p className={styles.disclaimer}>Lifestyle support for general wellbeing — not medical advice. Your care team makes any clinical calls.</p>
-      <BottomNav />
     </main>
   );
 }

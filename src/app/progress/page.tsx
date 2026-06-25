@@ -4,7 +4,6 @@ import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { getMarkerSnapshot, personaTrack } from "@/lib/journey";
 import type { MarkerSet } from "@/types/journey";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import { ChevronLeft, TrendingDown, Minus, Trophy } from "lucide-react";
 import styles from "./progress.module.css";
 
@@ -42,7 +41,6 @@ export default function ProgressPage() {
           <h1 className={styles.h1}>No program metrics yet</h1>
           <p className={styles.emptySub}>You&apos;re on the companion track — keep tracking your cycle and mood, and we&apos;ll re-check over time.</p>
         </div>
-        <BottomNav />
       </main>
     );
   }
@@ -119,7 +117,6 @@ export default function ProgressPage() {
         </div>
       )}
 
-      <BottomNav />
     </main>
   );
 }

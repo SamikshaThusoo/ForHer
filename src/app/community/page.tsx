@@ -3,7 +3,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import { cycleDayForDate, cycleLengthFor, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
 import type { CyclePhase } from "@/types/journey";
 import { ChevronLeft, Heart, Check } from "lucide-react";
@@ -140,7 +139,6 @@ export default function CommunityPage() {
       </div>
 
       <p className={styles.disclaimer}>Shared for general wellbeing — not medical advice.</p>
-      <BottomNav />
     </main>
   );
 }

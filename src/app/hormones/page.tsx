@@ -3,7 +3,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import {
   cycleDayForDate, cycleLengthFor, phaseForCycleDay, PHASE_LABEL, PHASE_PROSE, HORMONES,
 } from "@/lib/forher/cycleview";
@@ -99,7 +98,6 @@ export default function HormonesPage() {
       )}
 
       <p className={styles.disclaimer}>An educational model of how hormones move — not your measured levels.</p>
-      <BottomNav />
     </main>
   );
 }

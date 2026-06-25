@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Check } from "lucide-react";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import styles from "./mood.module.css";
 
 const FEELINGS = ["Energetic", "Calm", "Motivated", "Tired", "Crampy", "Bloated", "Moody", "Anxious"];
@@ -69,7 +68,6 @@ export default function MoodLogPage() {
           <Link href="/plan" className={styles.doneCta}>Back to my plan</Link>
         </div>
       )}
-      <BottomNav />
     </main>
   );
 }
