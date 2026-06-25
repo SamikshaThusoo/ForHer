@@ -1,9 +1,11 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { resolveDailyPlan, personaTrack } from "@/lib/journey";
 import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay } from "@/lib/forher/cycleview";
+import { WINDOW_FOR_CAT, WINDOW_ORDER, WINDOW_LABEL, WINDOW_TIME } from "@/lib/forher/taskmeta";
 import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntryCard";
 import { FocusCarousel } from "@/components/forher/FocusCarousel/FocusCarousel";
 import {
@@ -17,6 +19,7 @@ export default function ForHerHome() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const track = personaTrack(persona);
+  const [nowWin, setNowWin] = useState(0); // simulated time-of-day (index into the day's windows)
 
   const backHabit = (
     <Link href="/" className={styles.backHabit}><ChevronLeft size={15} /> Habit Health</Link>
@@ -109,9 +112,20 @@ export default function ForHerHome() {
 
   // ---- STATE 2: assessed, on care plan → carousel dashboard ----
   const tasks = resolveDailyPlan(persona, fh.day);
-  const nextTask = tasks.find((t) => !fh.isDone(t.id)) ?? tasks[0];
-  const doneCount = tasks.filter((t) => fh.isDone(t.id)).length;
-  const allDone = doneCount === tasks.length;
+  const winOf = (t: (typeof tasks)[number]) => WINDOW_FOR_CAT[t.category];
+  const dayWindows = [...new Set(tasks.map(winOf))].sort((a, b) => WINDOW_ORDER.indexOf(a) - WINDOW_ORDER.indexOf(b));
+  const curIdx = Math.min(nowWin, Math.max(0, dayWindows.length - 1));
+  const idxOf = (t: (typeof tasks)[number]) => dayWindows.indexOf(winOf(t));
+  const undone = tasks.filter((t) => !fh.isDone(t.id));
+  const upcoming = undone.filter((t) => idxOf(t) >= curIdx).sort((a, b) => idxOf(a) - idxOf(b));
+  const missed = undone.filter((t) => idxOf(t) < curIdx).sort((a, b) => idxOf(a) - idxOf(b));
+  const nextTask = upcoming[0] ?? missed[0] ?? null;
+  const doneCount = tasks.length - undone.length;
+  const allDone = undone.length === 0;
+  const nextEyebrow = allDone ? "All done today — lovely"
+    : nextTask && idxOf(nextTask) === curIdx ? `Now · ${WINDOW_LABEL[winOf(nextTask)]}`
+    : nextTask && idxOf(nextTask) > curIdx ? `Coming up · ${WINDOW_LABEL[winOf(nextTask)]} ${WINDOW_TIME[winOf(nextTask)]}`
+    : "Earlier today";
 
   return (
     <main className={`${styles.home} fhTheme`}>
@@ -126,11 +140,28 @@ export default function ForHerHome() {
         <p className={styles.dayline}>Day {fh.day} of 90 · {doneCount}/{tasks.length} done today</p>
       </section>
 
+      {/* Demo clock — move the time of day and watch tasks surface in their windows */}
+      <div className={styles.sim}>
+        <span className={styles.simCap}>Your day · tap to move the time</span>
+        <div className={styles.simRow}>
+          {dayWindows.map((w, i) => {
+            const wDone = tasks.filter((t) => winOf(t) === w).every((t) => fh.isDone(t.id));
+            return (
+              <button key={w} type="button" onClick={() => setNowWin(i)}
+                className={`${styles.simSeg} ${i === curIdx ? styles.simSegOn : ""}`}>
+                <span className={styles.simWin}>{WINDOW_LABEL[w]}</span>
+                <span className={styles.simTime}>{wDone ? "✓ done" : WINDOW_TIME[w]}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <FocusCarousel>
         {setupCard}
         {nextTask && (
           <div className={`${styles.car} ${styles.carTask}`} key="task">
-            <span className={styles.carEyebrow}>{allDone ? "All done today — lovely" : "Up next"}</span>
+            <span className={styles.carEyebrow}>{nextEyebrow}</span>
             <h3 className={styles.carTitle}>{nextTask.title}</h3>
             <p className={styles.carSub}>{nextTask.detail}</p>
             <button type="button"

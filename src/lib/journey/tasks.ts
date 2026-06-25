@@ -98,8 +98,8 @@ export function pickThreeThings(tasks: JourneyTask[]): JourneyTask[] {
   return pickTop(tasks, 3);
 }
 
-/** The 5 tasks a woman actually does on a given day — a focused, varied set
- *  (not the full catalog), surfaced in her scheduled time windows. */
+/** The 3–4 tasks a woman actually does on a given day — a focused, varied set
+ *  (not the full catalog), surfaced one at a time in her scheduled time windows. */
 export function resolveDailyPlan(persona: Persona, dayIndex: number): JourneyTask[] {
-  return pickTop(resolveTasksForDay(persona, dayIndex), 5);
+  return pickTop(resolveTasksForDay(persona, dayIndex), 4);
 }
