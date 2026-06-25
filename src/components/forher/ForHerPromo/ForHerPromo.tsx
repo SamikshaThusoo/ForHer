@@ -38,12 +38,12 @@ export function ForHerPromo() {
             <div className={styles.markers}>
               {f.markers.map((m) => <span key={m.label} className={styles.marker}><strong>{m.value}</strong> {m.label}</span>)}
             </div>
-            <p className={styles.sub}>These can be linked to PMOS — take the 3-minute check.</p>
+            <p className={styles.sub}>These can be linked to PMOS — take the 2-minute check.</p>
           </>
         ) : (
           <>
             <h3 className={styles.title}>{f.state === "C" ? "Understand your cycle & hormones" : "A quick check for your hormonal health"}</h3>
-            <p className={styles.sub}>{f.state === "C" ? "A 3-minute PMOS check — no health report needed." : "See whether PMOS patterns apply to you."}</p>
+            <p className={styles.sub}>{f.state === "C" ? "A 2-minute PMOS check — no health report needed." : "See whether PMOS patterns apply to you."}</p>
           </>
         )}
         <span className={styles.cta}>Take the check <ArrowRight size={15} /></span>

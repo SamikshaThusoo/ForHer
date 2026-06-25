@@ -26,7 +26,7 @@ export function Assessment({
 
   return (
     <div className={styles.wrap}>
-      <h2 className={styles.title}>A quick 3-minute check</h2>
+      <h2 className={styles.title}>A quick 2-minute check</h2>
       <p className={styles.lead}>This is a screen, not a diagnosis — your answers help us understand your patterns.</p>
 
       {entryState === "C" && (

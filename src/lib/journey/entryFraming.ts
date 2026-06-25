@@ -27,7 +27,7 @@ export function entryFraming(persona: Persona): EntryFraming | null {
       eyebrow: "Flagged in your health check",
       headline: "A few markers worth a closer look",
       sub: `These can be linked to ${PMOS_LABEL_FIRST_MENTION} — a quick check tells you more.`,
-      cta: "Take the 3-minute check", markers,
+      cta: "Take the 2-minute check", markers,
     };
   }
   if (p.entryState === "C") {
@@ -35,7 +35,7 @@ export function entryFraming(persona: Persona): EntryFraming | null {
       state: "C", urgency: "low",
       eyebrow: "For Her",
       headline: "Understand your cycle & hormones",
-      sub: `A 3-minute check screens for ${PMOS_LABEL_FIRST_MENTION}. No health report needed.`,
+      sub: `A 2-minute check screens for ${PMOS_LABEL_FIRST_MENTION}. No health report needed.`,
       cta: "Take the check — no report needed",
     };
   }
@@ -44,6 +44,6 @@ export function entryFraming(persona: Persona): EntryFraming | null {
     eyebrow: "For Her",
     headline: "A quick check for your hormonal health",
     sub: `See whether ${PMOS_LABEL_FIRST_MENTION} patterns apply to you.`,
-    cta: "Take the 3-minute check",
+    cta: "Take the 2-minute check",
   };
 }

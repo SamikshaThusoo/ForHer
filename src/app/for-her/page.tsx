@@ -98,7 +98,6 @@ export default function ForHerPage() {
           <Link href="/forher" className={styles.doneCta}>
             {outcome === "none" ? "Go to my companion" : "Go to my dashboard"}
           </Link>
-          {outcome !== "none" && <Link href="/plan" className={styles.homeLink}>See the full plan</Link>}
         </div>
       )}
     </main>
