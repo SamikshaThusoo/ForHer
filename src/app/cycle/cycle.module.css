@@ -53,3 +53,5 @@
 .legend { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 16px 18px 0; }
 .legItem { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #6B5A65; }
 .legDot { width: 10px; height: 10px; border-radius: 50%; }
+
+.introSub { font-size: 13px; line-height: 1.55; color: #6B5A65; margin-top: 9px; }

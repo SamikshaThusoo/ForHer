@@ -1,0 +1,28 @@
+.card {
+  margin: 16px 18px 0; padding: 20px 18px; background: #fff;
+  border: 1px solid rgba(91,42,74,0.1); border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(91,42,74,0.08);
+}
+.icon {
+  width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  background: rgba(199,107,122,0.14); color: #C76B7A; margin-bottom: 12px;
+}
+.title { font-family: var(--font-forher-serif), Georgia, serif; font-weight: 400; font-size: 21px; color: #3E1B33; }
+.sub { font-size: 12.5px; line-height: 1.5; color: #6B5A65; margin-top: 7px; }
+.label { display: block; font-size: 12px; font-weight: 700; color: #5B2A4A; margin: 16px 0 7px; }
+.date {
+  width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; color: #3E1B33;
+  border: 1px solid rgba(91,42,74,0.2); border-radius: 11px; padding: 10px 12px; background: #fff;
+}
+.date:focus { outline: none; border-color: rgba(142,83,120,0.5); }
+.chips { display: flex; gap: 8px; }
+.chip {
+  flex: 1; font-family: inherit; font-size: 14px; font-weight: 700; color: #5B2A4A; cursor: pointer;
+  background: rgba(142,83,120,0.07); border: 1px solid rgba(142,83,120,0.2); border-radius: 12px; padding: 11px 0;
+}
+.chipOn { background: #5B2A4A; color: #fff; border-color: transparent; }
+.save {
+  width: 100%; margin-top: 18px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); color: #fff; border: none; border-radius: 14px; padding: 13px;
+}
+.save:disabled { opacity: 0.45; cursor: default; }

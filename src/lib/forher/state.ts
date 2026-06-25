@@ -9,6 +9,9 @@ const kAssessed = (id: string) => `forher.${id}.assessed`;
 const kDay = (id: string) => `forher.${id}.day`;
 const kDone = (id: string) => `forher.${id}.done`;
 const kSchedule = (id: string) => `forher.${id}.schedule`;
+const kCycle = (id: string) => `forher.${id}.cycle`;
+
+export type CycleLog = { lastPeriod: string; duration: number };
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -27,6 +30,12 @@ export { PLAN_LAST_DAY };
 export function markAssessed(personaId: string) { write(kAssessed(personaId), true); }
 export function saveSchedule(personaId: string, schedule: Record<string, string>) {
   write(kSchedule(personaId), schedule);
+}
+export function saveCycleLog(personaId: string, lastPeriod: string, duration: number) {
+  write(kCycle(personaId), { lastPeriod, duration });
+}
+export function readCycleLog(personaId: string): CycleLog | null {
+  return read<CycleLog | null>(kCycle(personaId), null);
 }
 
 /** Clears every forher.* key (demo Reset). */
@@ -48,11 +57,13 @@ export function useForHer(personaId: string) {
   const [assessed, setAssessed] = useState(false);
   const [day, setDayState] = useState(1);
   const [done, setDone] = useState<Record<number, string[]>>({});
+  const [cycleLog, setCycleLog] = useState<CycleLog | null>(null);
 
   useEffect(() => {
     setAssessed(read(kAssessed(personaId), false));
     setDayState(read(kDay(personaId), 1));
     setDone(read(kDone(personaId), {}));
+    setCycleLog(read<CycleLog | null>(kCycle(personaId), null));
     setHydrated(true);
   }, [personaId]);
 
@@ -83,5 +94,5 @@ export function useForHer(personaId: string) {
     else break;
   }
 
-  return { hydrated, assessed, day, setDay, isDone, toggleDone, doneCount, streak, done };
+  return { hydrated, assessed, day, setDay, isDone, toggleDone, doneCount, streak, done, cycleLog, cycleLogged: !!cycleLog };
 }

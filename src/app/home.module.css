@@ -148,6 +148,13 @@
 .carSteps { background: linear-gradient(135deg, #FBF0E4, #FCF5EC); }
 .carSteps .carIcon { background: rgba(201,119,42,0.14); color: #C9772A; }
 .carLearn { background: linear-gradient(135deg, #EEF2FB, #F5F8FE); }
+.carCycle { background: linear-gradient(135deg, #FCEEF1, #FBF3F5); }
+.carCycle .carIcon { background: rgba(199,107,122,0.16); color: #C76B7A; }
+
+.setupPill {
+  display: inline-block; font-size: 11px; font-weight: 700; color: #fff; text-decoration: none;
+  background: linear-gradient(135deg, #C76B7A, #B5532F); border-radius: 999px; padding: 4px 12px;
+}
 
 .journeyLink {
   display: flex; width: max-content; align-items: center; gap: 7px; margin: 16px auto 0;

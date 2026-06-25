@@ -2,13 +2,12 @@
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
-import {
-  resolveDailyPlan, getCyclePhase, personaTrack,
-} from "@/lib/journey";
+import { resolveDailyPlan, personaTrack } from "@/lib/journey";
+import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay } from "@/lib/forher/cycleview";
 import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntryCard";
 import { FocusCarousel } from "@/components/forher/FocusCarousel/FocusCarousel";
 import {
-  Flame, Moon, ScanLine, CalendarHeart, Activity, MessagesSquare, ArrowRight, ChevronLeft, Check, Footprints, Map,
+  Flame, Moon, ScanLine, CalendarHeart, Activity, MessagesSquare, ArrowRight, ChevronLeft, Check, Footprints, Map, Droplet,
 } from "lucide-react";
 import styles from "../home.module.css";
 
@@ -44,10 +43,23 @@ export default function ForHerHome() {
     );
   }
 
-  const cycle = getCyclePhase(persona, fh.day);
-  const phaseChip = (
-    <span className={styles.cyclePill}>{cap(cycle.phase)} phase{cycle.confidence === "low" ? " (est.)" : ""}</span>
-  );
+  // Cycle phase comes ONLY from her logged cycle — until she's set it up, we
+  // prompt setup instead of showing a phase.
+  const L = cycleLengthFor(persona);
+  const cyclePhase = fh.cycleLog
+    ? phaseForCycleDay(cycleDayFromLog(fh.cycleLog.lastPeriod, L, new Date()), L)
+    : null;
+  const phaseChip = cyclePhase
+    ? <span className={styles.cyclePill}>{cap(cyclePhase)} phase</span>
+    : <Link href="/cycle" className={styles.setupPill}>Set up your cycle →</Link>;
+  const setupCard = !fh.cycleLogged ? (
+    <Link href="/cycle" className={`${styles.car} ${styles.carCycle}`} key="setup">
+      <span className={styles.carIcon}><Droplet size={22} /></span>
+      <h3 className={styles.carTitle}>Set up your cycle</h3>
+      <p className={styles.carSub}>Log your last period so we can predict your phases.</p>
+      <span className={styles.carCta}>Set up now <ArrowRight size={14} /></span>
+    </Link>
+  ) : null;
 
   // ---- STATE 3: assessed, no risk → companion ----
   if (track === "none") {
@@ -65,6 +77,7 @@ export default function ForHerHome() {
         </section>
 
         <FocusCarousel>
+          {setupCard}
           <Link href="/cycle" className={`${styles.car} ${styles.carScan}`} key="cycle">
             <span className={styles.carIcon}><CalendarHeart size={22} /></span>
             <h3 className={styles.carTitle}>Your cycle</h3>
@@ -114,6 +127,7 @@ export default function ForHerHome() {
       </section>
 
       <FocusCarousel>
+        {setupCard}
         {nextTask && (
           <div className={`${styles.car} ${styles.carTask}`} key="task">
             <span className={styles.carEyebrow}>{allDone ? "All done today — lovely" : "Up next"}</span>
