@@ -9,7 +9,7 @@ import { WINDOW_FOR_CAT, WINDOW_ORDER, WINDOW_LABEL, WINDOW_TIME } from "@/lib/f
 import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntryCard";
 import { FocusCarousel } from "@/components/forher/FocusCarousel/FocusCarousel";
 import {
-  Flame, Moon, ScanLine, CalendarHeart, Activity, MessagesSquare, ArrowRight, ChevronLeft, Check, Footprints, Map, Droplet,
+  Flame, Moon, ScanLine, CalendarHeart, Activity, MessagesSquare, ArrowRight, ChevronLeft, Check, Footprints, Map, Droplet, TrendingUp,
 } from "lucide-react";
 import styles from "../home.module.css";
 
@@ -198,6 +198,12 @@ export default function ForHerHome() {
           <span className={styles.carEyebrow}>Today&apos;s read</span>
           <h3 className={styles.carTitle}>Why your skin breaks out before your period</h3>
           <span className={styles.carCta}>Read · 2 min <ArrowRight size={14} /></span>
+        </Link>
+        <Link href="/progress" className={`${styles.car} ${styles.carMood}`} key="progress">
+          <span className={styles.carIcon}><TrendingUp size={22} /></span>
+          <h3 className={styles.carTitle}>Your progress</h3>
+          <p className={styles.carSub}>Habits you&apos;re building + the markers that move.</p>
+          <span className={styles.carCta}>See progress <ArrowRight size={14} /></span>
         </Link>
       </FocusCarousel>
 
