@@ -115,17 +115,13 @@ export default function ForHerHome() {
   const winOf = (t: (typeof tasks)[number]) => WINDOW_FOR_CAT[t.category];
   const dayWindows = [...new Set(tasks.map(winOf))].sort((a, b) => WINDOW_ORDER.indexOf(a) - WINDOW_ORDER.indexOf(b));
   const curIdx = Math.min(nowWin, Math.max(0, dayWindows.length - 1));
-  const idxOf = (t: (typeof tasks)[number]) => dayWindows.indexOf(winOf(t));
-  const undone = tasks.filter((t) => !fh.isDone(t.id));
-  const upcoming = undone.filter((t) => idxOf(t) >= curIdx).sort((a, b) => idxOf(a) - idxOf(b));
-  const missed = undone.filter((t) => idxOf(t) < curIdx).sort((a, b) => idxOf(a) - idxOf(b));
-  const nextTask = upcoming[0] ?? missed[0] ?? null;
-  const doneCount = tasks.length - undone.length;
-  const allDone = undone.length === 0;
-  const nextEyebrow = allDone ? "All done today — lovely"
-    : nextTask && idxOf(nextTask) === curIdx ? `Now · ${WINDOW_LABEL[winOf(nextTask)]}`
-    : nextTask && idxOf(nextTask) > curIdx ? `Coming up · ${WINDOW_LABEL[winOf(nextTask)]} ${WINDOW_TIME[winOf(nextTask)]}`
-    : "Earlier today";
+  // Clicking a time window shows THAT window's task directly in the card below.
+  const curWin = dayWindows[curIdx];
+  const winTasks = tasks.filter((t) => winOf(t) === curWin);
+  const nextTask = winTasks.find((t) => !fh.isDone(t.id)) ?? winTasks[0] ?? null;
+  const doneCount = tasks.filter((t) => fh.isDone(t.id)).length;
+  const allDone = doneCount === tasks.length;
+  const nextEyebrow = curWin ? `${WINDOW_LABEL[curWin]} · ${WINDOW_TIME[curWin]}` : "Today";
 
   return (
     <main className={`${styles.home} fhTheme`}>
