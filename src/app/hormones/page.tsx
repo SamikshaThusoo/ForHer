@@ -2,9 +2,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
+import { useForHer } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
 import {
-  cycleDayForDate, cycleLengthFor, phaseForCycleDay, PHASE_LABEL, PHASE_PROSE, HORMONES,
+  cycleDayFromLog, cycleLengthFor, phaseForCycleDay, PHASE_LABEL, PHASE_PROSE, HORMONES,
 } from "@/lib/forher/cycleview";
 import { ChevronLeft } from "lucide-react";
 import styles from "./hormones.module.css";
@@ -13,12 +14,18 @@ const W = 320, H = 116, PAD = 6;
 
 export default function HormonesPage() {
   const { persona } = usePersona();
+  const fh = useForHer(persona.id);
   const today = new Date();
   const L = cycleLengthFor(persona);
-  const todayCd = cycleDayForDate(persona, today);
-  const [day, setDay] = useState(todayCd);
+  // "Today" is real only once she's logged her cycle; otherwise we centre the
+  // scrubber mid-cycle and don't claim a current day.
+  const todayCd = fh.cycleLog ? cycleDayFromLog(fh.cycleLog.lastPeriod, L, today) : Math.round(L / 2);
+  const [dayState, setDayState] = useState<number | null>(null);
+  const day = dayState ?? todayCd;
+  const setDay = (d: number) => setDayState(d);
   const phase = phaseForCycleDay(day, L);
   const carePlan = personaTrack(persona) !== "none";
+  const isToday = fh.cycleLog != null && day === todayCd;
 
   const x = (d: number) => PAD + ((d - 1) / (L - 1)) * (W - 2 * PAD);
   const y = (v: number) => H - PAD - v * (H - 2 * PAD);
@@ -40,7 +47,7 @@ export default function HormonesPage() {
       <div className={styles.hero}>
         <h1 className={styles.h1}>Your hormone <em>rhythm</em></h1>
         <p className={styles.sub}>
-          Day {day}{day === todayCd ? " · today" : ""} · {PHASE_LABEL[phase]} phase
+          Day {day}{isToday ? " · today" : ""} · {PHASE_LABEL[phase]} phase
         </p>
       </div>
 
@@ -74,7 +81,7 @@ export default function HormonesPage() {
       </div>
 
       <div className={styles.phaseBox}>
-        <span className={styles.phaseTag}>{PHASE_LABEL[phase]} phase{day === todayCd ? ", right now" : ""}</span>
+        <span className={styles.phaseTag}>{PHASE_LABEL[phase]} phase{isToday ? ", right now" : ""}</span>
         <p className={styles.phaseProse}>{PHASE_PROSE[phase]}</p>
       </div>
 

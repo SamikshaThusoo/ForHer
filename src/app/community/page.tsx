@@ -2,8 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
+import { useForHer } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
-import { cycleDayForDate, cycleLengthFor, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
+import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
 import type { CyclePhase } from "@/types/journey";
 import { ChevronLeft, Heart, Check } from "lucide-react";
 import styles from "./community.module.css";
@@ -64,9 +65,14 @@ const PACING: Record<CyclePhase, string> = {
 
 export default function CommunityPage() {
   const { persona } = usePersona();
+  const fh = useForHer(persona.id);
   const today = new Date();
   const L = cycleLengthFor(persona);
-  const phase = phaseForCycleDay(cycleDayForDate(persona, today), L);
+  const logged = fh.cycleLogged;
+  // Phase comes only from her logged cycle; until then we don't claim a phase.
+  const phase: CyclePhase = fh.cycleLog
+    ? phaseForCycleDay(cycleDayFromLog(fh.cycleLog.lastPeriod, L, today), L)
+    : "follicular";
   const carePlan = personaTrack(persona) !== "none";
 
   const [picked, setPicked] = useState<Set<string>>(new Set());
@@ -82,8 +88,17 @@ export default function CommunityPage() {
       </header>
 
       <div className={styles.hero}>
-        <h1 className={styles.h1}>Women in your <em>{PHASE_LABEL[phase].toLowerCase()} phase</em></h1>
-        <p className={styles.sub}>Real recommendations and check-ins from women tracking the same phase.</p>
+        {logged ? (
+          <>
+            <h1 className={styles.h1}>Women in your <em>{PHASE_LABEL[phase].toLowerCase()} phase</em></h1>
+            <p className={styles.sub}>Real recommendations and check-ins from women tracking the same phase.</p>
+          </>
+        ) : (
+          <>
+            <h1 className={styles.h1}>Women <em>like you</em></h1>
+            <p className={styles.sub}>Real recommendations and check-ins. <Link href="/cycle" className={styles.inlineLink}>Log your cycle</Link> to see your phase community.</p>
+          </>
+        )}
       </div>
 
       {carePlan && <div className={styles.pacing}>{PACING[phase]}</div>}
