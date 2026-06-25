@@ -1,5 +1,4 @@
 import { CaresHeader } from "@/components/cares/CaresHeader/CaresHeader";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 
 export default function CaresLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +13,6 @@ export default function CaresLayout({ children }: { children: React.ReactNode })
     >
       <CaresHeader />
       <div style={{ flex: 1 }}>{children}</div>
-      <BottomNav />
     </div>
   );
 }

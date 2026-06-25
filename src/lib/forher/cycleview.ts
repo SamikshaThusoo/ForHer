@@ -27,6 +27,12 @@ export function cycleDayForDate(persona: Persona, date: Date): number {
   return (((days % L) + L) % L) + 1;
 }
 
+/** 1-based cycle day from a logged last-period date + cycle length. */
+export function cycleDayFromLog(lastPeriodISO: string, length: number, date: Date): number {
+  const days = startOfDay(date) - Math.floor(isoToMs(lastPeriodISO) / 86400000);
+  return (((days % length) + length) % length) + 1;
+}
+
 /** Phase for a 1-based cycle day, matching the engine's boundaries. */
 export function phaseForCycleDay(cycleDay: number, L: number): CyclePhase {
   const ovStart = Math.floor(L / 2) - 1;

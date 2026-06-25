@@ -1,27 +1,25 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
-import { useForHer, PLAN_LAST_DAY } from "@/lib/forher/state";
-import {
-  resolveTasksForDay, pickThreeThings, getPhase, getCyclePhase, personaTrack,
-} from "@/lib/journey";
+import { useForHer } from "@/lib/forher/state";
+import { resolveDailyPlan, personaTrack } from "@/lib/journey";
+import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay } from "@/lib/forher/cycleview";
+import { WINDOW_FOR_CAT, WINDOW_ORDER, WINDOW_LABEL, WINDOW_TIME } from "@/lib/forher/taskmeta";
 import { ForHerEntryCard } from "@/components/forher/ForHerEntryCard/ForHerEntryCard";
-import { TaskCard } from "@/components/forher/TaskCard/TaskCard";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
+import { FocusCarousel } from "@/components/forher/FocusCarousel/FocusCarousel";
 import {
-  Flame, Moon, ScanLine, BookOpen, Users, CalendarHeart, Activity, MessagesSquare, ArrowRight, TrendingUp, ChevronLeft,
+  Flame, Moon, ScanLine, CalendarHeart, Activity, MessagesSquare, ArrowRight, ChevronLeft, Check, Footprints, Map, Droplet, TrendingUp,
 } from "lucide-react";
 import styles from "../home.module.css";
 
-const PHASE_LABEL: Record<string, string> = {
-  foundation: "Foundation", build: "Build", milestone: "Milestone",
-};
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export default function ForHerHome() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const track = personaTrack(persona);
+  const [nowWin, setNowWin] = useState(0); // simulated time-of-day (index into the day's windows)
 
   const backHabit = (
     <Link href="/" className={styles.backHabit}><ChevronLeft size={15} /> Habit Health</Link>
@@ -48,10 +46,23 @@ export default function ForHerHome() {
     );
   }
 
-  const cycle = getCyclePhase(persona, fh.day);
-  const phaseChip = (
-    <span className={styles.cyclePill}>{cap(cycle.phase)} phase{cycle.confidence === "low" ? " (est.)" : ""}</span>
-  );
+  // Cycle phase comes ONLY from her logged cycle — until she's set it up, we
+  // prompt setup instead of showing a phase.
+  const L = cycleLengthFor(persona);
+  const cyclePhase = fh.cycleLog
+    ? phaseForCycleDay(cycleDayFromLog(fh.cycleLog.lastPeriod, L, new Date()), L)
+    : null;
+  const phaseChip = cyclePhase
+    ? <span className={styles.cyclePill}>{cap(cyclePhase)} phase</span>
+    : <Link href="/cycle" className={styles.setupPill}>Set up your cycle →</Link>;
+  const setupCard = !fh.cycleLogged ? (
+    <Link href="/cycle" className={`${styles.car} ${styles.carCycle}`} key="setup">
+      <span className={styles.carIcon}><Droplet size={22} /></span>
+      <h3 className={styles.carTitle}>Set up your cycle</h3>
+      <p className={styles.carSub}>Log your last period so we can predict your phases.</p>
+      <span className={styles.carCta}>Set up now <ArrowRight size={14} /></span>
+    </Link>
+  ) : null;
 
   // ---- STATE 3: assessed, no risk → companion ----
   if (track === "none") {
@@ -68,72 +79,135 @@ export default function ForHerHome() {
           <p className={styles.lead}>No daily plan needed right now — keep tracking your cycle and we&apos;ll re-check over time.</p>
         </section>
 
-        <div className={styles.quickGrid}>
-          <Link href="/cycle" className={styles.quick}><CalendarHeart size={20} /><span>Cycle</span></Link>
-          <Link href="/hormones" className={styles.quick}><Activity size={20} /><span>Hormones</span></Link>
-          <Link href="/community" className={styles.quick}><MessagesSquare size={20} /><span>Community</span></Link>
-          <Link href="/log/mood" className={styles.quick}><Moon size={20} /><span>Track mood</span></Link>
-        </div>
-
-        <BottomNav />
+        <FocusCarousel>
+          {setupCard}
+          <Link href="/cycle" className={`${styles.car} ${styles.carScan}`} key="cycle">
+            <span className={styles.carIcon}><CalendarHeart size={22} /></span>
+            <h3 className={styles.carTitle}>Your cycle</h3>
+            <p className={styles.carSub}>Calendar, phase and next-period prediction.</p>
+            <span className={styles.carCta}>Open cycle <ArrowRight size={14} /></span>
+          </Link>
+          <Link href="/hormones" className={`${styles.car} ${styles.carMood}`} key="hormones">
+            <span className={styles.carIcon}><Activity size={22} /></span>
+            <h3 className={styles.carTitle}>Hormone rhythm</h3>
+            <p className={styles.carSub}>How your hormones move across your cycle.</p>
+            <span className={styles.carCta}>Explore <ArrowRight size={14} /></span>
+          </Link>
+          <Link href="/community" className={`${styles.car} ${styles.carCommunity}`} key="community">
+            <span className={styles.carIcon}><MessagesSquare size={22} /></span>
+            <h3 className={styles.carTitle}>Community</h3>
+            <p className={styles.carSub}>Tips and check-ins from women in your phase.</p>
+            <span className={styles.carCta}>Open community <ArrowRight size={14} /></span>
+          </Link>
+          <Link href="/log/mood" className={`${styles.car} ${styles.carLearn}`} key="mood">
+            <span className={styles.carIcon}><Moon size={22} /></span>
+            <h3 className={styles.carTitle}>Daily check-in</h3>
+            <p className={styles.carSub}>Log your mood, energy and symptoms.</p>
+            <span className={styles.carCta}>Check in <ArrowRight size={14} /></span>
+          </Link>
+        </FocusCarousel>
       </main>
     );
   }
 
-  // ---- STATE 2: assessed, on care plan → daily dashboard ----
-  const tasks = resolveTasksForDay(persona, fh.day);
-  const three = pickThreeThings(tasks);
-  const jphase = getPhase(fh.day);
+  // ---- STATE 2: assessed, on care plan → carousel dashboard ----
+  const tasks = resolveDailyPlan(persona, fh.day);
+  const winOf = (t: (typeof tasks)[number]) => WINDOW_FOR_CAT[t.category];
+  const dayWindows = [...new Set(tasks.map(winOf))].sort((a, b) => WINDOW_ORDER.indexOf(a) - WINDOW_ORDER.indexOf(b));
+  const curIdx = Math.min(nowWin, Math.max(0, dayWindows.length - 1));
+  const idxOf = (t: (typeof tasks)[number]) => dayWindows.indexOf(winOf(t));
+  const undone = tasks.filter((t) => !fh.isDone(t.id));
+  const upcoming = undone.filter((t) => idxOf(t) >= curIdx).sort((a, b) => idxOf(a) - idxOf(b));
+  const missed = undone.filter((t) => idxOf(t) < curIdx).sort((a, b) => idxOf(a) - idxOf(b));
+  const nextTask = upcoming[0] ?? missed[0] ?? null;
+  const doneCount = tasks.length - undone.length;
+  const allDone = undone.length === 0;
+  const nextEyebrow = allDone ? "All done today — lovely"
+    : nextTask && idxOf(nextTask) === curIdx ? `Now · ${WINDOW_LABEL[winOf(nextTask)]}`
+    : nextTask && idxOf(nextTask) > curIdx ? `Coming up · ${WINDOW_LABEL[winOf(nextTask)]} ${WINDOW_TIME[winOf(nextTask)]}`
+    : "Earlier today";
 
   return (
     <main className={`${styles.home} fhTheme`}>
       {backHabit}
       <header className={styles.dashTop}>
         <div className={styles.wordmark}>For Her <span className={styles.tag}>PMOS</span></div>
-        {fh.streak > 0 && (
-          <span className={styles.streak}><Flame size={13} /> {fh.streak}-day streak</span>
-        )}
+        {fh.streak > 0 && <span className={styles.streak}><Flame size={13} /> {fh.streak}-day streak</span>}
       </header>
 
       <section className={styles.dashHero}>
         <p className={styles.hi}>Hi {persona.shortName}</p>
-        <div className={styles.phaseRow}>
-          <span className={styles.jphasePill}>{PHASE_LABEL[jphase]} phase</span>
-          {phaseChip}
-        </div>
+        <p className={styles.dayline}>Day {fh.day} of 90 · {doneCount}/{tasks.length} done today</p>
       </section>
 
-      <div className={styles.scrub}>
-        <div className={styles.scrubTop}>
-          <span className={styles.dayNum}>Day {fh.day}<span className={styles.dayTot}> / {PLAN_LAST_DAY}</span></span>
+      {/* Demo clock — move the time of day and watch tasks surface in their windows */}
+      <div className={styles.sim}>
+        <span className={styles.simCap}>Your day · tap to move the time</span>
+        <div className={styles.simRow}>
+          {dayWindows.map((w, i) => {
+            const wDone = tasks.filter((t) => winOf(t) === w).every((t) => fh.isDone(t.id));
+            return (
+              <button key={w} type="button" onClick={() => setNowWin(i)}
+                className={`${styles.simSeg} ${i === curIdx ? styles.simSegOn : ""}`}>
+                <span className={styles.simWin}>{WINDOW_LABEL[w]}</span>
+                <span className={styles.simTime}>{wDone ? "✓ done" : WINDOW_TIME[w]}</span>
+              </button>
+            );
+          })}
         </div>
-        <input
-          className={styles.range} type="range" min={1} max={PLAN_LAST_DAY} value={fh.day}
-          onChange={(e) => fh.setDay(Number(e.target.value))} aria-label="Day in plan"
-        />
       </div>
 
-      <div className={styles.sectionHead}>
-        <span className={styles.sectionTitle}>3 things today</span>
-        <span className={styles.sectionCount}>{three.filter((t) => fh.isDone(t.id)).length}/{three.length}</span>
-      </div>
-      <div className={styles.tasks}>
-        {three.map((t) => (
-          <TaskCard key={t.id} task={t} done={fh.isDone(t.id)} onToggle={() => fh.toggleDone(t.id)} highlight />
-        ))}
-      </div>
-      <Link href="/plan" className={styles.seeAll}>See all {tasks.length} tasks <ArrowRight size={15} /></Link>
+      <FocusCarousel>
+        {setupCard}
+        {nextTask && (
+          <div className={`${styles.car} ${styles.carTask}`} key="task">
+            <span className={styles.carEyebrow}>{nextEyebrow}</span>
+            <h3 className={styles.carTitle}>{nextTask.title}</h3>
+            <p className={styles.carSub}>{nextTask.detail}</p>
+            <button type="button"
+              className={`${styles.carCheck} ${fh.isDone(nextTask.id) ? styles.carCheckOn : ""}`}
+              onClick={() => fh.toggleDone(nextTask.id)}>
+              {fh.isDone(nextTask.id) ? <><Check size={15} /> Done</> : "Mark done"}
+            </button>
+          </div>
+        )}
+        <Link href="/community" className={`${styles.car} ${styles.carCommunity}`} key="community">
+          <span className={styles.carEyebrow}>From your community</span>
+          <h3 className={styles.carTitle}>Women in your phase are sharing what helps</h3>
+          <p className={styles.carSub}>Tips, pacing and check-ins from women like you.</p>
+          <span className={styles.carCta}>Open community <ArrowRight size={14} /></span>
+        </Link>
+        <Link href="/cares/scan" className={`${styles.car} ${styles.carScan}`} key="scan">
+          <span className={styles.carIcon}><ScanLine size={22} /></span>
+          <h3 className={styles.carTitle}>What&apos;s in your food?</h3>
+          <p className={styles.carSub}>Scan a snack for a PMOS-aware verdict.</p>
+          <span className={styles.carCta}>Scan food <ArrowRight size={14} /></span>
+        </Link>
+        <Link href="/log/mood" className={`${styles.car} ${styles.carMood}`} key="mood">
+          <span className={styles.carIcon}><Moon size={22} /></span>
+          <h3 className={styles.carTitle}>How are you today?</h3>
+          <p className={styles.carSub}>Log your mood, symptoms and cycle in 15 seconds.</p>
+          <span className={styles.carCta}>Quick check-in <ArrowRight size={14} /></span>
+        </Link>
+        <div className={`${styles.car} ${styles.carSteps}`} key="steps">
+          <span className={styles.carIcon}><Footprints size={22} /></span>
+          <h3 className={styles.carTitle}>8,240 steps today</h3>
+          <p className={styles.carSub}>From your Habit activity — ahead of your phase pace.</p>
+        </div>
+        <Link href="/learn" className={`${styles.car} ${styles.carLearn}`} key="learn">
+          <span className={styles.carEyebrow}>Today&apos;s read</span>
+          <h3 className={styles.carTitle}>Why your skin breaks out before your period</h3>
+          <span className={styles.carCta}>Read · 2 min <ArrowRight size={14} /></span>
+        </Link>
+        <Link href="/progress" className={`${styles.car} ${styles.carMood}`} key="progress">
+          <span className={styles.carIcon}><TrendingUp size={22} /></span>
+          <h3 className={styles.carTitle}>Your progress</h3>
+          <p className={styles.carSub}>Habits you&apos;re building + the markers that move.</p>
+          <span className={styles.carCta}>See progress <ArrowRight size={14} /></span>
+        </Link>
+      </FocusCarousel>
 
-      <div className={styles.quickGrid}>
-        <Link href="/cares/scan" className={styles.quick}><ScanLine size={20} /><span>Scan food</span></Link>
-        <Link href="/log/mood" className={styles.quick}><Moon size={20} /><span>Track mood</span></Link>
-        <Link href="/log/move" className={styles.quick}><Activity size={20} /><span>Log movement</span></Link>
-        <Link href="/learn" className={styles.quick}><BookOpen size={20} /><span>Learn</span></Link>
-        <Link href="/progress" className={styles.quick}><TrendingUp size={20} /><span>Progress</span></Link>
-        <Link href="/cares/care-team" className={styles.quick}><Users size={20} /><span>Care team</span></Link>
-      </div>
-
-      <BottomNav />
+      <Link href="/plan" className={styles.journeyLink}><Map size={15} /> See my 90-day journey</Link>
     </main>
   );
 }

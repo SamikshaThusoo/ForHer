@@ -4,7 +4,6 @@ import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { getMarkerSnapshot, personaTrack } from "@/lib/journey";
 import type { MarkerSet } from "@/types/journey";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
 import { ChevronLeft, TrendingDown, Minus, Trophy } from "lucide-react";
 import styles from "./progress.module.css";
 
@@ -42,7 +41,6 @@ export default function ProgressPage() {
           <h1 className={styles.h1}>No program metrics yet</h1>
           <p className={styles.emptySub}>You&apos;re on the companion track — keep tracking your cycle and mood, and we&apos;ll re-check over time.</p>
         </div>
-        <BottomNav />
       </main>
     );
   }
@@ -60,6 +58,10 @@ export default function ProgressPage() {
     || (d90.weightKg != null && d0.weightKg != null && d90.weightKg < d0.weightKg);
   const rec: "step-down" | "continue" | "tulip" = ttc ? "tulip" : improved ? "step-down" : "continue";
 
+  // Adherence half — the engagement story, from her daily tasks.
+  const tasksDone = Object.values(fh.done).reduce((s, a) => s + a.length, 0);
+  const daysActive = Object.values(fh.done).filter((a) => a.length > 0).length;
+
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
@@ -69,7 +71,7 @@ export default function ProgressPage() {
 
       <div className={styles.hero}>
         <h1 className={styles.h1}>Your <em>progress</em></h1>
-        <p className={styles.sub}>Day 0 vs Day 90 — your measured markers.</p>
+        <p className={styles.sub}>Two halves: the habits you&apos;re building, and the markers that move.</p>
       </div>
 
       {ms && (
@@ -79,6 +81,16 @@ export default function ProgressPage() {
         </div>
       )}
 
+      <div className={styles.sectionHead}>How you&apos;re showing up</div>
+      <div className={styles.stats}>
+        <div className={styles.stat}><span className={styles.statNum}>{fh.streak}</span><span className={styles.statLab}>day streak</span></div>
+        <div className={styles.stat}><span className={styles.statNum}>{tasksDone}</span><span className={styles.statLab}>tasks done</span></div>
+        <div className={styles.stat}><span className={styles.statNum}>{daysActive}</span><span className={styles.statLab}>active days</span></div>
+      </div>
+
+      <div className={styles.sectionHead}>
+        What&apos;s changing {fh.day < 90 && <span className={styles.proj}>· projected to Day 90</span>}
+      </div>
       <div className={styles.metrics}>
         {rows.map(({ m, a, b }) => {
           const delta = (b as number) - (a as number);
@@ -119,7 +131,6 @@ export default function ProgressPage() {
         </div>
       )}
 
-      <BottomNav />
     </main>
   );
 }

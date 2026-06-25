@@ -2,11 +2,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
+import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
 import {
-  cycleDayForDate, cycleLengthFor, phaseForCycleDay, nextPeriodDate,
-  PHASE_COLOR, PHASE_LABEL,
+  cycleLengthFor, cycleDayFromLog, phaseForCycleDay,
+  PHASE_COLOR, PHASE_LABEL, PHASE_PROSE,
 } from "@/lib/forher/cycleview";
+import { CycleOnboarding } from "@/components/forher/CycleOnboarding/CycleOnboarding";
 import type { CyclePhase } from "@/types/journey";
 import { ChevronLeft, Plus, Check } from "lucide-react";
 import styles from "./cycle.module.css";
@@ -21,12 +22,43 @@ function readLogged(id: string): string[] {
 
 export default function CyclePage() {
   const { persona } = usePersona();
+  const fh = useForHer(persona.id);
   const today = new Date();
   const [logged, setLogged] = useState<string[]>(() => (typeof window === "undefined" ? [] : readLogged(persona.id)));
+  const [selected, setSelected] = useState<number>(today.getDate());
+  const [localCycle, setLocalCycle] = useState<CycleLog | null>(null);
+
+  const cycle = localCycle ?? fh.cycleLog;
+
+  const header = (
+    <header className={styles.head}>
+      <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+      <span className={styles.brandline}>For Her · Cycle</span>
+    </header>
+  );
+
+  if (!fh.hydrated) return <main className={`${styles.page} fhTheme`}>{header}</main>;
+
+  // ---- Not set up yet → onboard (this is what unlocks phase prediction) ----
+  if (!cycle) {
+    return (
+      <main className={`${styles.page} fhTheme`}>
+        {header}
+        <div className={styles.hero}>
+          <h1 className={styles.h1}>Your <em>cycle</em></h1>
+          <p className={styles.introSub}>We won&apos;t show a phase until you&apos;ve logged your cycle — no guessing on our part.</p>
+        </div>
+        <CycleOnboarding onSave={(lp, dur) => { saveCycleLog(persona.id, lp, dur); setLocalCycle({ lastPeriod: lp, duration: dur }); }} />
+      </main>
+    );
+  }
 
   const L = cycleLengthFor(persona);
-  const todayPhase = phaseForCycleDay(cycleDayForDate(persona, today), L);
-  const next = nextPeriodDate(persona, today);
+  const cdFor = (date: Date) => cycleDayFromLog(cycle.lastPeriod, L, date);
+  const todayPhase = phaseForCycleDay(cdFor(today), L);
+  const todayCd = cdFor(today);
+  const daysToStart = todayCd === 1 ? 0 : L - todayCd + 1;
+  const next = new Date(today.getTime() + daysToStart * 86400000);
 
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -40,18 +72,20 @@ export default function CyclePage() {
   const logToday = () => {
     const key = iso(today);
     if (logged.includes(key)) return;
-    const next = [...logged, key];
-    setLogged(next);
-    try { localStorage.setItem(`forher.${persona.id}.loggedperiods`, JSON.stringify(next)); } catch { /* ignore */ }
+    const nextLogged = [...logged, key];
+    setLogged(nextLogged);
+    try { localStorage.setItem(`forher.${persona.id}.loggedperiods`, JSON.stringify(nextLogged)); } catch { /* ignore */ }
   };
   const loggedToday = logged.includes(iso(today));
 
+  const selDate = new Date(year, month, selected);
+  const selCd = cdFor(selDate);
+  const selPhase = phaseForCycleDay(selCd, L);
+  const selPeriod = selPhase === "menstrual" || logged.includes(iso(selDate));
+
   return (
     <main className={`${styles.page} fhTheme`}>
-      <header className={styles.head}>
-        <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
-        <span className={styles.brandline}>For Her · Cycle</span>
-      </header>
+      {header}
 
       <div className={styles.hero}>
         <h1 className={styles.h1}>Your <em>cycle</em></h1>
@@ -68,21 +102,32 @@ export default function CyclePage() {
           {cells.map((d, i) => {
             if (d == null) return <span key={i} />;
             const date = new Date(year, month, d);
-            const cd = cycleDayForDate(persona, date);
-            const phase = phaseForCycleDay(cd, L);
+            const phase = phaseForCycleDay(cdFor(date), L);
             const isToday = d === today.getDate();
             const isPeriod = phase === "menstrual" || logged.includes(iso(date));
             return (
-              <span
+              <button
                 key={i}
-                className={`${styles.day} ${isToday ? styles.dayToday : ""}`}
+                type="button"
+                onClick={() => setSelected(d)}
+                className={`${styles.day} ${isToday ? styles.dayToday : ""} ${selected === d ? styles.daySel : ""}`}
                 style={{ background: isPeriod ? PHASE_COLOR.menstrual : `${PHASE_COLOR[phase]}22`, color: isPeriod ? "#fff" : "#3E1B33" }}
               >
                 {d}
-              </span>
+              </button>
             );
           })}
         </div>
+      </div>
+
+      <div className={styles.detail} style={{ borderLeftColor: PHASE_COLOR[selPhase] }}>
+        <div className={styles.detailTop}>
+          <span className={styles.detailDate}>{selDate.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
+          <span className={styles.detailPhase} style={{ color: PHASE_COLOR[selPhase] }}>
+            Cycle day {selCd} · {PHASE_LABEL[selPhase]}
+          </span>
+        </div>
+        <p className={styles.detailBody}>{selPeriod ? "Period likely on this day. " : ""}{PHASE_PROSE[selPhase]}</p>
       </div>
 
       <button type="button" className={styles.logBtn} onClick={logToday} disabled={loggedToday}>
@@ -96,8 +141,6 @@ export default function CyclePage() {
           </span>
         ))}
       </div>
-
-      <BottomNav />
     </main>
   );
 }

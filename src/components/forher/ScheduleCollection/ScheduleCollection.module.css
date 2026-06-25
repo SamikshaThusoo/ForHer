@@ -24,3 +24,10 @@
   cursor: pointer; box-shadow: 0 6px 16px rgba(91,42,74,0.22); transition: opacity 0.15s ease;
 }
 .cta:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.nudgeBlock { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(91,42,74,0.1); }
+.nudgeHead {
+  display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700;
+  color: #5B2A4A; margin-bottom: 11px;
+}
+.nudgeHead svg { color: #8E5378; }

@@ -20,6 +20,10 @@
   color: #fff; margin-top: 1px; background: transparent; cursor: pointer; padding: 0; flex: 0 0 auto;
 }
 .checkOn { background: #4F9D69; border-color: #4F9D69; }
+@keyframes fhPop { 0% { transform: scale(0.5); } 55% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.checkMark { display: flex; animation: fhPop 0.34s cubic-bezier(0.16, 1, 0.3, 1); }
+.card { transition: opacity 0.2s ease, box-shadow 0.15s ease, transform 0.12s ease; }
+.card:active { transform: scale(0.992); }
 
 .body {
   display: flex; flex-direction: column; min-width: 0;

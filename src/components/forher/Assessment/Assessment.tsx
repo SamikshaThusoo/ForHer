@@ -4,12 +4,12 @@ import type { AssessmentAnswers } from "@/types/journey";
 import { Info, ArrowRight } from "lucide-react";
 import styles from "./Assessment.module.css";
 
-const QUESTIONS: { key: keyof AssessmentAnswers; domain: string; q: string }[] = [
-  { key: "irregularPeriods", domain: "Cycle", q: "Are your periods irregular or unpredictable?" },
-  { key: "acneSkin", domain: "Skin", q: "Do you get persistent acne or oily skin?" },
-  { key: "hairChanges", domain: "Skin", q: "Noticed extra facial/body hair, or scalp thinning?" },
-  { key: "weightDifficulty", domain: "Metabolic", q: "Do you find it hard to manage your weight?" },
-  { key: "familyHistory", domain: "Family", q: "Family history of diabetes or PMOS (PCOS)?" },
+const QUESTIONS: { key: keyof AssessmentAnswers; domain: string; q: string; yes: string; no: string }[] = [
+  { key: "irregularPeriods", domain: "Your cycle", q: "How predictable is your period?", yes: "All over the place", no: "Fairly regular" },
+  { key: "acneSkin", domain: "Skin", q: "Acne or oily skin that won't settle — especially around the jaw?", yes: "Yes, persistent", no: "Rarely" },
+  { key: "hairChanges", domain: "Hair", q: "Noticed unwanted facial or body hair, or thinning at the scalp?", yes: "Yes, noticed it", no: "No changes" },
+  { key: "weightDifficulty", domain: "Energy & weight", q: "Does weight cling on, even when you eat well and move?", yes: "Yes, it clings on", no: "Feels manageable" },
+  { key: "familyHistory", domain: "Family", q: "Diabetes or PMOS (PCOS) anywhere in your family?", yes: "Yes", no: "No / not sure" },
 ];
 
 export function Assessment({
@@ -26,8 +26,8 @@ export function Assessment({
 
   return (
     <div className={styles.wrap}>
-      <h2 className={styles.title}>A quick 3-minute check</h2>
-      <p className={styles.lead}>This is a screen, not a diagnosis — your answers help us understand your patterns.</p>
+      <h2 className={styles.title}>A few quick questions</h2>
+      <p className={styles.lead}>No right answers and no diagnosis — just tell us how things have felt lately. Takes about 2 minutes.</p>
 
       {entryState === "C" && (
         <div className={styles.caveat}>
@@ -49,12 +49,12 @@ export function Assessment({
                   type="button"
                   className={`${styles.pill} ${answers[item.key] ? styles.yes : ""}`}
                   onClick={() => set(item.key, true)}
-                >Yes</button>
+                >{item.yes}</button>
                 <button
                   type="button"
                   className={`${styles.pill} ${!answers[item.key] ? styles.no : ""}`}
                   onClick={() => set(item.key, false)}
-                >No</button>
+                >{item.no}</button>
               </div>
             </div>
           );

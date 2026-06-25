@@ -24,8 +24,22 @@
 .day {
   aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
   border-radius: 10px; font-size: 12.5px; font-weight: 600;
+  border: none; font-family: inherit; cursor: pointer; padding: 0;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+.day:active { transform: scale(0.9); }
 .dayToday { box-shadow: 0 0 0 2px #5B2A4A; font-weight: 800; }
+.daySel { box-shadow: 0 0 0 2.5px #8E5378; transform: scale(1.06); }
+
+.detail {
+  margin: 14px 18px 0; background: #fff; border: 1px solid rgba(91,42,74,0.1);
+  border-left: 4px solid #8E5378; border-radius: 14px; padding: 12px 14px;
+  box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+}
+.detailTop { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.detailDate { font-size: 13px; font-weight: 800; color: #3E1B33; }
+.detailPhase { font-size: 11px; font-weight: 700; }
+.detailBody { font-size: 12px; line-height: 1.5; color: #4A3A44; margin-top: 7px; }
 
 .logBtn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
@@ -39,3 +53,5 @@
 .legend { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 16px 18px 0; }
 .legItem { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #6B5A65; }
 .legDot { width: 10px; height: 10px; border-radius: 50%; }
+
+.introSub { font-size: 13px; line-height: 1.55; color: #6B5A65; margin-top: 9px; }

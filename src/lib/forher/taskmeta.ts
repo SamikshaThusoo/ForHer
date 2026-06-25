@@ -36,3 +36,20 @@ export function fmtTarget(t: TaskTarget): string {
 export function hrefForTask(task: JourneyTask): string | undefined {
   return ROUTE_HREF[task.routeTo];
 }
+
+// Time windows (spec §2.2) — each task surfaces in its window, prompted at that
+// time. Clinical sits in a flex slot (anytime, highest priority).
+export type TimeWindow = "flex" | "morning" | "midday" | "afternoon" | "evening" | "winddown";
+
+export const WINDOW_FOR_CAT: Record<TaskCategory, TimeWindow> = {
+  clinical: "flex", track: "morning", move: "morning", nourish: "midday",
+  learn: "midday", connect: "afternoon", mind: "evening", sleep: "winddown",
+};
+export const WINDOW_ORDER: TimeWindow[] = ["flex", "morning", "midday", "afternoon", "evening", "winddown"];
+export const WINDOW_LABEL: Record<TimeWindow, string> = {
+  flex: "Anytime", morning: "Morning", midday: "Midday", afternoon: "Afternoon",
+  evening: "Evening", winddown: "Wind-down",
+};
+export const WINDOW_TIME: Record<TimeWindow, string> = {
+  flex: "scheduled", morning: "7–9am", midday: "1pm", afternoon: "4pm", evening: "8pm", winddown: "10pm",
+};

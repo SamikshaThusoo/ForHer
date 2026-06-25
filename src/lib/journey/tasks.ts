@@ -80,7 +80,8 @@ export function resolveTasksForDay(persona: Persona, dayIndex: number): JourneyT
   return out;
 }
 
-export function pickThreeThings(tasks: JourneyTask[]): JourneyTask[] {
+/** Top `n` tasks by priority, one per category (variety), clinical first. */
+export function pickTop(tasks: JourneyTask[], n: number): JourneyTask[] {
   const sorted = [...tasks].sort((a, b) => a.priority - b.priority);
   const seen = new Set<string>();
   const picked: JourneyTask[] = [];
@@ -88,7 +89,17 @@ export function pickThreeThings(tasks: JourneyTask[]): JourneyTask[] {
     if (seen.has(t.category)) continue;
     seen.add(t.category);
     picked.push(t);
-    if (picked.length === 3) break;
+    if (picked.length === n) break;
   }
   return picked;
+}
+
+export function pickThreeThings(tasks: JourneyTask[]): JourneyTask[] {
+  return pickTop(tasks, 3);
+}
+
+/** The 3–4 tasks a woman actually does on a given day — a focused, varied set
+ *  (not the full catalog), surfaced one at a time in her scheduled time windows. */
+export function resolveDailyPlan(persona: Persona, dayIndex: number): JourneyTask[] {
+  return pickTop(resolveTasksForDay(persona, dayIndex), 4);
 }

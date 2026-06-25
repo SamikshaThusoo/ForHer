@@ -2,9 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
+import { useForHer } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
-import { BottomNav } from "@/components/forher/BottomNav/BottomNav";
-import { cycleDayForDate, cycleLengthFor, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
+import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
 import type { CyclePhase } from "@/types/journey";
 import { ChevronLeft, Heart, Check } from "lucide-react";
 import styles from "./community.module.css";
@@ -65,9 +65,14 @@ const PACING: Record<CyclePhase, string> = {
 
 export default function CommunityPage() {
   const { persona } = usePersona();
+  const fh = useForHer(persona.id);
   const today = new Date();
   const L = cycleLengthFor(persona);
-  const phase = phaseForCycleDay(cycleDayForDate(persona, today), L);
+  const logged = fh.cycleLogged;
+  // Phase comes only from her logged cycle; until then we don't claim a phase.
+  const phase: CyclePhase = fh.cycleLog
+    ? phaseForCycleDay(cycleDayFromLog(fh.cycleLog.lastPeriod, L, today), L)
+    : "follicular";
   const carePlan = personaTrack(persona) !== "none";
 
   const [picked, setPicked] = useState<Set<string>>(new Set());
@@ -83,8 +88,17 @@ export default function CommunityPage() {
       </header>
 
       <div className={styles.hero}>
-        <h1 className={styles.h1}>Women in your <em>{PHASE_LABEL[phase].toLowerCase()} phase</em></h1>
-        <p className={styles.sub}>Real recommendations and check-ins from women tracking the same phase.</p>
+        {logged ? (
+          <>
+            <h1 className={styles.h1}>Women in your <em>{PHASE_LABEL[phase].toLowerCase()} phase</em></h1>
+            <p className={styles.sub}>Real recommendations and check-ins from women tracking the same phase.</p>
+          </>
+        ) : (
+          <>
+            <h1 className={styles.h1}>Women <em>like you</em></h1>
+            <p className={styles.sub}>Real recommendations and check-ins. <Link href="/cycle" className={styles.inlineLink}>Log your cycle</Link> to see your phase community.</p>
+          </>
+        )}
       </div>
 
       {carePlan && <div className={styles.pacing}>{PACING[phase]}</div>}
@@ -119,7 +133,7 @@ export default function CommunityPage() {
       <div className={styles.sectionTitle}>What&apos;s working for women now</div>
       <div className={styles.tips}>
         {TIPS[phase].map((t, i) => (
-          <div key={i} className={styles.tip}>
+          <div key={i} className={`${styles.tip} fhReveal`} style={{ animationDelay: `${i * 70}ms` }}>
             <span className={`${styles.kind} ${styles["kind" + t.kind]}`}>{t.kind === "Peer" ? "From the community" : t.kind === "Pacing" ? "Keeping your pace" : "Diet from the community"}</span>
             <p className={styles.tipText}>{t.text}</p>
             <span className={styles.saved}>{t.saved.toLocaleString()} women saved this</span>
@@ -131,7 +145,7 @@ export default function CommunityPage() {
       <div className={styles.sectionTitle}>Phase check-ins</div>
       <div className={styles.posts}>
         {POSTS[phase].map((p, i) => (
-          <div key={i} className={styles.post}>
+          <div key={i} className={`${styles.post} fhReveal`} style={{ animationDelay: `${i * 70}ms` }}>
             <div className={styles.postTop}><span className={styles.avatar} aria-hidden /><span className={styles.name}>In your {PHASE_LABEL[phase].toLowerCase()} phase</span></div>
             <p className={styles.postText}>{p.text}</p>
             <span className={styles.likes}><Heart size={12} /> {p.likes}</span>
@@ -140,7 +154,6 @@ export default function CommunityPage() {
       </div>
 
       <p className={styles.disclaimer}>Shared for general wellbeing — not medical advice.</p>
-      <BottomNav />
     </main>
   );
 }

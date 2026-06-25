@@ -1,25 +1,39 @@
 "use client";
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Bell } from "lucide-react";
 import styles from "./ScheduleCollection.module.css";
 
-// A light timing questionnaire so the plan can land tasks at sensible moments.
+// Timing questions so the plan can land each daily prompt at a sensible moment.
 const QUESTIONS = [
   { key: "wake", q: "When do you usually wake up?", opts: ["Before 6", "6–7", "7–8", "After 8"] },
   { key: "meals", q: "When's your biggest meal?", opts: ["Breakfast", "Lunch", "Dinner", "It varies"] },
-  { key: "exercise", q: "When can you move most days?", opts: ["Morning", "Afternoon", "Evening", "Not sure yet"] },
-  { key: "bed", q: "When do you usually sleep?", opts: ["Before 10", "10–11", "11–12", "After 12"] },
+  { key: "move", q: "When can you move most days?", opts: ["Morning", "Afternoon", "Evening", "Not sure yet"] },
+  { key: "checkin", q: "Best time for a quick mood & symptom check-in?", opts: ["Morning", "Midday", "Evening", "Before bed"] },
+  { key: "bed", q: "When do you usually wind down?", opts: ["Before 10", "10–11", "11–12", "After 12"] },
+];
+
+// The daily prompts she can opt into — these are exactly what the care plan nudges.
+const NUDGES = [
+  { key: "meals", label: "Meals & food scan" },
+  { key: "movement", label: "Movement" },
+  { key: "mood", label: "Mood & symptoms" },
+  { key: "hydration", label: "Hydration" },
+  { key: "winddown", label: "Wind-down & sleep" },
 ];
 
 export function ScheduleCollection({ onComplete }: { onComplete: (s: Record<string, string>) => void }) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [nudges, setNudges] = useState<Set<string>>(() => new Set(NUDGES.map((n) => n.key)));
   const allAnswered = QUESTIONS.every((q) => answers[q.key]);
+
+  const toggleNudge = (k: string) =>
+    setNudges((p) => { const n = new Set(p); n.has(k) ? n.delete(k) : n.add(k); return n; });
 
   return (
     <div className={styles.wrap}>
       <span className={styles.eyebrow}>Last step</span>
       <h2 className={styles.title}>Let&apos;s fit the plan to <em>your day</em></h2>
-      <p className={styles.lead}>So reminders land when they actually help — you can change these any time.</p>
+      <p className={styles.lead}>So each nudge lands when it actually helps — you can change all of this any time.</p>
 
       {QUESTIONS.map((item) => (
         <div key={item.key} className={styles.q}>
@@ -36,8 +50,22 @@ export function ScheduleCollection({ onComplete }: { onComplete: (s: Record<stri
         </div>
       ))}
 
-      <button type="button" className={styles.cta} disabled={!allAnswered} onClick={() => onComplete(answers)}>
-        Set my schedule <ArrowRight size={16} />
+      <div className={styles.nudgeBlock}>
+        <p className={styles.nudgeHead}><Bell size={14} /> Which daily nudges do you want?</p>
+        <div className={styles.opts}>
+          {NUDGES.map((n) => (
+            <button
+              key={n.key} type="button"
+              className={`${styles.opt} ${nudges.has(n.key) ? styles.optOn : ""}`}
+              onClick={() => toggleNudge(n.key)}
+            >{n.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <button type="button" className={styles.cta} disabled={!allAnswered}
+        onClick={() => onComplete({ ...answers, nudges: [...nudges].join(",") })}>
+        Set my reminders <ArrowRight size={16} />
       </button>
     </div>
   );
