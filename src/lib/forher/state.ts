@@ -11,7 +11,13 @@ const kDone = (id: string) => `forher.${id}.done`;
 const kSchedule = (id: string) => `forher.${id}.schedule`;
 const kCycle = (id: string) => `forher.${id}.cycle`;
 
-export type CycleLog = { lastPeriod: string; duration: number };
+export type CycleIntent = "track" | "ttc" | "pregnant";
+export type CycleLog = {
+  intent: CycleIntent;
+  lastPeriod?: string;    // track + ttc
+  duration?: number;      // track + ttc
+  weeksPregnant?: number; // pregnant
+};
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -31,8 +37,8 @@ export function markAssessed(personaId: string) { write(kAssessed(personaId), tr
 export function saveSchedule(personaId: string, schedule: Record<string, string>) {
   write(kSchedule(personaId), schedule);
 }
-export function saveCycleLog(personaId: string, lastPeriod: string, duration: number) {
-  write(kCycle(personaId), { lastPeriod, duration });
+export function saveCycleLog(personaId: string, log: CycleLog) {
+  write(kCycle(personaId), log);
 }
 export function readCycleLog(personaId: string): CycleLog | null {
   return read<CycleLog | null>(kCycle(personaId), null);

@@ -48,17 +48,56 @@ export default function CyclePage() {
           <h1 className={styles.h1}>Your <em>cycle</em></h1>
           <p className={styles.introSub}>We won&apos;t show a phase until you&apos;ve logged your cycle — no guessing on our part.</p>
         </div>
-        <CycleOnboarding onSave={(lp, dur) => { saveCycleLog(persona.id, lp, dur); setLocalCycle({ lastPeriod: lp, duration: dur }); }} />
+        <CycleOnboarding onSave={(log) => { saveCycleLog(persona.id, log); setLocalCycle(log); }} />
+      </main>
+    );
+  }
+
+  // ---- Pregnant → no cycle tracking; pregnancy progress + Tulip ----
+  if (cycle.intent === "pregnant") {
+    const weeks = cycle.weeksPregnant ?? 0;
+    const trimester = weeks <= 13 ? "First" : weeks <= 27 ? "Second" : "Third";
+    return (
+      <main className={`${styles.page} fhTheme`}>
+        {header}
+        <div className={styles.hero}>
+          <h1 className={styles.h1}>Your <em>pregnancy</em></h1>
+          <p className={styles.introSub}>We&apos;ve paused cycle tracking — here&apos;s what matters now.</p>
+        </div>
+        <div className={styles.pregCard}>
+          <div><span className={styles.pregWeeks}>{weeks}</span><span className={styles.pregUnit}> weeks</span></div>
+          <span className={styles.pregTri}>{trimester} trimester</span>
+        </div>
+        <Link href="/cares/care-team" className={styles.tulipCard}>
+          <span className={styles.tulipEyebrow}>Recommended for you</span>
+          <h3 className={styles.tulipTitle}>Tulip — pregnancy care with PCOS</h3>
+          <p className={styles.tulipSub}>PCOS can raise some pregnancy risks. Tulip adds closer monitoring and a dedicated team.</p>
+          <span className={styles.tulipCta}>Explore Tulip →</span>
+        </Link>
+        <Link href="/community" className={styles.pregComm}>
+          <span className={styles.pregCommLabel}>Community</span>
+          <span className={styles.pregCommText}>Women navigating pregnancy with PCOS →</span>
+        </Link>
       </main>
     );
   }
 
   const L = cycleLengthFor(persona);
-  const cdFor = (date: Date) => cycleDayFromLog(cycle.lastPeriod, L, date);
+  const anchor = cycle.lastPeriod ?? iso(today);
+  const cdFor = (date: Date) => cycleDayFromLog(anchor, L, date);
   const todayPhase = phaseForCycleDay(cdFor(today), L);
   const todayCd = cdFor(today);
   const daysToStart = todayCd === 1 ? 0 : L - todayCd + 1;
   const next = new Date(today.getTime() + daysToStart * 86400000);
+
+  // TTC: surface the fertile window (cycle days ~ovulation-4 .. +1).
+  const ttc = cycle.intent === "ttc";
+  const ovCd = Math.floor(L / 2);
+  const isFertileCd = (cd: number) => cd >= ovCd - 4 && cd <= ovCd + 1;
+  const daysToOv = ((ovCd - todayCd) % L + L) % L;
+  const ovDate = new Date(today.getTime() + daysToOv * 86400000);
+  const fertileStart = new Date(ovDate.getTime() - 4 * 86400000);
+  const fmt = (d: Date) => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
 
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -91,7 +130,9 @@ export default function CyclePage() {
         <h1 className={styles.h1}>Your <em>cycle</em></h1>
         <div className={styles.summary}>
           <span className={styles.todayPill} style={{ background: PHASE_COLOR[todayPhase] }}>{PHASE_LABEL[todayPhase]} phase</span>
-          <span className={styles.nextNote}>Next period ~ {next.toLocaleDateString(undefined, { day: "numeric", month: "short" })}</span>
+          {ttc
+            ? <span className={styles.fertileNote}>Most fertile ~ {fmt(fertileStart)}–{fmt(ovDate)}</span>
+            : <span className={styles.nextNote}>Next period ~ {next.toLocaleDateString(undefined, { day: "numeric", month: "short" })}</span>}
         </div>
       </div>
 
@@ -105,12 +146,13 @@ export default function CyclePage() {
             const phase = phaseForCycleDay(cdFor(date), L);
             const isToday = d === today.getDate();
             const isPeriod = phase === "menstrual" || logged.includes(iso(date));
+            const fertile = ttc && isFertileCd(cdFor(date));
             return (
               <button
                 key={i}
                 type="button"
                 onClick={() => setSelected(d)}
-                className={`${styles.day} ${isToday ? styles.dayToday : ""} ${selected === d ? styles.daySel : ""}`}
+                className={`${styles.day} ${isToday ? styles.dayToday : ""} ${selected === d ? styles.daySel : ""} ${fertile ? styles.dayFertile : ""}`}
                 style={{ background: isPeriod ? PHASE_COLOR.menstrual : `${PHASE_COLOR[phase]}22`, color: isPeriod ? "#fff" : "#3E1B33" }}
               >
                 {d}
@@ -127,7 +169,7 @@ export default function CyclePage() {
             Cycle day {selCd} · {PHASE_LABEL[selPhase]}
           </span>
         </div>
-        <p className={styles.detailBody}>{selPeriod ? "Period likely on this day. " : ""}{PHASE_PROSE[selPhase]}</p>
+        <p className={styles.detailBody}>{ttc && isFertileCd(selCd) ? "High-fertility day. " : ""}{selPeriod ? "Period likely on this day. " : ""}{PHASE_PROSE[selPhase]}</p>
       </div>
 
       <button type="button" className={styles.logBtn} onClick={logToday} disabled={loggedToday}>
