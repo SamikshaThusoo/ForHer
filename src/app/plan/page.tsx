@@ -27,7 +27,7 @@ export default function PlanPage() {
     return (
       <main className={`${styles.page} fhTheme`}>
         <header className={styles.head}>
-          <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+          <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
           <span className={styles.brandline}>For Her · PMOS</span>
         </header>
         <div className={styles.empty}>
@@ -56,13 +56,13 @@ export default function PlanPage() {
   const nodes = [...milestones, ...tps].sort((a, b) => a.day - b.day);
 
   // Lay the nodes along a winding road. Single "current" = the last node reached.
-  const STEP = 122;
+  const STEP = 132;
   const positioned = nodes.map((n, i) => ({
     ...n,
-    x: 50 + 30 * Math.sin(i * 0.85), // % across — gentle S-curve
-    y: 64 + i * STEP,                // px down
+    x: 50 + 23 * Math.sin(i * 0.72), // % across — gentle S-curve
+    y: 70 + i * STEP,                // px down
   }));
-  const totalH = 64 + nodes.length * STEP + 30;
+  const totalH = 70 + nodes.length * STEP + 26;
   const currentIdx = nodes.reduce((acc, n, i) => (n.day <= fh.day ? i : acc), 0);
   const roadD = positioned
     .map((p, i) => {
@@ -76,7 +76,7 @@ export default function PlanPage() {
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
-        <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+        <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · PMOS</span>
       </header>
 
@@ -96,7 +96,7 @@ export default function PlanPage() {
 
       <div className={styles.path} style={{ height: totalH }}>
         <svg className={styles.road} viewBox={`0 0 100 ${totalH}`} preserveAspectRatio="none" aria-hidden>
-          <path d={roadD} fill="none" stroke="rgba(142,83,120,0.18)" strokeWidth={12}
+          <path d={roadD} fill="none" stroke="rgba(142,83,120,0.22)" strokeWidth={14}
             strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         </svg>
         {positioned.map((n, i) => {
