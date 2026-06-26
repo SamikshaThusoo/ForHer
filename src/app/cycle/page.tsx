@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
 import {
@@ -23,6 +24,7 @@ function readLogged(id: string): string[] {
 export default function CyclePage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
+  const router = useRouter();
   const today = new Date();
   const [logged, setLogged] = useState<string[]>(() => (typeof window === "undefined" ? [] : readLogged(persona.id)));
   const [selected, setSelected] = useState<number>(today.getDate());
@@ -48,7 +50,7 @@ export default function CyclePage() {
           <h1 className={styles.h1}>Your <em>cycle</em></h1>
           <p className={styles.introSub}>We won&apos;t show a phase until you&apos;ve logged your cycle — no guessing on our part.</p>
         </div>
-        <CycleOnboarding onSave={(log) => { saveCycleLog(persona.id, log); setLocalCycle(log); }} />
+        <CycleOnboarding onSave={(log) => { saveCycleLog(persona.id, log); setLocalCycle(log); router.push("/"); }} />
       </main>
     );
   }
