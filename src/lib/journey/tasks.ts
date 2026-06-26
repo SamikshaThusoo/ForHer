@@ -13,9 +13,9 @@ function dueToday(everyDays: number, onDay: number | undefined, dayIndex: number
 
 function phaseNudge(phase: CyclePhase): string {
   switch (phase) {
-    case "luteal": return "Energy may dip now — keep it gentle. ";
-    case "ovulatory": return "Energy is peaking — a good day to push. ";
-    case "menstrual": return "Be kind to yourself today. ";
+    case "luteal": return "Keep it gentle today. ";
+    case "ovulatory": return "Energy's peaking today. ";
+    case "menstrual": return "Be gentle today. ";
     default: return "";
   }
 }
