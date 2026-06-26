@@ -5,8 +5,14 @@ import { learnedCycleLength } from "@/lib/journey";
 // Calendar/hormone helpers for the companion screens. They reuse the engine's
 // learned cycle length (no engine changes) and mirror its phase boundaries.
 
-function isoToMs(iso: string): number { return new Date(iso + "T00:00:00Z").getTime(); }
-function startOfDay(d: Date): number { return Math.floor(d.getTime() / 86400000); }
+// Day numbers from calendar Y/M/D only (no time-of-day, no timezone drift).
+function isoDayNum(iso: string): number {
+  const [y, m, d] = iso.split("-").map(Number);
+  return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+}
+function dateDayNum(d: Date): number {
+  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+}
 
 export function cycleLengthFor(persona: Persona): number {
   return learnedCycleLength(persona.pmos?.cycleHistory ?? []);
@@ -23,13 +29,13 @@ export function cycleDayForDate(persona: Persona, date: Date): number {
   const last = lastStartFor(persona);
   const L = cycleLengthFor(persona);
   if (!last) return 1;
-  const days = startOfDay(date) - Math.floor(isoToMs(last) / 86400000);
+  const days = dateDayNum(date) - isoDayNum(last);
   return (((days % L) + L) % L) + 1;
 }
 
 /** 1-based cycle day from a logged last-period date + cycle length. */
 export function cycleDayFromLog(lastPeriodISO: string, length: number, date: Date): number {
-  const days = startOfDay(date) - Math.floor(isoToMs(lastPeriodISO) / 86400000);
+  const days = dateDayNum(date) - isoDayNum(lastPeriodISO);
   return (((days % length) + length) % length) + 1;
 }
 

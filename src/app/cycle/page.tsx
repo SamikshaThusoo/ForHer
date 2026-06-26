@@ -1,35 +1,33 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
-import {
-  cycleLengthFor, cycleDayFromLog, phaseForCycleDay,
-  PHASE_COLOR, PHASE_LABEL, PHASE_PROSE,
-} from "@/lib/forher/cycleview";
+import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
 import { CycleOnboarding } from "@/components/forher/CycleOnboarding/CycleOnboarding";
-import type { CyclePhase } from "@/types/journey";
-import { ChevronLeft, Plus, Check } from "lucide-react";
+import { ChevronLeft, ArrowRight } from "lucide-react";
 import styles from "./cycle.module.css";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
-const PHASES: CyclePhase[] = ["menstrual", "follicular", "ovulatory", "luteal"];
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+const pad = (n: number) => String(n).padStart(2, "0");
+const localISO = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const fromISO = (s: string) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const dayNum = (d: Date) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
 
 function readLogged(id: string): string[] {
   try { return JSON.parse(localStorage.getItem(`forher.${id}.loggedperiods`) || "[]"); } catch { return []; }
+}
+function writeLogged(id: string, set: Set<string>) {
+  try { localStorage.setItem(`forher.${id}.loggedperiods`, JSON.stringify([...set])); } catch { /* ignore */ }
 }
 
 export default function CyclePage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
-  const router = useRouter();
   const today = new Date();
-  const [logged, setLogged] = useState<string[]>(() => (typeof window === "undefined" ? [] : readLogged(persona.id)));
-  const [selected, setSelected] = useState<number>(today.getDate());
+  const [logged, setLogged] = useState<Set<string>>(() => new Set(typeof window === "undefined" ? [] : readLogged(persona.id)));
   const [localCycle, setLocalCycle] = useState<CycleLog | null>(null);
-
   const cycle = localCycle ?? fh.cycleLog;
 
   const header = (
@@ -39,9 +37,18 @@ export default function CyclePage() {
     </header>
   );
 
+  const toggleDay = (iso: string) => {
+    setLogged((prev) => {
+      const next = new Set(prev);
+      next.has(iso) ? next.delete(iso) : next.add(iso);
+      writeLogged(persona.id, next);
+      return next;
+    });
+  };
+
   if (!fh.hydrated) return <main className={`${styles.page} fhTheme`}>{header}</main>;
 
-  // ---- Not set up yet → onboard (this is what unlocks phase prediction) ----
+  // ---- Not set up yet → onboard. Saving seeds the period days, then shows the calendar. ----
   if (!cycle) {
     return (
       <main className={`${styles.page} fhTheme`}>
@@ -50,7 +57,17 @@ export default function CyclePage() {
           <h1 className={styles.h1}>Your <em>cycle</em></h1>
           <p className={styles.introSub}>We won&apos;t show a phase until you&apos;ve logged your cycle — no guessing on our part.</p>
         </div>
-        <CycleOnboarding onSave={(log) => { saveCycleLog(persona.id, log); setLocalCycle(log); router.push("/"); }} />
+        <CycleOnboarding onSave={(log) => {
+          saveCycleLog(persona.id, log);
+          if (log.lastPeriod && log.duration) {
+            const start = fromISO(log.lastPeriod);
+            const next = new Set(logged);
+            for (let i = 0; i < log.duration; i++) next.add(localISO(addDays(start, i)));
+            setLogged(next);
+            writeLogged(persona.id, next);
+          }
+          setLocalCycle(log); // stay here and show the calendar
+        }} />
       </main>
     );
   }
@@ -76,53 +93,73 @@ export default function CyclePage() {
           <p className={styles.tulipSub}>PCOS can raise some pregnancy risks. Tulip adds closer monitoring and a dedicated team.</p>
           <span className={styles.tulipCta}>Explore Tulip →</span>
         </Link>
-        <Link href="/community" className={styles.pregComm}>
-          <span className={styles.pregCommLabel}>Community</span>
-          <span className={styles.pregCommText}>Women navigating pregnancy with PCOS →</span>
-        </Link>
       </main>
     );
   }
 
+  // ---- Track / TTC calendar ----
   const L = cycleLengthFor(persona);
-  const anchor = cycle.lastPeriod ?? iso(today);
-  const cdFor = (date: Date) => cycleDayFromLog(anchor, L, date);
-  const todayPhase = phaseForCycleDay(cdFor(today), L);
-  const todayCd = cdFor(today);
-  const daysToStart = todayCd === 1 ? 0 : L - todayCd + 1;
-  const next = new Date(today.getTime() + daysToStart * 86400000);
-
-  // TTC: surface the fertile window (cycle days ~ovulation-4 .. +1).
+  const duration = cycle.duration ?? 5;
   const ttc = cycle.intent === "ttc";
   const ovCd = Math.floor(L / 2);
-  const isFertileCd = (cd: number) => cd >= ovCd - 4 && cd <= ovCd + 1;
-  const daysToOv = ((ovCd - todayCd) % L + L) % L;
-  const ovDate = new Date(today.getTime() + daysToOv * 86400000);
-  const fertileStart = new Date(ovDate.getTime() - 4 * 86400000);
+
+  // Anchor = most recent period start (a logged day whose previous day isn't logged), on/before today.
+  const sorted = [...logged].sort();
+  const starts = sorted.filter((s) => !logged.has(localISO(addDays(fromISO(s), -1))));
+  const pastStarts = starts.filter((s) => dayNum(fromISO(s)) <= dayNum(today));
+  const anchorISO = pastStarts.length ? pastStarts[pastStarts.length - 1] : (cycle.lastPeriod ?? localISO(today));
+  const anchor = fromISO(anchorISO);
+
+  // Predicted future periods.
+  const predicted = new Set<string>();
+  for (let k = 1; k <= 4; k++) {
+    const ps = addDays(anchor, k * L);
+    for (let i = 0; i < duration; i++) predicted.add(localISO(addDays(ps, i)));
+  }
+
+  const todayCd = cycleDayFromLog(anchorISO, L, today);
+  const todayPhase = phaseForCycleDay(todayCd, L);
+  const nextStart = addDays(anchor, dayNum(today) - dayNum(anchor) < L ? L : Math.ceil((dayNum(today) - dayNum(anchor) + 1) / L) * L);
   const fmt = (d: Date) => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
 
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [
-    ...Array(firstDay).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ];
+  const months = [0, 1, 2].map((off) => new Date(today.getFullYear(), today.getMonth() + off, 1));
 
-  const logToday = () => {
-    const key = iso(today);
-    if (logged.includes(key)) return;
-    const nextLogged = [...logged, key];
-    setLogged(nextLogged);
-    try { localStorage.setItem(`forher.${persona.id}.loggedperiods`, JSON.stringify(nextLogged)); } catch { /* ignore */ }
+  const renderMonth = (m: Date) => {
+    const year = m.getFullYear(); const month = m.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells: (number | null)[] = [...Array(firstDay).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+    return (
+      <div className={styles.month} key={`${year}-${month}`}>
+        <div className={styles.monthLabel}>{m.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</div>
+        <div className={styles.grid}>
+          {WEEKDAYS.map((w, i) => <span key={`w${i}`} className={styles.wd}>{w}</span>)}
+          {cells.map((d, i) => {
+            if (d == null) return <span key={i} />;
+            const date = new Date(year, month, d);
+            const iso = localISO(date);
+            const isLogged = logged.has(iso);
+            const isPred = !isLogged && predicted.has(iso);
+            const cd = cycleDayFromLog(anchorISO, L, date);
+            const isOv = cd === ovCd;
+            const isFertile = ttc && !isLogged && !isPred && cd >= ovCd - 4 && cd <= ovCd + 1;
+            const isToday = iso === localISO(today);
+            return (
+              <button key={i} type="button" onClick={() => toggleDay(iso)}
+                className={[styles.day,
+                  isLogged ? styles.dayLogged : "",
+                  isPred ? styles.dayPred : "",
+                  isFertile ? styles.dayFertile : "",
+                  isOv && ttc ? styles.dayOv : "",
+                  isToday ? styles.dayToday : ""].filter(Boolean).join(" ")}>
+                {d}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
-  const loggedToday = logged.includes(iso(today));
-
-  const selDate = new Date(year, month, selected);
-  const selCd = cdFor(selDate);
-  const selPhase = phaseForCycleDay(selCd, L);
-  const selPeriod = selPhase === "menstrual" || logged.includes(iso(selDate));
 
   return (
     <main className={`${styles.page} fhTheme`}>
@@ -131,60 +168,31 @@ export default function CyclePage() {
       <div className={styles.hero}>
         <h1 className={styles.h1}>Your <em>cycle</em></h1>
         <div className={styles.summary}>
-          <span className={styles.todayPill} style={{ background: PHASE_COLOR[todayPhase] }}>{PHASE_LABEL[todayPhase]} phase</span>
-          {ttc
-            ? <span className={styles.fertileNote}>Most fertile ~ {fmt(fertileStart)}–{fmt(ovDate)}</span>
-            : <span className={styles.nextNote}>Next period ~ {next.toLocaleDateString(undefined, { day: "numeric", month: "short" })}</span>}
+          <span className={styles.dayChip}>Day {todayCd} of {L}</span>
+          <span className={styles.todayPill}>{PHASE_LABEL[todayPhase]} phase</span>
         </div>
+        <p className={styles.nextNote}>
+          {ttc ? `Most fertile ~ ${fmt(addDays(anchor, ovCd - 4))}–${fmt(addDays(anchor, ovCd))}` : `Next period ~ ${fmt(nextStart)}`}
+        </p>
       </div>
 
-      <div className={styles.calendar}>
-        <div className={styles.monthLabel}>{today.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</div>
-        <div className={styles.grid}>
-          {WEEKDAYS.map((w, i) => <span key={i} className={styles.wd}>{w}</span>)}
-          {cells.map((d, i) => {
-            if (d == null) return <span key={i} />;
-            const date = new Date(year, month, d);
-            const phase = phaseForCycleDay(cdFor(date), L);
-            const isToday = d === today.getDate();
-            const isPeriod = phase === "menstrual" || logged.includes(iso(date));
-            const fertile = ttc && isFertileCd(cdFor(date));
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setSelected(d)}
-                className={`${styles.day} ${isToday ? styles.dayToday : ""} ${selected === d ? styles.daySel : ""} ${fertile ? styles.dayFertile : ""}`}
-                style={{ background: isPeriod ? PHASE_COLOR.menstrual : `${PHASE_COLOR[phase]}22`, color: isPeriod ? "#fff" : "#3E1B33" }}
-              >
-                {d}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <p className={styles.tapHint}>Tap a day to add or remove a period day. Future periods are predicted (outlined).</p>
 
-      <div className={styles.detail} style={{ borderLeftColor: PHASE_COLOR[selPhase] }}>
-        <div className={styles.detailTop}>
-          <span className={styles.detailDate}>{selDate.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
-          <span className={styles.detailPhase} style={{ color: PHASE_COLOR[selPhase] }}>
-            Cycle day {selCd} · {PHASE_LABEL[selPhase]}
-          </span>
-        </div>
-        <p className={styles.detailBody}>{ttc && isFertileCd(selCd) ? "High-fertility day. " : ""}{selPeriod ? "Period likely on this day. " : ""}{PHASE_PROSE[selPhase]}</p>
+      <div className={styles.months}>
+        {months.map(renderMonth)}
       </div>
-
-      <button type="button" className={styles.logBtn} onClick={logToday} disabled={loggedToday}>
-        {loggedToday ? <><Check size={16} /> Period logged today</> : <><Plus size={16} /> Log period today</>}
-      </button>
 
       <div className={styles.legend}>
-        {PHASES.map((p) => (
-          <span key={p} className={styles.legItem}>
-            <span className={styles.legDot} style={{ background: PHASE_COLOR[p] }} />{PHASE_LABEL[p]}
-          </span>
-        ))}
+        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.dayLogged}`} />Period</span>
+        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.dayPred}`} />Predicted</span>
+        {ttc && <span className={styles.legItem}><span className={`${styles.legDot} ${styles.dayFertile}`} />Fertile</span>}
       </div>
+
+      <button type="button" className={styles.logBtn} onClick={() => toggleDay(localISO(today))}>
+        {logged.has(localISO(today)) ? "Remove today's period" : "Log period"}
+      </button>
+
+      <Link href="/hormones" className={styles.nextBtn}>Next · your hormone rhythm <ArrowRight size={16} /></Link>
     </main>
   );
 }
