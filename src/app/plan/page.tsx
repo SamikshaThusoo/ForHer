@@ -4,7 +4,7 @@ import { usePersona } from "@/context/PersonaContext";
 import { useForHer, PLAN_LAST_DAY } from "@/lib/forher/state";
 import { getTouchpointsDue, getPhase, personaTrack } from "@/lib/journey";
 import {
-  ChevronLeft, Sparkles, Star, Award, ClipboardCheck, Stethoscope, Check, Lock, MapPin,
+  ChevronLeft, Sparkles, Star, Award, ClipboardCheck, Stethoscope, Check, Lock,
 } from "lucide-react";
 import styles from "./plan.module.css";
 
@@ -84,21 +84,24 @@ export default function PlanPage() {
           const phase = getPhase(n.day);
           const band = phase !== prevPhase ? PHASE_LABEL[phase] : null;
           prevPhase = phase;
-          const done = n.day < fh.day;
+          const done = n.day < reachedMax;
           const current = n.day === reachedMax;
+          const locked = n.day > reachedMax;
+          const big = n.type === "milestone" || n.type === "finish";
           const Icon = ICON[n.type];
           const side = i % 2 === 0;
           return (
             <div key={i}>
-              {band && <div className={styles.band}>{band} phase</div>}
+              {band && <div className={styles.band}><span>{band} phase</span></div>}
               <div className={`${styles.nodeRow} ${side ? styles.rowL : styles.rowR}`}>
-                <div className={`${styles.node} ${done ? styles.nodeDone : current ? styles.nodeCurrent : styles.nodeFuture}`}>
-                  {done ? <Check size={18} strokeWidth={3} /> : current ? <Icon size={18} /> : n.day > fh.day ? <Lock size={15} /> : <Icon size={18} />}
+                <div className={`${styles.node} ${done ? styles.nodeDone : current ? styles.nodeCurrent : styles.nodeFuture} ${big ? styles.nodeBig : ""}`}>
+                  {done ? <Check size={big ? 26 : 22} strokeWidth={3} /> : locked ? <Lock size={16} /> : <Icon size={big ? 26 : 22} />}
+                  {done && <span className={styles.star}><Star size={11} fill="currentColor" strokeWidth={0} /></span>}
+                  {current && <span className={styles.startTag}>START</span>}
                 </div>
                 <div className={styles.nodeLabel}>
                   <span className={styles.nodeDay}>Day {n.day}</span>
                   <span className={styles.nodeText}>{n.label}</span>
-                  {current && <span className={styles.youHere}><MapPin size={11} /> You&apos;re here</span>}
                 </div>
               </div>
             </div>
