@@ -29,7 +29,7 @@ function meta(items: Item[]) {
   const isMilestone = items.some((i) => i.type === "milestone" || i.type === "finish");
   const primary = items.find((i) => i.type === "milestone" || i.type === "finish") ?? items[0];
   const lbl = primary.label.toLowerCase();
-  let Icon: React.ComponentType<{ size?: number }> = Stethoscope;
+  let Icon: React.ComponentType<{ size?: number; className?: string }> = Stethoscope;
   let short = primary.label;
   if (isFinish) { Icon = Trophy; short = "Complete"; }
   else if (primary.type === "start") { Icon = Sparkles; short = "Begin"; }
@@ -147,9 +147,9 @@ export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number
               style={{ left: `${xPct}%`, top: p.y }}
               initial={reduce ? false : { opacity: 0, scale: 0.6 }} animate={reduce ? undefined : { opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: Math.min(p.i * 0.03, 0.3) }}>
-              <Icon size={isMilestone ? 30 : 24} />
+              <Icon size={isMilestone ? 30 : 24} className={locked ? styles.iconGhost : undefined} />
               {done && <span className={styles.checkBadge}><Check size={11} strokeWidth={3} /></span>}
-              {locked && <span className={styles.lockBadge}><Lock size={10} /></span>}
+              {locked && <span className={styles.lockMain}><Lock size={isMilestone ? 28 : 24} strokeWidth={2.4} /></span>}
             </motion.button>
 
             {current && (
@@ -161,7 +161,7 @@ export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number
               </motion.span>
             )}
 
-            <span className={styles.label} style={{ left: `${xPct}%`, top: p.y + r + 15 }}>
+            <span className={styles.label} style={{ left: `${xPct}%`, top: p.y + r + 18 }}>
               <span className={styles.labelDay}>Day {p.day}</span>
               <span className={styles.labelShort}>{short}</span>
             </span>

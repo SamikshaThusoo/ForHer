@@ -37,9 +37,11 @@
   position: absolute; top: -2px; right: -2px; width: 20px; height: 20px; border-radius: 50%;
   background: #4F9D69; color: #fff; display: flex; align-items: center; justify-content: center; border: 2px solid #fff;
 }
-.lockBadge {
-  position: absolute; bottom: -1px; right: -1px; width: 18px; height: 18px; border-radius: 50%;
-  background: #B9ADB5; color: #fff; display: flex; align-items: center; justify-content: center; border: 2px solid #FBF3F5;
+/* Locked: activity icon blurred behind a prominent centred lock. */
+.iconGhost { filter: blur(1.7px); opacity: 0.38; }
+.lockMain {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  z-index: 2; color: #5E5059;
 }
 
 /* ---- "You're here" bubble ---- */
@@ -54,15 +56,15 @@
 }
 
 /* ---- Labels (single line, collision-free) ---- */
+/* The label sits on a soft chip (matches the page bg) so it always masks the
+   path + node shadow behind the text — readable on every day. */
 .label {
-  position: absolute; transform: translateX(-50%); z-index: 1; width: 100px;
-  display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center;
+  position: absolute; transform: translateX(-50%); z-index: 5; width: max-content; max-width: 132px;
+  display: flex; flex-direction: column; align-items: center; gap: 0; text-align: center;
+  background: rgba(251,243,245,0.94); border-radius: 9px; padding: 3px 9px;
 }
-.labelDay { font-size: 8.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #B9A9B2; }
-.labelShort {
-  font-size: 12px; font-weight: 700; color: #3E1B33; line-height: 1.15; white-space: nowrap;
-  background: rgba(251,243,245,0.82); border-radius: 7px; padding: 1px 7px;
-}
+.labelDay { font-size: 8.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #A9929F; }
+.labelShort { font-size: 12px; font-weight: 700; color: #3E1B33; line-height: 1.2; white-space: nowrap; }
 
 /* ---- Day-detail popup ---- */
 .modalBg {
