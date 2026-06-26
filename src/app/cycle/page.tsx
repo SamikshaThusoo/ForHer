@@ -32,7 +32,7 @@ export default function CyclePage() {
 
   const header = (
     <header className={styles.head}>
-      <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+      <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
       <span className={styles.brandline}>For Her · Cycle</span>
     </header>
   );

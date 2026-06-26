@@ -34,7 +34,7 @@ export default function ProgressPage() {
     return (
       <main className={`${styles.page} fhTheme`}>
         <header className={styles.head}>
-          <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+          <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
           <span className={styles.brandline}>For Her · Progress</span>
         </header>
         <div className={styles.empty}>
@@ -65,7 +65,7 @@ export default function ProgressPage() {
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
-        <Link href="/forher" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+        <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · Progress</span>
       </header>
 

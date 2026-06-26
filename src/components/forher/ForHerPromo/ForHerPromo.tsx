@@ -54,7 +54,7 @@ export function ForHerPromo() {
       <div className={`${styles.companion} fhReveal`}>
         <div className={styles.compHead}>
           <span className={styles.compBrand}>For Her · Companion</span>
-          <Link href="/forher" className={styles.compOpen}>Open <ArrowRight size={13} /></Link>
+          <Link href="/" className={styles.compOpen}>Open <ArrowRight size={13} /></Link>
         </div>
         <div className={styles.compTiles}>
           <Link href="/cycle" className={styles.compTile}><CalendarHeart size={18} /><span>Cycle</span></Link>
