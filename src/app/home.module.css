@@ -128,9 +128,13 @@
 .carTitle {
   font-family: var(--font-forher-serif), Georgia, serif; font-weight: 400;
   font-size: 19px; line-height: 1.2; color: #3E1B33; margin-top: 9px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.carSub { font-size: 12.5px; line-height: 1.5; color: #6B5A65; margin-top: 8px; }
-.carCta { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #8E5378; padding-top: 12px; }
+.carSub {
+  font-size: 12.5px; line-height: 1.45; color: #6B5A65; margin-top: 8px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.carCta { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #8E5378; padding-top: 12px; }
 
 .carTask { background: linear-gradient(135deg, #5B2A4A, #7A3A62 60%, #B5687E); color: #fff; }
 .carTask .carEyebrow { color: rgba(255,255,255,0.85); }
