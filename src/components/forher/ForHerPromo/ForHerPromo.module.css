@@ -78,3 +78,18 @@
   border-radius: 13px; background: rgba(142,83,120,0.07); color: #5B2A4A; text-decoration: none;
 }
 .compTile span { font-size: 10.5px; font-weight: 600; }
+
+/* For Her live hub on the Habit home */
+.hubWrap { margin: 8px 0 4px; }
+.hubHead { display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
+.hubBrand {
+  font-family: var(--font-forher-serif), Georgia, serif; font-size: 17px; color: #5B2A4A;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.hubTag {
+  font-family: var(--font-forher-sans), system-ui, sans-serif;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #8E5378; background: rgba(142,83,120,0.12); border-radius: 999px; padding: 3px 8px;
+}
+.hubOpen { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: #8E5378; text-decoration: none; }
+.hubDay { font-size: 11.5px; color: #9A8A92; padding: 3px 18px 0; }
