@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { resolveDailyPlan, getTouchpointsDue } from "@/lib/journey";
@@ -48,6 +49,7 @@ function todayMood(): { feelings: string[]; cycle?: string } | null {
 export function ForHerHub() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
+  const router = useRouter();
   if (!fh.hydrated) return null;
 
   const tasks = resolveDailyPlan(persona, fh.day);
@@ -76,14 +78,20 @@ export function ForHerHub() {
         </Link>
       )}
       {cyclePhase && cycleDay && (
-        <div className={`${styles.car} ${styles.carCycle}`} key="cyclestatus">
+        <div className={`${styles.car} ${styles.carCycle}`} key="cyclestatus"
+          role="button" tabIndex={0} style={{ cursor: "pointer" }}
+          onClick={() => router.push("/cycle")}
+          onKeyDown={(e) => { if (e.key === "Enter") router.push("/cycle"); }}>
           <span className={styles.carIcon}><CalendarHeart size={22} /></span>
           <span className={styles.carEyebrow}>Day {cycleDay} of {L}</span>
           <h3 className={styles.carTitle}>{PHASE_LABEL[cyclePhase]} phase</h3>
           <p className={styles.carSub}>{BODY_NOTE[cyclePhase].replace("Your body: ", "")}</p>
           {mood
             ? <span className={styles.carCta}><Check size={14} /> {mood.feelings.length ? `Feeling ${mood.feelings.slice(0, 3).join(", ").toLowerCase()}` : "Mood logged"}</span>
-            : <Link href="/log/mood" className={styles.carCta}>Log your mood <ArrowRight size={14} /></Link>}
+            : <button type="button" className={styles.carCta}
+                onClick={(e) => { e.stopPropagation(); router.push("/log/mood"); }}>
+                Log your mood <ArrowRight size={14} />
+              </button>}
         </div>
       )}
       {consult && (

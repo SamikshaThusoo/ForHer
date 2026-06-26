@@ -134,7 +134,11 @@
 /* margin-bottom guarantees a gap between the text and the bottom-pinned CTA,
    even when the copy fills the card */
 .carSub { font-size: 12.5px; line-height: 1.45; color: #6B5A65; margin-top: 8px; margin-bottom: 14px; }
-.carCta { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #8E5378; }
+.carCta {
+  margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 700; color: #8E5378;
+  background: none; border: none; padding: 0; cursor: pointer; font-family: inherit;
+}
 
 .carTask { background: linear-gradient(135deg, #5B2A4A, #7A3A62 60%, #B5687E); color: #fff; }
 .carTask .carEyebrow { color: rgba(255,255,255,0.85); }
