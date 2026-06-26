@@ -5,11 +5,12 @@ import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { resolveDailyPlan, getTouchpointsDue } from "@/lib/journey";
 import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
+import { todaysMeals, MEALS } from "@/lib/forher/foodlog";
 import type { CyclePhase } from "@/types/journey";
 import { WINDOW_FOR_CAT, WINDOW_ORDER, WINDOW_LABEL, hrefForTask, fmtTarget } from "@/lib/forher/taskmeta";
 import { FocusCarousel } from "../FocusCarousel/FocusCarousel";
 import {
-  Moon, ArrowRight, Check, Footprints, TrendingUp, Droplet, MessagesSquare, Stethoscope, FlaskConical, CalendarHeart, Briefcase,
+  Moon, ArrowRight, Check, Footprints, TrendingUp, Droplet, MessagesSquare, Stethoscope, FlaskConical, CalendarHeart, Briefcase, Utensils,
 } from "lucide-react";
 import styles from "@/app/home.module.css";
 
@@ -34,6 +35,7 @@ const BODY_NOTE: Record<CyclePhase, string> = {
 };
 
 const pad = (n: number) => String(n).padStart(2, "0");
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
 function todayMood(): { feelings: string[]; cycle?: string } | null {
   try {
@@ -66,6 +68,7 @@ export function ForHerHub() {
   const cyclePhase: CyclePhase | null = lp ? phaseForCycleDay(cycleDayFromLog(lp, L, new Date()), L) : null;
   const cycleDay = lp ? cycleDayFromLog(lp, L, new Date()) : null;
   const mood = todayMood();
+  const meals = todaysMeals();
 
   return (
     <FocusCarousel>
@@ -112,9 +115,23 @@ export function ForHerHub() {
           <span className={styles.carCta}>Upload <ArrowRight size={14} /></span>
         </Link>
       )}
+      {MEALS.map((m) => {
+        const loggedName = meals[m];
+        return (
+          <Link href={`/cares/food?meal=${m}`} className={`${styles.car} ${styles.carScan}`} key={`meal-${m}`}>
+            <span className={styles.carIcon}><Utensils size={22} /></span>
+            <span className={styles.carEyebrow}>{cap(m)}</span>
+            <h3 className={styles.carTitle}>{loggedName ?? `Log ${m}`}</h3>
+            <p className={styles.carSub}>{loggedName ? "Logged today — tap to change." : "Scan, say or search what you ate."}</p>
+            <span className={styles.carCta}>{loggedName ? <><Check size={14} /> Logged · update</> : <>Log food <ArrowRight size={14} /></>}</span>
+          </Link>
+        );
+      })}
       {orderedTasks.map((t) => {
         // The cycle/mood task is the "Set up tracker" / "Cycle added" card above.
         if (t.id === "cycle-mood-log") return null;
+        // Food-logging tasks are shown as the Breakfast/Lunch/Dinner banners.
+        if (t.routeTo === "food-logger") return null;
         // Step goal is a static banner — just the target, no "mark done", no extra line.
         if (t.id === "steps") {
           return (
