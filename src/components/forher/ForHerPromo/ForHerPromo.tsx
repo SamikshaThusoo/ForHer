@@ -2,15 +2,12 @@
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
-import {
-  entryFraming, personaTrack, resolveDailyPlan, pickThreeThings, getPhase, TRACK_LABELS,
-} from "@/lib/journey";
+import { entryFraming, personaTrack, TRACK_LABELS } from "@/lib/journey";
+import { ForHerHub } from "@/components/forher/ForHerHub/ForHerHub";
 import {
   Sparkles, ArrowRight, CalendarHeart, Activity, MessagesSquare, Moon,
 } from "lucide-react";
 import styles from "./ForHerPromo.module.css";
-
-const PHASE_LABEL: Record<string, string> = { foundation: "Foundation", build: "Build", milestone: "Milestone" };
 
 /** The For Her card on the Habit Health home — the hub. Three states:
  *  first-time entry (-> assessment), personalised care-plan view, or a minimal
@@ -69,29 +66,15 @@ export function ForHerPromo() {
     );
   }
 
-  // ---- Assessed, on care plan: personalised view ----
-  const three = pickThreeThings(resolveDailyPlan(persona, fh.day));
-  const done = three.filter((t) => fh.isDone(t.id)).length;
-  const phase = getPhase(fh.day);
+  // ---- Assessed, on care plan: the live carousel, right on the home ----
   return (
-    <Link href="/forher" className={`${styles.card} fhReveal`}>
-      <div className={styles.glow} aria-hidden />
-      <div className={styles.head}>
-        <span className={styles.brand}>For Her</span>
-        <span className={styles.tag}>PMOS</span>
-        <span className={styles.dayChip}>Day {fh.day}</span>
+    <div className={`${styles.hubWrap} fhReveal`}>
+      <div className={styles.hubHead}>
+        <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>PMOS</span></span>
+        <Link href="/forher" className={styles.hubOpen}>Open today <ArrowRight size={13} /></Link>
       </div>
-      <p className={styles.eyebrow}>{TRACK_LABELS[track]} · {PHASE_LABEL[phase]}</p>
-      <div className={styles.progressLine}>
-        <span className={styles.progBig}>{done}/3</span>
-        <span className={styles.progLabel}>things done today</span>
-      </div>
-      <div className={styles.miniTasks}>
-        {three.map((t) => (
-          <span key={t.id} className={`${styles.miniTask} ${fh.isDone(t.id) ? styles.miniDone : ""}`}>{t.title}</span>
-        ))}
-      </div>
-      <span className={styles.cta}>Open today <ArrowRight size={15} /></span>
-    </Link>
+      <p className={styles.hubDay}>{TRACK_LABELS[track]} · Day {fh.day}</p>
+      <ForHerHub />
+    </div>
   );
 }
