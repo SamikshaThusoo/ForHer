@@ -104,8 +104,9 @@ export function ForHerHub() {
         </Link>
       )}
       {orderedTasks.map((t) => {
-        // The cycle/mood task becomes the "Cycle added" card above once logged.
-        if (t.id === "cycle-mood-log" && cyclePhase) return null;
+        // The cycle/mood task is never a generic card — it's the "Set up your tracker"
+        // card before logging and the "Cycle added" card after.
+        if (t.id === "cycle-mood-log") return null;
         const action = ACTION_LABEL[t.routeTo] ?? (t.routeTo === "cycle-log" ? "Log cycle + mood" : undefined);
         const href = hrefForTask(t);
         const goal = fmtTarget(t.target);
