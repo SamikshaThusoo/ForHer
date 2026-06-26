@@ -2,10 +2,10 @@
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
-import { entryFraming, personaTrack, TRACK_LABELS } from "@/lib/journey";
+import { entryFraming, personaTrack } from "@/lib/journey";
 import { ForHerHub } from "@/components/forher/ForHerHub/ForHerHub";
 import { ForHerCompanionHub } from "@/components/forher/ForHerCompanionHub/ForHerCompanionHub";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, ScanLine } from "lucide-react";
 import styles from "./ForHerPromo.module.css";
 
 /** The For Her card on the Habit Health home — the hub. Three states:
@@ -52,9 +52,12 @@ export function ForHerPromo() {
     return (
       <div className={`${styles.hubWrap} fhReveal`}>
         <div className={styles.hubHead}>
-          <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>Companion</span></span>
+          <div className={styles.hubLeft}>
+            <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>Companion</span></span>
+            <span className={styles.hubPlanMuted}>Tracking &amp; insights</span>
+          </div>
+          <Link href="/cares/scan" className={styles.hubScan}><ScanLine size={18} /><span>Scan</span></Link>
         </div>
-        <p className={styles.hubDay}>Tracking &amp; insights · no daily plan needed right now</p>
         <ForHerCompanionHub />
       </div>
     );
@@ -64,10 +67,12 @@ export function ForHerPromo() {
   return (
     <div className={`${styles.hubWrap} fhReveal`}>
       <div className={styles.hubHead}>
-        <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>PMOS</span></span>
-        <Link href="/plan" className={styles.hubOpen}>See my 90-day plan <ArrowRight size={13} /></Link>
+        <div className={styles.hubLeft}>
+          <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>PMOS</span></span>
+          <Link href="/plan" className={styles.hubPlan}>See my 90-day plan <ArrowRight size={12} /></Link>
+        </div>
+        <Link href="/cares/scan" className={styles.hubScan}><ScanLine size={18} /><span>Scan</span></Link>
       </div>
-      <p className={styles.hubDay}>{TRACK_LABELS[track]} · Day {fh.day}</p>
       <ForHerHub />
     </div>
   );
