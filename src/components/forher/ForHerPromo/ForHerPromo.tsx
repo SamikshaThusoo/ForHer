@@ -71,7 +71,7 @@ export function ForHerPromo() {
     <div className={`${styles.hubWrap} fhReveal`}>
       <div className={styles.hubHead}>
         <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>PMOS</span></span>
-        <Link href="/forher" className={styles.hubOpen}>Open today <ArrowRight size={13} /></Link>
+        <Link href="/plan" className={styles.hubOpen}>See my 90-day plan <ArrowRight size={13} /></Link>
       </div>
       <p className={styles.hubDay}>{TRACK_LABELS[track]} · Day {fh.day}</p>
       <ForHerHub />
