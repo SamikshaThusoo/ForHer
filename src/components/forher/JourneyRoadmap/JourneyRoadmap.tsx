@@ -44,7 +44,7 @@ function meta(items: Item[]) {
   return { Icon, short, isMilestone, isFinish };
 }
 
-const W = 360, CX = 180, AMP = 48, PITCH = 138, TOP = 16, DIV = 80, BOT = 24;
+const W = 360, CX = 180, AMP = 48, PITCH = 138, TOP = 82, DIV = 80, BOT = 28;
 
 /** The gamified 90-day journey: one smooth serpentine path, evenly-pitched nodes
  *  with activity icons, phase dividers between chapters, and a clean detail popup
@@ -161,7 +161,7 @@ export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number
               </motion.span>
             )}
 
-            <span className={styles.label} style={{ left: `${xPct}%`, top: p.y + r + 8 }}>
+            <span className={styles.label} style={{ left: `${xPct}%`, top: p.y + r + 15 }}>
               <span className={styles.labelDay}>Day {p.day}</span>
               <span className={styles.labelShort}>{short}</span>
             </span>
