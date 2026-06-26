@@ -105,6 +105,8 @@ export default function HormonesPage() {
       )}
 
       <p className={styles.disclaimer}>An educational model of how hormones move — not your measured levels.</p>
+
+      <Link href="/" className={styles.homeBtn}>Done · back to home</Link>
     </main>
   );
 }

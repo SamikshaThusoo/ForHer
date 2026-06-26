@@ -85,3 +85,28 @@
 }
 .pregCommLabel { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #8E5378; }
 .pregCommText { font-size: 13px; font-weight: 600; color: #3E1B33; }
+
+/* ---- Multi-month calendar (Flo-style) ---- */
+.months { padding: 6px 18px 0; display: flex; flex-direction: column; gap: 16px; }
+.month {
+  background: #fff; border: 1px solid rgba(91,42,74,0.1); border-radius: 18px;
+  padding: 14px 12px; box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+}
+.dayChip { font-size: 11px; font-weight: 800; color: #5B2A4A; background: rgba(142,83,120,0.12); border-radius: 999px; padding: 4px 11px; }
+.tapHint { font-size: 11px; color: #9A8A92; padding: 9px 18px 0; line-height: 1.45; }
+
+.todayPill {
+  display: inline-block; font-size: 11px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); border-radius: 999px; padding: 4px 11px;
+}
+.dayLogged { background: #C76B7A; color: #fff; box-shadow: none; }
+.dayPred { background: transparent; color: #C76B7A; box-shadow: inset 0 0 0 1.6px #C76B7A; }
+.dayFertile { background: rgba(79,157,105,0.2); color: #2F6B45; box-shadow: none; }
+.dayOv { box-shadow: inset 0 0 0 2px #4F9D69; }
+.dayToday { box-shadow: 0 0 0 2px #3E1B33; font-weight: 800; }
+
+.nextBtn {
+  display: flex; align-items: center; justify-content: center; gap: 7px; margin: 14px 18px 6px;
+  padding: 13px; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: 14px;
+  color: #fff; background: linear-gradient(135deg, #5B2A4A, #8E5378);
+}
