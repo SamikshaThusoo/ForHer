@@ -119,7 +119,9 @@
   display: flex; flex-direction: column; height: 210px; box-sizing: border-box;
   border-radius: 20px; padding: 18px 17px; box-shadow: 0 8px 22px rgba(91,42,74,0.1);
   text-decoration: none; color: #3E1B33; overflow: hidden; position: relative;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+.car:active { transform: scale(0.985); box-shadow: 0 5px 16px rgba(91,42,74,0.12); }
 .carEyebrow { font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #8E5378; }
 .carIcon {
   width: 42px; height: 42px; border-radius: 13px; display: flex; align-items: center; justify-content: center;
