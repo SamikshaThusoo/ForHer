@@ -19,7 +19,8 @@ export default function ForHerHome() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const track = personaTrack(persona);
-  const [nowWin, setNowWin] = useState(0); // simulated time-of-day (index into the day's windows)
+  const [active, setActive] = useState(0); // centred carousel card
+  const [scrollTo, setScrollTo] = useState<{ idx: number } | undefined>(undefined); // bar-driven scroll
 
   const backHabit = (
     <Link href="/" className={styles.backHabit}><ChevronLeft size={15} /> Habit Health</Link>
@@ -113,15 +114,10 @@ export default function ForHerHome() {
   // ---- STATE 2: assessed, on care plan → carousel dashboard ----
   const tasks = resolveDailyPlan(persona, fh.day);
   const winOf = (t: (typeof tasks)[number]) => WINDOW_FOR_CAT[t.category];
-  const dayWindows = [...new Set(tasks.map(winOf))].sort((a, b) => WINDOW_ORDER.indexOf(a) - WINDOW_ORDER.indexOf(b));
-  const curIdx = Math.min(nowWin, Math.max(0, dayWindows.length - 1));
-  // Clicking a time window shows THAT window's task directly in the card below.
-  const curWin = dayWindows[curIdx];
-  const winTasks = tasks.filter((t) => winOf(t) === curWin);
-  const nextTask = winTasks.find((t) => !fh.isDone(t.id)) ?? winTasks[0] ?? null;
+  const orderedTasks = [...tasks].sort((a, b) => WINDOW_ORDER.indexOf(winOf(a)) - WINDOW_ORDER.indexOf(winOf(b)));
   const doneCount = tasks.filter((t) => fh.isDone(t.id)).length;
-  const allDone = doneCount === tasks.length;
-  const nextEyebrow = curWin ? `${WINDOW_LABEL[curWin]} · ${WINDOW_TIME[curWin]}` : "Today";
+  const taskOffset = setupCard ? 1 : 0; // index of the first task card in the carousel
+  const barIdx = Math.max(0, Math.min(orderedTasks.length - 1, active - taskOffset));
 
   return (
     <main className={`${styles.home} fhTheme`}>
@@ -136,37 +132,40 @@ export default function ForHerHome() {
         <p className={styles.dayline}>Day {fh.day} of 90 · {doneCount}/{tasks.length} done today</p>
       </section>
 
-      {/* Demo clock — move the time of day and watch tasks surface in their windows */}
-      <div className={styles.sim}>
-        <span className={styles.simCap}>Your day · tap to move the time</span>
-        <div className={styles.simRow}>
-          {dayWindows.map((w, i) => {
-            const wDone = tasks.filter((t) => winOf(t) === w).every((t) => fh.isDone(t.id));
-            return (
-              <button key={w} type="button" onClick={() => setNowWin(i)}
-                className={`${styles.simSeg} ${i === curIdx ? styles.simSegOn : ""}`}>
-                <span className={styles.simWin}>{WINDOW_LABEL[w]}</span>
-                <span className={styles.simTime}>{wDone ? "✓ done" : WINDOW_TIME[w]}</span>
-              </button>
-            );
-          })}
+      {/* Time bar — slide through your day and the task cards move with it */}
+      <div className={styles.simBar}>
+        <span className={styles.simCap}>Your day · slide to move through it</span>
+        <input
+          className={styles.simRange} type="range" min={0} max={Math.max(0, orderedTasks.length - 1)} step={1}
+          value={barIdx} onChange={(e) => setScrollTo({ idx: taskOffset + Number(e.target.value) })}
+          aria-label="Time of day"
+        />
+        <div className={styles.simTicks}>
+          {orderedTasks.map((t, i) => (
+            <button key={t.id} type="button"
+              className={`${styles.simTick} ${i === barIdx ? styles.simTickOn : ""}`}
+              onClick={() => setScrollTo({ idx: taskOffset + i })}>
+              <span className={styles.simTickWin}>{WINDOW_LABEL[winOf(t)]}</span>
+              <span className={styles.simTickTime}>{WINDOW_TIME[winOf(t)]}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      <FocusCarousel>
+      <FocusCarousel scrollTo={scrollTo} onActiveChange={setActive}>
         {setupCard}
-        {nextTask && (
-          <div className={`${styles.car} ${styles.carTask}`} key="task">
-            <span className={styles.carEyebrow}>{nextEyebrow}</span>
-            <h3 className={styles.carTitle}>{nextTask.title}</h3>
-            <p className={styles.carSub}>{nextTask.detail}</p>
+        {orderedTasks.map((t) => (
+          <div className={`${styles.car} ${styles.carTask}`} key={t.id}>
+            <span className={styles.carEyebrow}>{WINDOW_LABEL[winOf(t)]} · {WINDOW_TIME[winOf(t)]}</span>
+            <h3 className={styles.carTitle}>{t.title}</h3>
+            <p className={styles.carSub}>{t.detail}</p>
             <button type="button"
-              className={`${styles.carCheck} ${fh.isDone(nextTask.id) ? styles.carCheckOn : ""}`}
-              onClick={() => fh.toggleDone(nextTask.id)}>
-              {fh.isDone(nextTask.id) ? <><Check size={15} /> Done</> : "Mark done"}
+              className={`${styles.carCheck} ${fh.isDone(t.id) ? styles.carCheckOn : ""}`}
+              onClick={() => fh.toggleDone(t.id)}>
+              {fh.isDone(t.id) ? <><Check size={15} /> Done</> : "Mark done"}
             </button>
           </div>
-        )}
+        ))}
         <Link href="/community" className={`${styles.car} ${styles.carCommunity}`} key="community">
           <span className={styles.carEyebrow}>From your community</span>
           <h3 className={styles.carTitle}>Women in your phase are sharing what helps</h3>

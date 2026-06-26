@@ -1,13 +1,29 @@
 "use client";
-import { Children, useRef, useState, type ReactNode } from "react";
+import { Children, useEffect, useRef, useState, type ReactNode } from "react";
 import styles from "./FocusCarousel.module.css";
 
 /** A swipeable carousel where the centered card is sharp + full-size and the
- *  neighbours are blurred and scaled down (peeking at the edges). */
-export function FocusCarousel({ children }: { children: ReactNode }) {
+ *  neighbours are blurred and scaled down (peeking on both sides).
+ *  - `scrollTo` (a fresh object per request) scrolls programmatically to an index.
+ *  - `onActiveChange` reports the centred index back (to sync an external bar). */
+export function FocusCarousel({ children, scrollTo, onActiveChange }: {
+  children: ReactNode;
+  scrollTo?: { idx: number };
+  onActiveChange?: (i: number) => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const items = Children.toArray(children);
+
+  useEffect(() => {
+    if (!scrollTo) return;
+    const el = ref.current;
+    if (!el) return;
+    const child = el.children[scrollTo.idx] as HTMLElement | undefined;
+    if (!child) return;
+    const target = child.offsetLeft - (el.clientWidth - child.clientWidth) / 2;
+    el.scrollTo({ left: target, behavior: "smooth" });
+  }, [scrollTo]);
 
   const onScroll = () => {
     const el = ref.current;
@@ -20,7 +36,7 @@ export function FocusCarousel({ children }: { children: ReactNode }) {
       const d = Math.abs(cc - center);
       if (d < bestDist) { bestDist = d; best = i; }
     });
-    setActive(best);
+    if (best !== active) { setActive(best); onActiveChange?.(best); }
   };
 
   return (
