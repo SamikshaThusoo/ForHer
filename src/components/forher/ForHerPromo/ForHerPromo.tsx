@@ -4,9 +4,8 @@ import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { entryFraming, personaTrack, TRACK_LABELS } from "@/lib/journey";
 import { ForHerHub } from "@/components/forher/ForHerHub/ForHerHub";
-import {
-  Sparkles, ArrowRight, CalendarHeart, Activity, MessagesSquare, Moon,
-} from "lucide-react";
+import { ForHerCompanionHub } from "@/components/forher/ForHerCompanionHub/ForHerCompanionHub";
+import { Sparkles, ArrowRight } from "lucide-react";
 import styles from "./ForHerPromo.module.css";
 
 /** The For Her card on the Habit Health home — the hub. Three states:
@@ -48,20 +47,15 @@ export function ForHerPromo() {
     );
   }
 
-  // ---- Assessed, no care plan: minimal companion card (don't overcrowd) ----
+  // ---- Assessed, no care plan: companion carousel (same treatment as the plan) ----
   if (track === "none") {
     return (
-      <div className={`${styles.companion} fhReveal`}>
-        <div className={styles.compHead}>
-          <span className={styles.compBrand}>For Her · Companion</span>
-          <Link href="/" className={styles.compOpen}>Open <ArrowRight size={13} /></Link>
+      <div className={`${styles.hubWrap} fhReveal`}>
+        <div className={styles.hubHead}>
+          <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>Companion</span></span>
         </div>
-        <div className={styles.compTiles}>
-          <Link href="/cycle" className={styles.compTile}><CalendarHeart size={18} /><span>Cycle</span></Link>
-          <Link href="/hormones" className={styles.compTile}><Activity size={18} /><span>Hormones</span></Link>
-          <Link href="/community" className={styles.compTile}><MessagesSquare size={18} /><span>Community</span></Link>
-          <Link href="/log/mood" className={styles.compTile}><Moon size={18} /><span>Mood</span></Link>
-        </div>
+        <p className={styles.hubDay}>Tracking &amp; insights · no daily plan needed right now</p>
+        <ForHerCompanionHub />
       </div>
     );
   }

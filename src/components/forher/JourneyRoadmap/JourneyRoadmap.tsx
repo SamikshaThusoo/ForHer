@@ -1,11 +1,20 @@
 "use client";
+import { useState } from "react";
 import { getTouchpointsDue, getPhase } from "@/lib/journey";
 import type { Persona } from "@/types/persona";
-import { Sparkles, Star, Award, ClipboardCheck, Stethoscope, Check, Lock } from "lucide-react";
+import { Sparkles, Star, Award, ClipboardCheck, Stethoscope, Check, Lock, X } from "lucide-react";
 import styles from "./JourneyRoadmap.module.css";
 
 type NodeType = "start" | "milestone" | "finish" | "retest" | "clinical";
 type PathNode = { day: number; label: string; type: NodeType };
+
+const NODE_DESC: Record<NodeType, string> = {
+  start: "Where it all begins — your first day on the plan.",
+  milestone: "A milestone in your journey. Keep the streak going!",
+  finish: "You complete the 90-day program — time to see what moved.",
+  retest: "Your Day-90 retest: bloods + an outcomes review with your doctor.",
+  clinical: "A check-in with your care team. We'll remind you the day before.",
+};
 
 const PHASE_LABEL: Record<string, string> = { foundation: "Foundation", build: "Build", milestone: "Milestone" };
 const ICON: Record<NodeType, React.ComponentType<{ size?: number }>> = {
@@ -15,6 +24,7 @@ const ICON: Record<NodeType, React.ComponentType<{ size?: number }>> = {
 /** The gamified 90-day journey (winding road of milestone + clinical nodes).
  *  Shared by /plan and the enrolment step. `day` drives the "you're here" marker. */
 export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number }) {
+  const [sel, setSel] = useState<PathNode | null>(null);
   const tps: PathNode[] = [];
   for (let d = 1; d <= 90; d++) {
     getTouchpointsDue(persona, d).forEach((t) => {
@@ -65,11 +75,12 @@ export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number
         return (
           <div key={i}>
             {band && <span className={styles.band} style={{ left: `${n.x}%`, top: n.y - 52 }}>{band}</span>}
-            <div className={`${styles.node} ${done ? styles.nodeDone : current ? styles.nodeCurrent : styles.nodeFuture} ${big ? styles.nodeBig : ""}`}
+            <button type="button" onClick={() => setSel(n)}
+              className={`${styles.node} ${done ? styles.nodeDone : current ? styles.nodeCurrent : styles.nodeFuture} ${big ? styles.nodeBig : ""}`}
               style={{ left: `${n.x}%`, top: n.y }}>
               {done ? <Check size={big ? 27 : 23} strokeWidth={3} /> : locked ? <Lock size={17} /> : <Icon size={big ? 27 : 23} />}
               {done && <span className={styles.star}><Star size={11} fill="currentColor" strokeWidth={0} /></span>}
-            </div>
+            </button>
             <span className={styles.nodeLabel} style={{ left: `${n.x}%`, top: n.y + (big ? 46 : 40) }}>
               {current && <span className={styles.hereTag}>You&apos;re here</span>}
               <span className={styles.nodeDay}>Day {n.day}</span>
@@ -78,6 +89,18 @@ export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number
           </div>
         );
       })}
+
+      {sel && (
+        <div className={styles.modalBg} onClick={() => setSel(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <button type="button" className={styles.modalClose} onClick={() => setSel(null)} aria-label="Close"><X size={16} /></button>
+            <span className={styles.modalDay}>Day {sel.day}</span>
+            <h3 className={styles.modalTitle}>{sel.label}</h3>
+            <p className={styles.modalSub}>{NODE_DESC[sel.type]}</p>
+            <button type="button" className={styles.modalBtn} onClick={() => setSel(null)}>Got it</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
