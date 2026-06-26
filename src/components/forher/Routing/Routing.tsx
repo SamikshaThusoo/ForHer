@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Persona } from "@/types/persona";
 import type { DomainSignals, RiskOutcome } from "@/types/journey";
 import { getCareCircle, TRACK_LABELS } from "@/lib/journey";
+import { JourneyRoadmap } from "@/components/forher/JourneyRoadmap/JourneyRoadmap";
 import { motion } from "framer-motion";
 import { Stethoscope, Salad, HeartPulse, Brain, Sparkles, UserRound, ArrowRight } from "lucide-react";
 import styles from "./Routing.module.css";
@@ -37,13 +38,17 @@ export function Routing({
     <div className={styles.wrap}>
       <span className={styles.eyebrow}>{TRACK_LABELS[outcome]}</span>
       <h2 className={styles.title}>
-        {isEngagement ? "Your engagement track" : "Your care circle"}
+        {isEngagement ? "Your engagement track" : "Your 90-day journey"}
       </h2>
       <p className={styles.lead}>
         {isEngagement
           ? "No plan needed right now — keep tracking your cycle, mood and habits, and we'll re-check over time."
-          : "These are the people who'll support you — lifestyle-led, with humans making any clinical calls."}
+          : "Here's the road ahead — milestones and check-ins with your care team. Take a look, then enrol."}
       </p>
+
+      {!isEngagement && <JourneyRoadmap persona={persona} day={1} />}
+
+      {!isEngagement && <h3 className={styles.subhead}>Your care circle</h3>}
 
       <div className={styles.circle}>
         {circle.map((s, i) => {
