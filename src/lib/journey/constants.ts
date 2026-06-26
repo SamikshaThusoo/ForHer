@@ -86,7 +86,7 @@ const daily = (kind: TaskTarget["kind"], value: number, unit?: string, everyDays
 export const TASK_CATALOG: TaskDef[] = [
   {
     id: "steps", category: "move", title: "Hit your step goal",
-    detail: "Steps are a simple movement nudge, not a medical target — a 10-minute walk counts.",
+    detail: "A 10-minute walk counts — movement, not a number.",
     routeTo: "activity", source: "companion",
     byTrack: {
       none:   daily("steps", 6000, "steps"),
@@ -97,7 +97,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "aerobic", category: "move", title: "Aerobic minutes",
-    detail: "Moderate movement across the week — within the 150–300 min guideline range.",
+    detail: "Moderate movement across the week.",
     routeTo: "activity", source: "careplan", phaseEmphasis: ["follicular", "ovulatory"],
     byTrack: {
       none:   daily("duration_min", 150, "min/week", 7),
@@ -108,7 +108,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "strength", category: "move", title: "Strength session",
-    detail: "Muscle-strengthening on non-consecutive days helps insulin sensitivity.",
+    detail: "Strength work — it lifts insulin sensitivity.",
     routeTo: "activity", source: "careplan", phaseEmphasis: ["ovulatory"],
     byTrack: {
       none:   { target: { kind: "sessions_week", value: 1 }, everyDays: 7 },
@@ -119,7 +119,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "meals-log", category: "nourish", title: "Log your meals",
-    detail: "Logging builds awareness — we frame food as additions and swaps, never guilt.",
+    detail: "Builds awareness — swaps and additions, never guilt.",
     routeTo: "food-logger", source: "companion",
     byTrack: {
       none:   daily("count", 1, "meals"),
@@ -130,7 +130,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "low-gi-swap", category: "nourish", title: "One low-GI swap",
-    detail: "Swap a refined carb for a low-GI option — millet for white rice, say.",
+    detail: "Swap a refined carb for low-GI — millet over rice.",
     routeTo: "scanner", source: "careplan", phaseEmphasis: ["luteal"],
     byTrack: {
       medium: daily("count", 1, "swap"),
@@ -168,7 +168,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "skin-hair-check", category: "track", title: "Skin + hair check",
-    detail: "A weekly note on skin and hair helps spot androgenic changes early.",
+    detail: "A weekly note on skin and hair.",
     routeTo: "placeholder", source: "companion",
     byTrack: {
       none:   daily("boolean", 1, undefined, 7), low: daily("boolean", 1, undefined, 7),
@@ -197,7 +197,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "mood-screen", category: "mind", title: "Mood check-in",
-    detail: "A short PHQ-2 / GAD-2 style screen. A low score routes you to a psychologist, never an automated verdict.",
+    detail: "A short mood screen, always reviewed by a person.",
     routeTo: "consult", source: "clinical",
     clinicalNote: "Positive screen → route to psychologist.",
     byTrack: {
@@ -227,7 +227,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "sleep", category: "sleep", title: "Wind down for sleep",
-    detail: "A consistent wind-down and wake time steadies insulin and curbs cravings — a real PMOS lever.",
+    detail: "Steady sleep + wake times calm insulin and cravings.",
     routeTo: "placeholder", source: "careplan",
     byTrack: {
       none:   daily("boolean", 1, undefined, 2), low: daily("boolean", 1, undefined, 2),
@@ -236,7 +236,7 @@ export const TASK_CATALOG: TaskDef[] = [
   },
   {
     id: "protein-breakfast", category: "nourish", title: "Protein-first breakfast",
-    detail: "Starting the day with protein + fibre blunts the morning blood-sugar spike.",
+    detail: "Protein + fibre blunts the morning sugar spike.",
     routeTo: "food-logger", source: "careplan", phaseEmphasis: ["menstrual", "luteal"],
     byTrack: {
       low:    daily("boolean", 1), medium: daily("boolean", 1), high: daily("boolean", 1),
