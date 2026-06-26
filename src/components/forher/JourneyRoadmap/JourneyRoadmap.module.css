@@ -1,59 +1,70 @@
-.path { position: relative; margin: 6px 0 6px; }
+.path { position: relative; width: 100%; max-width: 420px; margin: 6px auto; }
 .road { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
 
-.band {
-  position: absolute; z-index: 3; white-space: nowrap; transform: translateX(-50%);
-  font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase;
-  color: #fff; background: linear-gradient(135deg, #C9772A, #B5532F); border-radius: 999px; padding: 5px 14px;
-  box-shadow: 0 3px 0 rgba(155,68,38,0.45);
+/* ---- Phase divider (chapter break, not attached to a node) ---- */
+.divider {
+  position: absolute; left: 0; right: 0; display: flex; justify-content: center;
+  z-index: 3; transform: translateY(-50%);
+}
+.divPill {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
+  background: linear-gradient(135deg, #C9772A, #B5532F); border-radius: 999px; padding: 6px 16px;
+  box-shadow: 0 3px 0 rgba(155,68,38,0.4);
 }
 
+/* ---- Nodes ---- */
 .node {
   position: absolute; transform: translate(-50%, -50%); z-index: 2; box-sizing: border-box;
-  width: 62px; height: 62px; border-radius: 50%; padding: 0; cursor: pointer; font-family: inherit;
-  display: flex; align-items: center; justify-content: center; color: #fff; border: none;
+  width: 64px; height: 64px; border-radius: 50%; padding: 0; cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center; color: #fff;
 }
-.nodeBig { width: 76px; height: 76px; border: 3px solid #F2C14E; }
+.milestone { width: 80px; height: 80px; border: 3px solid #F2C14E; }
 
-.nodeDone { background: linear-gradient(160deg, #62B681, #3E8557); box-shadow: 0 6px 0 #2F6B45, 0 11px 16px rgba(62,133,87,0.3); }
-.nodeFuture { background: linear-gradient(160deg, #ECE4EA, #DCD1D9); color: #A99FA6; box-shadow: 0 5px 0 #CDC1C9; }
-@keyframes fhGlow {
-  0%, 100% { box-shadow: 0 6px 0 #3E1B33, 0 0 0 5px rgba(142,83,120,0.22), 0 12px 20px rgba(91,42,74,0.3); }
-  50% { box-shadow: 0 6px 0 #3E1B33, 0 0 0 13px rgba(142,83,120,0.08), 0 12px 20px rgba(91,42,74,0.3); }
+.done { background: linear-gradient(160deg, #B5687E, #5B2A4A); box-shadow: 0 7px 16px rgba(91,42,74,0.28); }
+.locked { background: linear-gradient(160deg, #ECE4EA, #DCD1D9); color: rgba(120,108,116,0.55); box-shadow: 0 5px 0 #CFC3CC; }
+@keyframes fhPulse {
+  0%, 100% { box-shadow: 0 7px 16px rgba(91,42,74,0.3), 0 0 0 4px rgba(142,83,120,0.22); }
+  50% { box-shadow: 0 7px 16px rgba(91,42,74,0.3), 0 0 0 13px rgba(142,83,120,0.06); }
 }
-.nodeCurrent {
-  width: 76px; height: 76px; background: linear-gradient(160deg, #8E5378, #5B2A4A);
-  box-shadow: 0 6px 0 #3E1B33, 0 0 0 5px rgba(142,83,120,0.22), 0 12px 20px rgba(91,42,74,0.3);
-  animation: fhGlow 1.9s ease-in-out infinite;
+.current {
+  background: linear-gradient(160deg, #B5687E, #5B2A4A);
+  box-shadow: 0 7px 16px rgba(91,42,74,0.3), 0 0 0 4px rgba(142,83,120,0.22);
+  animation: fhPulse 1.9s ease-in-out infinite;
 }
+@media (prefers-reduced-motion: reduce) { .current { animation: none; } }
 
-.star {
-  position: absolute; top: -3px; right: -3px; width: 19px; height: 19px; border-radius: 50%;
-  background: #F2C14E; color: #fff; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.18); border: 2px solid #fff;
+.checkBadge {
+  position: absolute; top: -2px; right: -2px; width: 20px; height: 20px; border-radius: 50%;
+  background: #4F9D69; color: #fff; display: flex; align-items: center; justify-content: center; border: 2px solid #fff;
 }
-@keyframes fhBounce2 {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-.hereTag {
-  font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #fff;
-  white-space: nowrap; background: linear-gradient(135deg, #8E5378, #5B2A4A);
-  border-radius: 999px; padding: 3px 10px; margin-bottom: 3px; box-shadow: 0 2px 6px rgba(91,42,74,0.32);
-  animation: fhBounce2 1.2s ease-in-out infinite;
+.lockBadge {
+  position: absolute; bottom: -1px; right: -1px; width: 18px; height: 18px; border-radius: 50%;
+  background: #B9ADB5; color: #fff; display: flex; align-items: center; justify-content: center; border: 2px solid #FBF3F5;
 }
 
-.nodeLabel {
-  position: absolute; z-index: 1; transform: translateX(-50%); width: 118px;
-  display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
+/* ---- "You're here" bubble ---- */
+.hereBubble {
+  position: absolute; transform: translateX(-50%); z-index: 4; white-space: nowrap;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.06em; color: #fff;
+  background: #C9772A; border-radius: 999px; padding: 3px 9px; box-shadow: 0 2px 6px rgba(0,0,0,0.22);
 }
-.nodeDay { font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #B9A9B2; }
-.nodeText {
-  font-size: 12px; font-weight: 700; color: #3E1B33; line-height: 1.2;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+.hereBubble::after {
+  content: ""; position: absolute; bottom: -4px; left: 50%; margin-left: -4px;
+  border: 4px solid transparent; border-top-color: #C9772A;
 }
 
-/* Day-detail popup */
+/* ---- Labels (single line, collision-free) ---- */
+.label {
+  position: absolute; transform: translateX(-50%); z-index: 1; width: 100px;
+  display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center;
+}
+.labelDay { font-size: 8.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #B9A9B2; }
+.labelShort {
+  font-size: 12px; font-weight: 700; color: #3E1B33; line-height: 1.15; white-space: nowrap;
+  background: rgba(251,243,245,0.82); border-radius: 7px; padding: 1px 7px;
+}
+
+/* ---- Day-detail popup ---- */
 .modalBg {
   position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
   background: rgba(62,27,51,0.45); backdrop-filter: blur(2px); padding: 24px;
@@ -68,8 +79,9 @@
   background: rgba(91,42,74,0.08); border: none; color: #8E5378;
 }
 .modalDay { font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #B5532F; }
-.modalTitle { font-family: var(--font-forher-serif), Georgia, serif; font-weight: 400; font-size: 20px; color: #3E1B33; margin-top: 8px; }
-.modalSub { font-size: 13px; line-height: 1.55; color: #6B5A65; margin-top: 9px; }
+.modalItem { margin-top: 10px; }
+.modalTitle { font-family: var(--font-forher-serif), Georgia, serif; font-weight: 400; font-size: 19px; color: #3E1B33; }
+.modalSub { font-size: 12.5px; line-height: 1.5; color: #6B5A65; margin-top: 5px; }
 .modalBtn {
   margin-top: 18px; width: 100%; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
   background: linear-gradient(135deg, #5B2A4A, #8E5378); color: #fff; border: none; border-radius: 13px; padding: 12px;
