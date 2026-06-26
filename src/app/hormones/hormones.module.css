@@ -56,3 +56,12 @@
   padding: 13px; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: 14px;
   color: #fff; background: linear-gradient(135deg, #5B2A4A, #8E5378);
 }
+
+.phaseDates { font-size: 11.5px; font-weight: 700; color: #C9772A; margin-top: 8px; }
+.recs { margin: 14px 18px 0; display: flex; flex-direction: column; gap: 9px; }
+.recRow {
+  display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: start;
+  background: #fff; border: 1px solid rgba(91,42,74,0.1); border-radius: 13px; padding: 11px 13px;
+}
+.recLabel { font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #8E5378; padding-top: 1px; }
+.recText { font-size: 12.5px; line-height: 1.45; color: #3E1B33; }

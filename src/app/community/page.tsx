@@ -63,6 +63,11 @@ const PACING: Record<CyclePhase, string> = {
   luteal: "Women in their luteal phase average ~6,100 steps — easing off is common.",
 };
 
+type MyPost = { note: string; feelings: string[]; phase: string; at: string };
+function readMyPosts(): MyPost[] {
+  try { const a = JSON.parse(localStorage.getItem("forher.community.v1") || "[]"); return Array.isArray(a) ? a : []; } catch { return []; }
+}
+
 export default function CommunityPage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
@@ -78,7 +83,19 @@ export default function CommunityPage() {
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [note, setNote] = useState("");
   const [shared, setShared] = useState(false);
+  const [myPosts, setMyPosts] = useState<MyPost[]>(() => (typeof window === "undefined" ? [] : readMyPosts()));
   const toggle = (f: string) => setPicked((p) => { const n = new Set(p); n.has(f) ? n.delete(f) : n.add(f); return n; });
+
+  // Persist the user's own shared prompts so they survive a reload.
+  const share = () => {
+    const p: MyPost = { note: note.trim(), feelings: [...picked], phase, at: new Date().toISOString() };
+    const next = [p, ...myPosts];
+    setMyPosts(next);
+    try { localStorage.setItem("forher.community.v1", JSON.stringify(next)); } catch { /* ignore */ }
+    setShared(true);
+    setPicked(new Set());
+    setNote("");
+  };
 
   return (
     <main className={`${styles.page} fhTheme`}>
@@ -105,29 +122,35 @@ export default function CommunityPage() {
 
       {/* Feeling check-in */}
       <div className={styles.contrib}>
-        {!shared ? (
-          <>
-            <div className={styles.contribHead}>How are you feeling this <em>{PHASE_LABEL[phase].toLowerCase()}</em> phase?</div>
-            <div className={styles.chips}>
-              {FEELINGS.map((f) => (
-                <button key={f} type="button" className={`${styles.chip} ${picked.has(f) ? styles.chipOn : ""}`} onClick={() => toggle(f)}>{f}</button>
-              ))}
-            </div>
-            <textarea
-              className={styles.note}
-              placeholder="Add a prompt to share — what helped you today? (optional)"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-            <button type="button" className={styles.share} onClick={() => setShared(true)} disabled={picked.size === 0 && !note.trim()}>Share with the community</button>
-          </>
-        ) : (
-          <div className={styles.thanksWrap}>
-            <div className={styles.thanks}><Check size={18} /> Shared with women in your phase</div>
-            {note.trim() && <p className={styles.yourNote}>&ldquo;{note.trim()}&rdquo;</p>}
-          </div>
-        )}
+        <div className={styles.contribHead}>How are you feeling this <em>{PHASE_LABEL[phase].toLowerCase()}</em> phase?</div>
+        <div className={styles.chips}>
+          {FEELINGS.map((f) => (
+            <button key={f} type="button" className={`${styles.chip} ${picked.has(f) ? styles.chipOn : ""}`} onClick={() => toggle(f)}>{f}</button>
+          ))}
+        </div>
+        <textarea
+          className={styles.note}
+          placeholder="Add a prompt to share — what helped you today? (optional)"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+        <button type="button" className={styles.share} onClick={share} disabled={picked.size === 0 && !note.trim()}>Share with the community</button>
+        {shared && <div className={styles.thanks}><Check size={18} /> Shared — thank you</div>}
       </div>
+
+      {myPosts.length > 0 && (
+        <>
+          <div className={styles.sectionTitle}>Your check-ins</div>
+          <div className={styles.tips}>
+            {myPosts.map((p, i) => (
+              <div key={i} className={styles.tip}>
+                {p.feelings.length > 0 && <span className={`${styles.kind} ${styles.kindPeer}`}>{p.feelings.join(", ")}</span>}
+                {p.note && <p className={styles.tipText}>{p.note}</p>}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Tips */}
       <div className={styles.sectionTitle}>What&apos;s working for women now</div>

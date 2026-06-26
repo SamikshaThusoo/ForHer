@@ -110,3 +110,11 @@
   padding: 13px; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: 14px;
   color: #fff; background: linear-gradient(135deg, #5B2A4A, #8E5378);
 }
+
+.monthNav { display: flex; align-items: center; justify-content: space-between; padding: 6px 22px 8px; }
+.monthNavLabel { font-size: 14px; font-weight: 700; color: #3E1B33; }
+.monthNavBtn {
+  width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid rgba(91,42,74,0.16); color: #5B2A4A; cursor: pointer;
+}
+.monthNavBtn:disabled { opacity: 0.4; cursor: default; }
