@@ -54,9 +54,24 @@ export default function PlanPage() {
     { day: 90, label: "90-day program complete", type: "finish" },
   ];
   const nodes = [...milestones, ...tps].sort((a, b) => a.day - b.day);
-  const reachedMax = Math.max(0, ...nodes.filter((n) => n.day <= fh.day).map((n) => n.day));
 
-  let prevPhase = "";
+  // Lay the nodes along a winding road. Single "current" = the last node reached.
+  const STEP = 122;
+  const positioned = nodes.map((n, i) => ({
+    ...n,
+    x: 50 + 30 * Math.sin(i * 0.85), // % across — gentle S-curve
+    y: 64 + i * STEP,                // px down
+  }));
+  const totalH = 64 + nodes.length * STEP + 30;
+  const currentIdx = nodes.reduce((acc, n, i) => (n.day <= fh.day ? i : acc), 0);
+  const roadD = positioned
+    .map((p, i) => {
+      if (i === 0) return `M ${p.x} ${p.y}`;
+      const prev = positioned[i - 1];
+      const midY = (prev.y + p.y) / 2;
+      return `C ${prev.x} ${midY} ${p.x} ${midY} ${p.x} ${p.y}`;
+    })
+    .join(" ");
 
   return (
     <main className={`${styles.page} fhTheme`}>
@@ -79,31 +94,32 @@ export default function PlanPage() {
           onChange={(e) => fh.setDay(Number(e.target.value))} aria-label="Day in journey" />
       </div>
 
-      <div className={styles.path}>
-        {nodes.map((n, i) => {
+      <div className={styles.path} style={{ height: totalH }}>
+        <svg className={styles.road} viewBox={`0 0 100 ${totalH}`} preserveAspectRatio="none" aria-hidden>
+          <path d={roadD} fill="none" stroke="rgba(142,83,120,0.18)" strokeWidth={12}
+            strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        </svg>
+        {positioned.map((n, i) => {
           const phase = getPhase(n.day);
-          const band = phase !== prevPhase ? PHASE_LABEL[phase] : null;
-          prevPhase = phase;
-          const done = n.day < reachedMax;
-          const current = n.day === reachedMax;
-          const locked = n.day > reachedMax;
+          const band = i === 0 || getPhase(positioned[i - 1].day) !== phase ? PHASE_LABEL[phase] : null;
+          const done = i < currentIdx;
+          const current = i === currentIdx;
+          const locked = i > currentIdx;
           const big = n.type === "milestone" || n.type === "finish";
           const Icon = ICON[n.type];
-          const side = i % 2 === 0;
           return (
             <div key={i}>
-              {band && <div className={styles.band}><span>{band} phase</span></div>}
-              <div className={`${styles.nodeRow} ${side ? styles.rowL : styles.rowR}`}>
-                <div className={`${styles.node} ${done ? styles.nodeDone : current ? styles.nodeCurrent : styles.nodeFuture} ${big ? styles.nodeBig : ""}`}>
-                  {done ? <Check size={big ? 26 : 22} strokeWidth={3} /> : locked ? <Lock size={16} /> : <Icon size={big ? 26 : 22} />}
-                  {done && <span className={styles.star}><Star size={11} fill="currentColor" strokeWidth={0} /></span>}
-                  {current && <span className={styles.startTag}>START</span>}
-                </div>
-                <div className={styles.nodeLabel}>
-                  <span className={styles.nodeDay}>Day {n.day}</span>
-                  <span className={styles.nodeText}>{n.label}</span>
-                </div>
+              {band && <span className={styles.band} style={{ left: `${n.x}%`, top: n.y - 52 }}>{band}</span>}
+              <div className={`${styles.node} ${done ? styles.nodeDone : current ? styles.nodeCurrent : styles.nodeFuture} ${big ? styles.nodeBig : ""}`}
+                style={{ left: `${n.x}%`, top: n.y }}>
+                {done ? <Check size={big ? 27 : 23} strokeWidth={3} /> : locked ? <Lock size={17} /> : <Icon size={big ? 27 : 23} />}
+                {done && <span className={styles.star}><Star size={11} fill="currentColor" strokeWidth={0} /></span>}
               </div>
+              <span className={styles.nodeLabel} style={{ left: `${n.x}%`, top: n.y + (big ? 46 : 40) }}>
+                {current && <span className={styles.hereTag}>You&apos;re here</span>}
+                <span className={styles.nodeDay}>Day {n.day}</span>
+                <span className={styles.nodeText}>{n.label}</span>
+              </span>
             </div>
           );
         })}
