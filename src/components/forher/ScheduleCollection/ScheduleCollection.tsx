@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ArrowRight, Bell } from "lucide-react";
+import { ArrowRight, Bell, Check } from "lucide-react";
 import styles from "./ScheduleCollection.module.css";
 
 // Timing questions so the plan can land each daily prompt at a sensible moment.
@@ -52,14 +52,18 @@ export function ScheduleCollection({ onComplete }: { onComplete: (s: Record<stri
 
       <div className={styles.nudgeBlock}>
         <p className={styles.nudgeHead}><Bell size={14} /> Which daily nudges do you want?</p>
-        <div className={styles.opts}>
-          {NUDGES.map((n) => (
-            <button
-              key={n.key} type="button"
-              className={`${styles.opt} ${nudges.has(n.key) ? styles.optOn : ""}`}
-              onClick={() => toggleNudge(n.key)}
-            >{n.label}</button>
-          ))}
+        <div className={styles.nudgeList}>
+          {NUDGES.map((n) => {
+            const on = nudges.has(n.key);
+            return (
+              <button key={n.key} type="button"
+                className={`${styles.nudgeRow} ${on ? styles.nudgeRowOn : ""}`}
+                onClick={() => toggleNudge(n.key)}>
+                <span className={styles.nudgeRowLabel}>{n.label}</span>
+                <span className={`${styles.nudgeCheck} ${on ? styles.nudgeCheckOn : ""}`}>{on && <Check size={13} strokeWidth={3} />}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
