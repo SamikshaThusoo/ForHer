@@ -6,7 +6,7 @@ import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "
 import type { CyclePhase } from "@/types/journey";
 import { FocusCarousel } from "../FocusCarousel/FocusCarousel";
 import {
-  ScanLine, Moon, ArrowRight, CalendarHeart, Activity, MessagesSquare, Droplet, Briefcase,
+  Moon, ArrowRight, CalendarHeart, Activity, MessagesSquare, Droplet, Briefcase,
 } from "lucide-react";
 import styles from "@/app/home.module.css";
 
@@ -32,12 +32,7 @@ export function ForHerCompanionHub() {
     : null;
 
   return (
-    <>
-      <Link href="/cares/scan" className={styles.scanPin}>
-        <ScanLine size={17} /> Scan food <span className={styles.scanPinHint}>anytime</span>
-      </Link>
-
-      <FocusCarousel>
+    <FocusCarousel>
         {!logged && (
           <Link href="/cycle" className={`${styles.car} ${styles.carCycle}`} key="setup">
             <span className={styles.carIcon}><Droplet size={22} /></span>
@@ -58,11 +53,13 @@ export function ForHerCompanionHub() {
           <p className={styles.carSub}>How your hormones move across your cycle.</p>
           <span className={styles.carCta}>Explore <ArrowRight size={14} /></span>
         </Link>
-        <div className={`${styles.car} ${styles.carLearn}`} key="work">
+        <Link href="/hormones" className={`${styles.car} ${styles.carLearn}`} key="work">
           <span className={styles.carIcon}><Briefcase size={22} /></span>
-          <h3 className={styles.carTitle}>Your day at work</h3>
+          <span className={styles.carEyebrow}>Your day at work</span>
+          <h3 className={styles.carTitle}>{phase ? `${PHASE_LABEL[phase]} phase` : "Your cycle"}</h3>
           <p className={styles.carSub}>{phase ? WORK_PROMPT[phase] : "Log your cycle to get phase-based focus tips."}</p>
-        </div>
+          <span className={styles.carCta}>See your hormones <ArrowRight size={14} /></span>
+        </Link>
         <Link href="/community" className={`${styles.car} ${styles.carCommunity}`} key="community">
           <span className={styles.carIcon}><MessagesSquare size={22} /></span>
           <h3 className={styles.carTitle}>Community</h3>
@@ -75,7 +72,6 @@ export function ForHerCompanionHub() {
           <p className={styles.carSub}>Log your mood, energy and symptoms.</p>
           <span className={styles.carCta}>Check in <ArrowRight size={14} /></span>
         </Link>
-      </FocusCarousel>
-    </>
+    </FocusCarousel>
   );
 }

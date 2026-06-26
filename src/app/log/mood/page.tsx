@@ -6,6 +6,8 @@ import styles from "./mood.module.css";
 
 const FEELINGS = ["Energetic", "Calm", "Motivated", "Tired", "Crampy", "Bloated", "Moody", "Anxious"];
 const CYCLE = ["Period today", "Spotting", "No bleeding", "Not sure"];
+const pad = (n: number) => String(n).padStart(2, "0");
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
 
 export default function MoodLogPage() {
   const [feelings, setFeelings] = useState<Set<string>>(new Set());
@@ -19,7 +21,7 @@ export default function MoodLogPage() {
   const save = () => {
     try {
       const arr = JSON.parse(localStorage.getItem("forher.moodlog.v1") || "[]");
-      arr.push({ feelings: [...feelings], cycle, note, at: new Date().toISOString() });
+      arr.push({ feelings: [...feelings], cycle, note, day: todayISO(), at: new Date().toISOString() });
       localStorage.setItem("forher.moodlog.v1", JSON.stringify(arr));
     } catch {}
     setSaved(true);
@@ -28,7 +30,7 @@ export default function MoodLogPage() {
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
-        <Link href="/plan" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
+        <Link href="/" className={styles.back} aria-label="Back"><ChevronLeft size={20} /></Link>
         <span className={styles.brandline}>For Her · PMOS</span>
       </header>
 
@@ -65,7 +67,7 @@ export default function MoodLogPage() {
           <span className={styles.doneMark}><Check size={26} /></span>
           <h2 className={styles.doneTitle}>Logged for today</h2>
           <p className={styles.doneSub}>Keeping this current sharpens your phase predictions and your plan.</p>
-          <Link href="/plan" className={styles.doneCta}>Back to my plan</Link>
+          <Link href="/" className={styles.doneCta}>Back to home</Link>
         </div>
       )}
     </main>
