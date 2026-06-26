@@ -156,6 +156,20 @@
 .carClinical .carIcon { background: rgba(181,83,47,0.14); color: #B5532F; }
 .carClinical .carEyebrow { color: #B5532F; }
 
+/* Pinned scan (always available) */
+.scanPin {
+  display: flex; align-items: center; gap: 8px; margin: 4px 16px 0; padding: 11px 14px;
+  border-radius: 14px; text-decoration: none; color: #2F7A7A; font-size: 13px; font-weight: 700;
+  background: rgba(47,122,122,0.1); border: 1px solid rgba(47,122,122,0.22);
+}
+.scanPinHint { margin-left: auto; font-size: 10.5px; font-weight: 600; color: #6B9B9B; }
+
+/* Daily goal chip on task cards */
+.carGoal {
+  align-self: flex-start; margin-top: 8px; font-size: 10.5px; font-weight: 800;
+  letter-spacing: 0.02em; color: #fff; background: rgba(255,255,255,0.22); border-radius: 999px; padding: 3px 9px;
+}
+
 .setupPill {
   display: inline-block; font-size: 11px; font-weight: 700; color: #fff; text-decoration: none;
   background: linear-gradient(135deg, #C76B7A, #B5532F); border-radius: 999px; padding: 4px 12px;
