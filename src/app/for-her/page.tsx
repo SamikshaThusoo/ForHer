@@ -1,18 +1,19 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import type { AssessmentAnswers } from "@/types/journey";
-import { getDomainSignals, getRiskOutcome, TRACK_LABELS } from "@/lib/journey";
+import { getDomainSignals, getRiskOutcome } from "@/lib/journey";
 import { markAssessed, saveSchedule } from "@/lib/forher/state";
 import { ScheduleCollection } from "@/components/forher/ScheduleCollection/ScheduleCollection";
 import { Assessment } from "@/components/forher/Assessment/Assessment";
 import { RiskResult } from "@/components/forher/RiskResult/RiskResult";
 import { Routing } from "@/components/forher/Routing/Routing";
-import { ChevronLeft, CheckCircle2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import styles from "./for-her.module.css";
 
-type Step = "questions" | "result" | "routing" | "schedule" | "done";
+type Step = "questions" | "result" | "routing" | "schedule";
 
 const BLANK: AssessmentAnswers = {
   irregularPeriods: false, acneSkin: false, hairChanges: false, weightDifficulty: false, familyHistory: false,
@@ -20,6 +21,7 @@ const BLANK: AssessmentAnswers = {
 
 export default function ForHerPage() {
   const { persona } = usePersona();
+  const router = useRouter();
   const pmos = persona.pmos;
   const [step, setStep] = useState<Step>("questions");
   const [answers, setAnswers] = useState<AssessmentAnswers>(pmos?.assessment ?? BLANK);
@@ -72,7 +74,7 @@ export default function ForHerPage() {
           signals={signals}
           persona={persona}
           onConsent={() => {
-            if (outcome === "none") { markAssessed(persona.id); setStep("done"); }
+            if (outcome === "none") { markAssessed(persona.id); router.push("/"); }
             else setStep("schedule");
           }}
         />
@@ -80,25 +82,8 @@ export default function ForHerPage() {
 
       {step === "schedule" && (
         <ScheduleCollection
-          onComplete={(s) => { saveSchedule(persona.id, s); markAssessed(persona.id); setStep("done"); }}
+          onComplete={(s) => { saveSchedule(persona.id, s); markAssessed(persona.id); router.push("/"); }}
         />
-      )}
-
-      {step === "done" && (
-        <div className={styles.done}>
-          <CheckCircle2 size={44} className={styles.doneMark} />
-          <h2 className={styles.doneTitle}>
-            {outcome === "none" ? "You're all set" : "Your plan is ready"}
-          </h2>
-          <p className={styles.doneSub}>
-            {outcome === "none"
-              ? "We'll keep you on the engagement track and re-check over time."
-              : `You're on the ${TRACK_LABELS[outcome]}. Your daily companion is where it all comes together.`}
-          </p>
-          <Link href="/" className={styles.doneCta}>
-            {outcome === "none" ? "Go to my companion" : "Go to my dashboard"}
-          </Link>
-        </div>
       )}
     </main>
   );
