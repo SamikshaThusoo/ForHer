@@ -7,10 +7,18 @@ import { personaTrack } from "@/lib/journey";
 import {
   cycleDayFromLog, cycleLengthFor, phaseForCycleDay, PHASE_LABEL, PHASE_PROSE, HORMONES,
 } from "@/lib/forher/cycleview";
+import type { CyclePhase } from "@/types/journey";
 import { ChevronLeft } from "lucide-react";
 import styles from "./hormones.module.css";
 
 const W = 320, H = 116, PAD = 6;
+
+const PHASE_RECS: Record<CyclePhase, { body: string; work: string; tip: string }> = {
+  menstrual: { body: "Energy is low; cramps and fatigue are common.", work: "Keep the load light — admin and planning over big pushes.", tip: "Iron-rich meals, warmth and earlier nights." },
+  follicular: { body: "Energy, mood and focus are climbing.", work: "Start new projects and tackle the hard problems.", tip: "A good week for a new class or a harder workout." },
+  ovulatory: { body: "Energy, confidence and libido peak.", work: "Book the big conversations and presentations.", tip: "Stay hydrated; strength work feels great now." },
+  luteal: { body: "Energy dips; bloating, cravings and mood shifts build.", work: "Wrap up and tidy — protect focus from overload.", tip: "Magnesium-rich foods and gentle movement help." },
+};
 
 export default function HormonesPage() {
   const { persona } = usePersona();
@@ -26,6 +34,16 @@ export default function HormonesPage() {
   const phase = phaseForCycleDay(day, L);
   const carePlan = personaTrack(persona) !== "none";
   const isToday = fh.cycleLog?.lastPeriod != null && day === todayCd;
+
+  const lp = fh.cycleLog?.lastPeriod;
+  const fmtD = (d: Date) => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  let datesLine: string | null = null;
+  if (lp) {
+    const ovCd = Math.floor(L / 2);
+    const daysToOv = ((ovCd - todayCd) % L + L) % L;
+    const daysToPeriod = todayCd === 1 ? 0 : L - todayCd + 1;
+    datesLine = `Next period ~ ${fmtD(new Date(today.getTime() + daysToPeriod * 86400000))} · Ovulation ~ ${fmtD(new Date(today.getTime() + daysToOv * 86400000))}`;
+  }
 
   const x = (d: number) => PAD + ((d - 1) / (L - 1)) * (W - 2 * PAD);
   const y = (v: number) => H - PAD - v * (H - 2 * PAD);
@@ -83,6 +101,13 @@ export default function HormonesPage() {
       <div className={styles.phaseBox}>
         <span className={styles.phaseTag}>{PHASE_LABEL[phase]} phase{isToday ? ", right now" : ""}</span>
         <p className={styles.phaseProse}>{PHASE_PROSE[phase]}</p>
+        {datesLine && <p className={styles.phaseDates}>{datesLine}</p>}
+      </div>
+
+      <div className={styles.recs}>
+        <div className={styles.recRow}><span className={styles.recLabel}>Your body</span><span className={styles.recText}>{PHASE_RECS[phase].body}</span></div>
+        <div className={styles.recRow}><span className={styles.recLabel}>At work</span><span className={styles.recText}>{PHASE_RECS[phase].work}</span></div>
+        <div className={styles.recRow}><span className={styles.recLabel}>Try this</span><span className={styles.recText}>{PHASE_RECS[phase].tip}</span></div>
       </div>
 
       <div className={styles.hList}>
@@ -106,7 +131,7 @@ export default function HormonesPage() {
 
       <p className={styles.disclaimer}>An educational model of how hormones move — not your measured levels.</p>
 
-      <Link href="/" className={styles.homeBtn}>Done · back to home</Link>
+      <Link href="/" className={styles.homeBtn}>Done</Link>
     </main>
   );
 }

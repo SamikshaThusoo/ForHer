@@ -50,3 +50,5 @@
   display: inline-block; text-decoration: none; font-weight: 700; font-size: 13.5px; color: #fff;
   background: linear-gradient(135deg, #5B2A4A, #8E5378); border-radius: 999px; padding: 12px 22px;
 }
+
+.doneMood { font-size: 14px; font-weight: 600; color: #5B2A4A; margin-top: 4px; text-transform: capitalize; }

@@ -65,8 +65,9 @@ export default function MoodLogPage() {
       ) : (
         <div className={styles.doneWrap}>
           <span className={styles.doneMark}><Check size={26} /></span>
-          <h2 className={styles.doneTitle}>Logged for today</h2>
-          <p className={styles.doneSub}>Keeping this current sharpens your phase predictions and your plan.</p>
+          <h2 className={styles.doneTitle}>Today&apos;s check-in</h2>
+          {feelings.size > 0 && <p className={styles.doneMood}>Feeling {[...feelings].join(", ").toLowerCase()}</p>}
+          {cycle && <p className={styles.doneMood}>{cycle}</p>}
           <Link href="/" className={styles.doneCta}>Back to home</Link>
         </div>
       )}
