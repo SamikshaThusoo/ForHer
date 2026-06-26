@@ -68,9 +68,9 @@ export default function CommunityPage() {
   const fh = useForHer(persona.id);
   const today = new Date();
   const L = cycleLengthFor(persona);
-  const logged = fh.cycleLogged;
+  const logged = !!fh.cycleLog?.lastPeriod;
   // Phase comes only from her logged cycle; until then we don't claim a phase.
-  const phase: CyclePhase = fh.cycleLog
+  const phase: CyclePhase = fh.cycleLog?.lastPeriod
     ? phaseForCycleDay(cycleDayFromLog(fh.cycleLog.lastPeriod, L, today), L)
     : "follicular";
   const carePlan = personaTrack(persona) !== "none";

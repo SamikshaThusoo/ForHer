@@ -47,7 +47,7 @@ export default function ForHerHome() {
   // Cycle phase comes ONLY from her logged cycle — until she's set it up, we
   // prompt setup instead of showing a phase.
   const L = cycleLengthFor(persona);
-  const cyclePhase = fh.cycleLog
+  const cyclePhase = fh.cycleLog?.lastPeriod
     ? phaseForCycleDay(cycleDayFromLog(fh.cycleLog.lastPeriod, L, new Date()), L)
     : null;
   const phaseChip = cyclePhase

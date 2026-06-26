@@ -19,13 +19,13 @@ export default function HormonesPage() {
   const L = cycleLengthFor(persona);
   // "Today" is real only once she's logged her cycle; otherwise we centre the
   // scrubber mid-cycle and don't claim a current day.
-  const todayCd = fh.cycleLog ? cycleDayFromLog(fh.cycleLog.lastPeriod, L, today) : Math.round(L / 2);
+  const todayCd = fh.cycleLog?.lastPeriod ? cycleDayFromLog(fh.cycleLog.lastPeriod, L, today) : Math.round(L / 2);
   const [dayState, setDayState] = useState<number | null>(null);
   const day = dayState ?? todayCd;
   const setDay = (d: number) => setDayState(d);
   const phase = phaseForCycleDay(day, L);
   const carePlan = personaTrack(persona) !== "none";
-  const isToday = fh.cycleLog != null && day === todayCd;
+  const isToday = fh.cycleLog?.lastPeriod != null && day === todayCd;
 
   const x = (d: number) => PAD + ((d - 1) / (L - 1)) * (W - 2 * PAD);
   const y = (v: number) => H - PAD - v * (H - 2 * PAD);
