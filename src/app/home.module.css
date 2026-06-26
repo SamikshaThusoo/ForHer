@@ -156,19 +156,31 @@
   background: linear-gradient(135deg, #C76B7A, #B5532F); border-radius: 999px; padding: 4px 12px;
 }
 
-/* ---- Time-of-day simulator ---- */
-.sim { padding: 4px 18px 0; }
+/* ---- Time-of-day simulator (bar) ---- */
+.simBar { padding: 6px 20px 0; }
 .simCap { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #9A8A92; }
-.simRow { display: flex; gap: 6px; margin-top: 8px; }
-.simSeg {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer;
-  font-family: inherit; background: rgba(142,83,120,0.07); border: 1px solid rgba(142,83,120,0.16);
-  border-radius: 12px; padding: 8px 4px; transition: all 0.15s ease;
+.simRange {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 6px; margin: 12px 0 6px;
+  border-radius: 999px; background: rgba(142,83,120,0.2); cursor: pointer;
 }
-.simSegOn { background: linear-gradient(135deg, #5B2A4A, #8E5378); border-color: transparent; }
-.simWin { font-size: 10.5px; font-weight: 700; color: #5B2A4A; }
-.simTime { font-size: 9px; font-weight: 600; color: #9A8A92; }
-.simSegOn .simWin, .simSegOn .simTime { color: #fff; }
+.simRange::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); box-shadow: 0 2px 7px rgba(91,42,74,0.4);
+  cursor: pointer; border: 2px solid #fff;
+}
+.simRange::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); box-shadow: 0 2px 7px rgba(91,42,74,0.4); cursor: pointer;
+}
+.simTicks { display: flex; justify-content: space-between; margin-top: 2px; }
+.simTick {
+  display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer;
+  background: none; border: none; font-family: inherit; padding: 2px;
+}
+.simTickWin { font-size: 10px; font-weight: 700; color: #9A8A92; }
+.simTickTime { font-size: 9px; font-weight: 600; color: #B9A9B2; }
+.simTickOn .simTickWin { color: #5B2A4A; }
+.simTickOn .simTickTime { color: #8E5378; }
 
 .journeyLink {
   display: flex; width: max-content; align-items: center; gap: 7px; margin: 16px auto 0;
