@@ -14,15 +14,15 @@ import { fmtTarget } from "@/lib/forher/taskmeta";
 import { FocusCarousel } from "../FocusCarousel/FocusCarousel";
 import {
   ArrowRight, Check, Footprints, TrendingUp, Droplet, MessagesSquare, Stethoscope, FlaskConical,
-  CalendarHeart, Briefcase, Utensils, Wind, Salad, Brain, Sun, HeartPulse, Star, Download, FileText,
+  CalendarHeart, Briefcase, Utensils, Wind, Salad, Brain, Sun, HeartPulse, Star, Download, FileText, X,
 } from "lucide-react";
 import styles from "@/app/home.module.css";
 
 const WORK_PROMPT: Record<CyclePhase, string> = {
-  menstrual: "keep the load light — save deep work for later in your cycle.",
-  follicular: "a great week to start big projects.",
-  ovulatory: "focus and confidence peak — book the important conversations.",
-  luteal: "wind things down — protect your focus from overload.",
+  menstrual: "Keep the load light — save deep work for later.",
+  follicular: "A great week to start big projects.",
+  ovulatory: "Focus and confidence peak — book the big conversations.",
+  luteal: "Wind things down — protect your focus.",
 };
 const BODY_NOTE: Record<CyclePhase, string> = {
   menstrual: "Lower energy and possible cramps — rest is productive.",
@@ -37,6 +37,16 @@ const SPECIALIST: Record<string, { label: string; Icon: React.ComponentType<{ si
   dermatology: { label: "dermatologist", Icon: Sun },
   gynae: { label: "gynaecologist", Icon: HeartPulse },
 };
+// What a "View details" popup shows for each consult / the test (prototype stand-in
+// for the booked appointment in My Bookings).
+const CONSULT_INCLUDES: Record<string, string[]> = {
+  doctor: ["A review of your screening and AHC markers", "Your 90-day plan and any medication", "Time for questions about symptoms or side-effects"],
+  nutritionist: ["A look at your food logs and blood-sugar patterns", "A meal plan tuned to your cycle", "Practical swaps for cravings and energy dips"],
+  psychologist: ["A check-in on mood, stress and sleep", "Tools for the weeks PMOS hits hardest", "Support that works around your cycle"],
+  dermatology: ["Skin and hair changes linked to PMOS", "A targeted skincare or treatment plan", "When and how to escalate"],
+  gynae: ["A review of your cycle and hormonal markers", "Fertility or contraception questions", "Your next clinical steps"],
+};
+const TEST_INCLUDES = ["Fasting glucose and HbA1c", "A lipid panel", "Hormone panel (where needed)", "An outcomes review with your doctor"];
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -56,7 +66,7 @@ function DownloadBtn({ label }: { label: string }) {
   const [done, setDone] = useState(false);
   return (
     <button type="button" className={styles.cardBtn} onClick={() => setDone(true)}>
-      {done ? <><Check size={14} /> Saved to your files</> : <><Download size={14} /> {label}</>}
+      {done ? <><Check size={14} /> Saved</> : <><Download size={14} /> {label}</>}
     </button>
   );
 }
@@ -70,11 +80,11 @@ function ConsultDoneCard({ info }: { info: ConsultInfo }) {
     <div className={`${styles.car} ${styles.carClinical}`}>
       <span className={styles.carIcon}><sp.Icon size={22} /></span>
       <span className={styles.carEyebrow}>From your {sp.label}</span>
-      <h3 className={styles.carTitle}>How was your consult?</h3>
+      <h3 className={styles.consultQ}>How was your consult?</h3>
       <div className={styles.stars} role="group" aria-label="Rate your consult">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} type="button" className={styles.star} aria-label={`${n} star${n > 1 ? "s" : ""}`} onClick={() => rate(n)}>
-            <Star size={22} fill={n <= rating ? "#F2C14E" : "none"} color={n <= rating ? "#F2C14E" : "#D6B9C6"} />
+            <Star size={20} fill={n <= rating ? "#F2C14E" : "none"} color={n <= rating ? "#F2C14E" : "#D6B9C6"} />
           </button>
         ))}
       </div>
@@ -88,6 +98,7 @@ export function ForHerHub() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const router = useRouter();
+  const [detail, setDetail] = useState<{ kind: "consult" | "test"; service?: string; title: string } | null>(null);
   if (!fh.hydrated) return null;
 
   const tasks = resolveDailyPlan(persona, fh.day);
@@ -151,19 +162,39 @@ export function ForHerHub() {
     );
   }
 
-  // 2 · Consult day only — both states together (you've a consult + rate/prescription).
+  // 2 · Consult day — both states together. "View details" opens a popup (will
+  // deep-link to the booked appointment in My Bookings in the real app).
   if (consult) {
     const sp = SPECIALIST[consult.service] ?? { label: "care team", Icon: Stethoscope };
+    const openConsult = () => setDetail({ kind: "consult", service: consult.service, title: consult.label });
     cards.push(
-      <Link href="/cares/care-team" className={`${styles.car} ${styles.carClinical}`} key="consult-up">
+      <div className={`${styles.car} ${styles.carClinical}`} key="consult-up"
+        role="button" tabIndex={0} style={{ cursor: "pointer" }}
+        onClick={openConsult} onKeyDown={(e) => { if (e.key === "Enter") openConsult(); }}>
         <span className={styles.carIcon}><sp.Icon size={22} /></span>
         <span className={styles.carEyebrow}>From your care team</span>
         <h3 className={styles.carTitle}>You&apos;ve a consult today</h3>
         <p className={styles.carSub}>{consult.label}. Upload your prescription after.</p>
         <span className={styles.carCta}>View details <ArrowRight size={14} /></span>
-      </Link>,
+      </div>,
     );
     cards.push(<ConsultDoneCard info={consult} key={`consult-done-${consult.day}`} />);
+  }
+
+  // 2 · Test day — the reminder is the second card. "View details" opens a popup.
+  if (isTestDay) {
+    const openTest = () => setDetail({ kind: "test", title: "Day 90 retest" });
+    cards.push(
+      <div className={`${styles.car} ${styles.carClinical}`} key="test-reminder"
+        role="button" tabIndex={0} style={{ cursor: "pointer" }}
+        onClick={openTest} onKeyDown={(e) => { if (e.key === "Enter") openTest(); }}>
+        <span className={styles.carIcon}><FlaskConical size={22} /></span>
+        <span className={styles.carEyebrow}>This morning</span>
+        <h3 className={styles.carTitle}>Time for your test</h3>
+        <p className={styles.carSub}>Fasting bloods for your Day 90 retest. Water is fine.</p>
+        <span className={styles.carCta}>View details <ArrowRight size={14} /></span>
+      </div>,
+    );
   }
 
   // 3 · Breakfast.
@@ -184,9 +215,9 @@ export function ForHerHub() {
     cards.push(
       <Link href="/hormones" className={`${styles.car} ${styles.carLearn}`} key="work">
         <span className={styles.carIcon}><Briefcase size={22} /></span>
-        <span className={styles.carEyebrow}>Hormones &amp; your day at work</span>
+        <span className={styles.carEyebrow}>Hormones at work</span>
         <h3 className={styles.carTitle}>{PHASE_LABEL[cyclePhase]} phase</h3>
-        <p className={styles.carSub}>At work: {WORK_PROMPT[cyclePhase]}</p>
+        <p className={styles.carSub}>{WORK_PROMPT[cyclePhase]}</p>
         <span className={styles.carCta}>See your hormones <ArrowRight size={14} /></span>
       </Link>,
     );
@@ -205,19 +236,8 @@ export function ForHerHub() {
     </div>,
   );
 
-  // 8 · Dinner.
-  cards.push(mealCard("dinner"));
-
-  // Test day only — morning reminder + report together (mid-carousel).
+  // Report — before dinner, on test days only.
   if (isTestDay) {
-    cards.push(
-      <div className={`${styles.car} ${styles.carClinical}`} key="test-reminder">
-        <span className={styles.carIcon}><FlaskConical size={22} /></span>
-        <span className={styles.carEyebrow}>This morning</span>
-        <h3 className={styles.carTitle}>Time for your test</h3>
-        <p className={styles.carSub}>Fasting bloods for your Day 90 retest. Water is fine.</p>
-      </div>,
-    );
     cards.push(
       <div className={`${styles.car} ${styles.carClinical}`} key="report">
         <span className={styles.carIcon}><FileText size={22} /></span>
@@ -228,6 +248,9 @@ export function ForHerHub() {
       </div>,
     );
   }
+
+  // 8 · Dinner.
+  cards.push(mealCard("dinner"));
 
   // 9 · Step status (live-ish).
   cards.push(
@@ -259,5 +282,28 @@ export function ForHerHub() {
     </Link>,
   );
 
-  return <FocusCarousel>{cards}</FocusCarousel>;
+  return (
+    <>
+      <FocusCarousel>{cards}</FocusCarousel>
+      {detail && (
+        <div className={styles.detailBg} onClick={() => setDetail(null)}>
+          <div className={styles.detailCard} onClick={(e) => e.stopPropagation()}>
+            <button type="button" className={styles.detailClose} onClick={() => setDetail(null)} aria-label="Close"><X size={16} /></button>
+            <span className={styles.detailEyebrow}>
+              {detail.kind === "test" ? "Your retest" : `Your ${SPECIALIST[detail.service ?? ""]?.label ?? "consult"}`}
+            </span>
+            <h3 className={styles.detailTitle}>{detail.title}</h3>
+            <p className={styles.detailLead}>What&apos;s included</p>
+            <ul className={styles.detailList}>
+              {(detail.kind === "test" ? TEST_INCLUDES : CONSULT_INCLUDES[detail.service ?? ""] ?? []).map((it, i) => (
+                <li key={i} className={styles.detailItem}><Check size={15} /> {it}</li>
+              ))}
+            </ul>
+            <p className={styles.detailNote}>In the full app this opens your appointment in My Bookings.</p>
+            <button type="button" className={styles.detailBtn} onClick={() => setDetail(null)}>Got it</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
