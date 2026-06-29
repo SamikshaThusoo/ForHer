@@ -69,7 +69,7 @@ export function ForHerPromo() {
       <div className={styles.hubHead}>
         <div className={styles.hubLeft}>
           <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>PMOS</span></span>
-          <Link href="/plan" className={styles.hubPlan}>See my 90-day plan <ArrowRight size={12} /></Link>
+          <Link href="/plan" className={styles.hubPlan}>Day {Math.min(fh.day, 90)} of 90 · See plan <ArrowRight size={12} /></Link>
         </div>
         <Link href="/cares/scan" className={styles.hubScan}><ScanLine size={18} /><span>Scan</span></Link>
       </div>
