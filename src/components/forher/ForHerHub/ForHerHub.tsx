@@ -1,37 +1,41 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
-import { resolveDailyPlan, getTouchpointsDue } from "@/lib/journey";
+import { resolveDailyPlan } from "@/lib/journey";
 import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
-import { todaysMeals, MEALS } from "@/lib/forher/foodlog";
+import { todaysMeals, type MealType } from "@/lib/forher/foodlog";
+import { upcomingConsult, lastDoneConsult, hasRetest, type ConsultInfo } from "@/lib/forher/consults";
+import { getRating, setRating } from "@/lib/forher/consultfeedback";
 import type { CyclePhase } from "@/types/journey";
-import { WINDOW_FOR_CAT, WINDOW_ORDER, WINDOW_LABEL, hrefForTask, fmtTarget } from "@/lib/forher/taskmeta";
+import { fmtTarget } from "@/lib/forher/taskmeta";
 import { FocusCarousel } from "../FocusCarousel/FocusCarousel";
 import {
-  Moon, ArrowRight, Check, Footprints, TrendingUp, Droplet, MessagesSquare, Stethoscope, FlaskConical, CalendarHeart, Briefcase, Utensils,
+  ArrowRight, Check, Footprints, TrendingUp, Droplet, MessagesSquare, Stethoscope, FlaskConical,
+  CalendarHeart, Briefcase, Utensils, Wind, Salad, Brain, Sun, HeartPulse, Star, Download, FileText,
 } from "lucide-react";
 import styles from "@/app/home.module.css";
 
-const ACTION_LABEL: Partial<Record<string, string>> = {
-  "food-logger": "Log food",
-  scanner: "Scan food",
-  learn: "Read today's card",
-  community: "Open community",
-  consult: "View details",
-};
 const WORK_PROMPT: Record<CyclePhase, string> = {
-  menstrual: "At work: keep the load light — save deep work for later in your cycle.",
-  follicular: "At work: a great week to start big projects.",
-  ovulatory: "At work: focus and confidence peak — book the important conversations.",
-  luteal: "At work: wind things down — protect your focus from overload.",
+  menstrual: "keep the load light — save deep work for later in your cycle.",
+  follicular: "a great week to start big projects.",
+  ovulatory: "focus and confidence peak — book the important conversations.",
+  luteal: "wind things down — protect your focus from overload.",
 };
 const BODY_NOTE: Record<CyclePhase, string> = {
-  menstrual: "Your body: lower energy and possible cramps — rest is productive.",
-  follicular: "Your body: energy, mood and focus are rising.",
-  ovulatory: "Your body: peak energy, libido and confidence.",
-  luteal: "Your body: energy dips; bloating and cravings may build.",
+  menstrual: "Lower energy and possible cramps — rest is productive.",
+  follicular: "Energy, mood and focus are rising.",
+  ovulatory: "Peak energy, libido and confidence.",
+  luteal: "Energy dips; bloating and cravings may build.",
+};
+const SPECIALIST: Record<string, { label: string; Icon: React.ComponentType<{ size?: number }> }> = {
+  doctor: { label: "doctor", Icon: Stethoscope },
+  nutritionist: { label: "nutritionist", Icon: Salad },
+  psychologist: { label: "psychologist", Icon: Brain },
+  dermatology: { label: "dermatologist", Icon: Sun },
+  gynae: { label: "gynaecologist", Icon: HeartPulse },
 };
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -47,6 +51,38 @@ function todayMood(): { feelings: string[]; cycle?: string } | null {
   } catch { return null; }
 }
 
+/** A mock "download" button that confirms in place — prescriptions, reports. */
+function DownloadBtn({ label }: { label: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <button type="button" className={styles.cardBtn} onClick={() => setDone(true)}>
+      {done ? <><Check size={14} /> Saved to your files</> : <><Download size={14} /> {label}</>}
+    </button>
+  );
+}
+
+/** Post-consult card: rate the consult + grab the prescription. */
+function ConsultDoneCard({ info }: { info: ConsultInfo }) {
+  const sp = SPECIALIST[info.service] ?? { label: "care team", Icon: Stethoscope };
+  const [rating, setRatingState] = useState(() => getRating(info.day, info.service));
+  const rate = (n: number) => { setRatingState(n); setRating(info.day, info.service, n); };
+  return (
+    <div className={`${styles.car} ${styles.carClinical}`}>
+      <span className={styles.carIcon}><sp.Icon size={22} /></span>
+      <span className={styles.carEyebrow}>From your {sp.label}</span>
+      <h3 className={styles.carTitle}>How was your consult?</h3>
+      <div className={styles.stars} role="group" aria-label="Rate your consult">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button key={n} type="button" className={styles.star} aria-label={`${n} star${n > 1 ? "s" : ""}`} onClick={() => rate(n)}>
+            <Star size={22} fill={n <= rating ? "#F2C14E" : "none"} color={n <= rating ? "#F2C14E" : "#D6B9C6"} />
+          </button>
+        ))}
+      </div>
+      <DownloadBtn label="Download prescription" />
+    </div>
+  );
+}
+
 /** The ever-changing For Her carousel. Care-plan only. Swipe to move between cards. */
 export function ForHerHub() {
   const { persona } = usePersona();
@@ -55,13 +91,8 @@ export function ForHerHub() {
   if (!fh.hydrated) return null;
 
   const tasks = resolveDailyPlan(persona, fh.day);
-  const winOf = (t: (typeof tasks)[number]) => WINDOW_FOR_CAT[t.category];
-  const orderedTasks = [...tasks].sort((a, b) => WINDOW_ORDER.indexOf(winOf(a)) - WINDOW_ORDER.indexOf(winOf(b)));
-  const due = getTouchpointsDue(persona, fh.day).filter((t) => t.kind !== "cc-connect");
-  // Pre-retest prep repeats the consult reminder — don't surface it as its own card.
-  const consult = due.find((t) => (t.kind === "consult" || t.kind === "baseline") && !/pre-retest/i.test(t.label));
-  const test = due.find((t) => t.kind === "retest");
-  const showMood = fh.day % 3 === 1;
+  const stepsTask = tasks.find((t) => t.id === "steps");
+  const stepGoal = stepsTask ? fmtTarget(stepsTask.target) : "10,000 steps";
 
   const L = cycleLengthFor(persona);
   const lp = fh.cycleLog?.lastPeriod;
@@ -70,136 +101,170 @@ export function ForHerHub() {
   const mood = todayMood();
   const meals = todaysMeals();
 
-  return (
-    <FocusCarousel>
-      {!fh.cycleLogged && (
-        <Link href="/cycle" className={`${styles.car} ${styles.carCycle}`} key="setup">
-          <span className={styles.carIcon}><Droplet size={22} /></span>
-          <h3 className={styles.carTitle}>Set up your tracker</h3>
-          <p className={styles.carSub}>Tell us why you&apos;re here so we can tailor your cards.</p>
-          <span className={styles.carCta}>Set up now <ArrowRight size={14} /></span>
-        </Link>
-      )}
-      {cyclePhase && cycleDay && (
-        <div className={`${styles.car} ${styles.carCycle}`} key="cyclestatus"
-          role="button" tabIndex={0} style={{ cursor: "pointer" }}
-          onClick={() => router.push("/cycle")}
-          onKeyDown={(e) => { if (e.key === "Enter") router.push("/cycle"); }}>
-          <span className={styles.carIcon}><CalendarHeart size={22} /></span>
-          <span className={styles.carEyebrow}>Day {cycleDay} of {L}</span>
-          <h3 className={styles.carTitle}>{PHASE_LABEL[cyclePhase]} phase</h3>
-          <p className={styles.carSub}>{BODY_NOTE[cyclePhase].replace("Your body: ", "")}</p>
-          {mood
-            ? <span className={styles.carCta}><Check size={14} /> {mood.feelings.length ? `Feeling ${mood.feelings.slice(0, 3).join(", ").toLowerCase()}` : "Mood logged"}</span>
-            : <button type="button" className={styles.carCta}
-                onClick={(e) => { e.stopPropagation(); router.push("/log/mood"); }}>
-                Log your mood <ArrowRight size={14} />
-              </button>}
-        </div>
-      )}
-      {consult && (
-        <Link href="/cares/care-team" className={`${styles.car} ${styles.carClinical}`} key="consult">
-          <span className={styles.carIcon}><Stethoscope size={22} /></span>
-          <span className={styles.carEyebrow}>From your care team</span>
-          <h3 className={styles.carTitle}>You have a consult today</h3>
-          <p className={styles.carSub}>{consult.label}. Upload your prescription after.</p>
-          <span className={styles.carCta}>View details <ArrowRight size={14} /></span>
-        </Link>
-      )}
-      {test && (
-        <Link href="/cares/care-team" className={`${styles.car} ${styles.carClinical}`} key="test">
-          <span className={styles.carIcon}><FlaskConical size={22} /></span>
-          <span className={styles.carEyebrow}>Scheduled test</span>
-          <h3 className={styles.carTitle}>Upload your test results</h3>
-          <p className={styles.carSub}>Add your labs so your team can review them.</p>
-          <span className={styles.carCta}>Upload <ArrowRight size={14} /></span>
-        </Link>
-      )}
-      {MEALS.map((m) => {
-        const loggedName = meals[m];
-        return (
-          <Link href={`/cares/food?meal=${m}`} className={`${styles.car} ${styles.carScan}`} key={`meal-${m}`}>
-            <span className={styles.carIcon}><Utensils size={22} /></span>
-            <span className={styles.carEyebrow}>{cap(m)}</span>
-            <h3 className={styles.carTitle}>{loggedName ?? `Log ${m}`}</h3>
-            <p className={styles.carSub}>{loggedName ? "Logged today — tap to change." : "Scan, say or search what you ate."}</p>
-            <span className={styles.carCta}>{loggedName ? <><Check size={14} /> Logged · update</> : <>Log food <ArrowRight size={14} /></>}</span>
-          </Link>
-        );
-      })}
-      {orderedTasks.map((t) => {
-        // The cycle/mood task is the "Set up tracker" / "Cycle added" card above.
-        if (t.id === "cycle-mood-log") return null;
-        // Food-logging tasks are shown as the Breakfast/Lunch/Dinner banners.
-        if (t.routeTo === "food-logger") return null;
-        // Step goal is a static banner — just the target, no "mark done", no extra line.
-        if (t.id === "steps") {
-          return (
-            <div className={`${styles.car} ${styles.carSteps}`} key={t.id}>
-              <span className={styles.carIcon}><Footprints size={22} /></span>
-              <span className={styles.carEyebrow}>{WINDOW_LABEL[winOf(t)]}</span>
-              <h3 className={styles.carTitle}>Step goal</h3>
-              <p className={styles.carSub}>{fmtTarget(t.target)} today.</p>
-            </div>
-          );
-        }
-        const action = ACTION_LABEL[t.routeTo];
-        const href = hrefForTask(t);
-        const goal = fmtTarget(t.target);
-        const isDone = fh.isDone(t.id);
-        return (
-          <div className={`${styles.car} ${styles.carTask}`} key={t.id}>
-            <span className={styles.carEyebrow}>{WINDOW_LABEL[winOf(t)]}</span>
-            <h3 className={styles.carTitle}>{t.title}</h3>
-            {goal && <span className={styles.carGoal}>Today&apos;s goal · {goal}</span>}
-            <p className={styles.carSub}>{t.detail}</p>
-            {action && href ? (
-              <Link href={href} className={styles.carCheck}>{action} <ArrowRight size={14} /></Link>
-            ) : (
-              <button type="button"
-                className={`${styles.carCheck} ${isDone ? styles.carCheckOn : ""}`}
-                onClick={() => fh.toggleDone(t.id)}>
-                {isDone ? <><Check size={15} /> Done</> : "Mark done"}
-              </button>
-            )}
-          </div>
-        );
-      })}
-      {cyclePhase && (
-        <Link href="/hormones" className={`${styles.car} ${styles.carLearn}`} key="work">
-          <span className={styles.carIcon}><Briefcase size={22} /></span>
-          <span className={styles.carEyebrow}>Hormones &amp; your day at work</span>
-          <h3 className={styles.carTitle}>{PHASE_LABEL[cyclePhase]} phase</h3>
-          <p className={styles.carSub}>{BODY_NOTE[cyclePhase].replace("Your body: ", "")} {WORK_PROMPT[cyclePhase].replace("At work: ", "")}</p>
-          <span className={styles.carCta}>See your hormones <ArrowRight size={14} /></span>
-        </Link>
-      )}
-      <Link href="/community" className={`${styles.car} ${styles.carCommunity}`} key="community">
-        <span className={styles.carIcon}><MessagesSquare size={22} /></span>
-        <h3 className={styles.carTitle}>Women in your phase are sharing</h3>
-        <p className={styles.carSub}>Tips and check-ins from women like you.</p>
-        <span className={styles.carCta}>Open community <ArrowRight size={14} /></span>
+  const upcoming = upcomingConsult(persona, fh.day);
+  const done = lastDoneConsult(persona, fh.day);
+  const planHasTest = hasRetest(persona);
+  const nearTest = planHasTest && fh.day >= 85 && fh.day <= 90;
+
+  const mealCard = (m: MealType) => {
+    const loggedName = meals[m];
+    return (
+      <Link href={`/cares/food?meal=${m}`} className={`${styles.car} ${styles.carScan}`} key={`meal-${m}`}>
+        <span className={styles.carIcon}><Utensils size={22} /></span>
+        <span className={styles.carEyebrow}>{cap(m)}</span>
+        <h3 className={styles.carTitle}>{loggedName ?? `Log ${m}`}</h3>
+        <p className={styles.carSub}>{loggedName ? "Logged today — tap to change." : "Scan, say or search what you ate."}</p>
+        <span className={styles.carCta}>{loggedName ? <><Check size={14} /> Logged · update</> : <>Log food <ArrowRight size={14} /></>}</span>
       </Link>
-      {showMood && !mood && (
-        <Link href="/log/mood" className={`${styles.car} ${styles.carMood}`} key="mood">
-          <span className={styles.carIcon}><Moon size={22} /></span>
-          <h3 className={styles.carTitle}>How are you today?</h3>
-          <p className={styles.carSub}>A quick mood &amp; symptom check-in.</p>
-          <span className={styles.carCta}>Check in <ArrowRight size={14} /></span>
-        </Link>
-      )}
-      <div className={`${styles.car} ${styles.carSteps}`} key="stepstatus">
-        <span className={styles.carIcon}><Footprints size={22} /></span>
-        <span className={styles.carEyebrow}>End of day</span>
-        <h3 className={styles.carTitle}>8,240 / 10,000 steps</h3>
-        <p className={styles.carSub}>From your Habit activity — 82% of today&apos;s goal.</p>
-      </div>
-      <Link href="/progress" className={`${styles.car} ${styles.carMood}`} key="progress">
-        <span className={styles.carIcon}><TrendingUp size={22} /></span>
-        <h3 className={styles.carTitle}>See today&apos;s progress</h3>
-        <p className={styles.carSub}>Habits you&apos;re building + the markers that move.</p>
-        <span className={styles.carCta}>See progress <ArrowRight size={14} /></span>
-      </Link>
-    </FocusCarousel>
+    );
+  };
+
+  // ---- Explicit card order (per spec) ----
+  const cards: React.ReactNode[] = [];
+
+  // 1 · Period — setup if not tracking, else phase-aware (with mood CTA).
+  if (!fh.cycleLogged) {
+    cards.push(
+      <Link href="/cycle" className={`${styles.car} ${styles.carCycle}`} key="period-setup">
+        <span className={styles.carIcon}><Droplet size={22} /></span>
+        <h3 className={styles.carTitle}>Set up your tracker</h3>
+        <p className={styles.carSub}>Tell us why you&apos;re here so we can tailor your cards.</p>
+        <span className={styles.carCta}>Set up now <ArrowRight size={14} /></span>
+      </Link>,
+    );
+  } else if (cyclePhase && cycleDay) {
+    cards.push(
+      <div className={`${styles.car} ${styles.carCycle}`} key="period-phase"
+        role="button" tabIndex={0} style={{ cursor: "pointer" }}
+        onClick={() => router.push("/cycle")}
+        onKeyDown={(e) => { if (e.key === "Enter") router.push("/cycle"); }}>
+        <span className={styles.carIcon}><CalendarHeart size={22} /></span>
+        <span className={styles.carEyebrow}>Day {cycleDay} of {L}</span>
+        <h3 className={styles.carTitle}>{PHASE_LABEL[cyclePhase]} phase</h3>
+        <p className={styles.carSub}>{BODY_NOTE[cyclePhase]}</p>
+        {mood
+          ? <span className={styles.carCta}><Check size={14} /> {mood.feelings.length ? `Feeling ${mood.feelings.slice(0, 3).join(", ").toLowerCase()}` : "Mood logged"}</span>
+          : <button type="button" className={styles.carCta}
+              onClick={(e) => { e.stopPropagation(); router.push("/log/mood"); }}>
+              Log your mood <ArrowRight size={14} />
+            </button>}
+      </div>,
+    );
+  }
+
+  // 2 · Upcoming consult (heads-up).
+  if (upcoming) {
+    const sp = SPECIALIST[upcoming.service] ?? { label: "care team", Icon: Stethoscope };
+    const isToday = upcoming.day === fh.day;
+    cards.push(
+      <Link href="/cares/care-team" className={`${styles.car} ${styles.carClinical}`} key="consult-up">
+        <span className={styles.carIcon}><sp.Icon size={22} /></span>
+        <span className={styles.carEyebrow}>From your care team</span>
+        <h3 className={styles.carTitle}>You&apos;ve a consult{isToday ? " today" : ""}</h3>
+        <p className={styles.carSub}>{upcoming.label}{isToday ? "" : ` · day ${upcoming.day}`}. Upload your prescription after.</p>
+        <span className={styles.carCta}>View details <ArrowRight size={14} /></span>
+      </Link>,
+    );
+  }
+
+  // Post-consult: rate + prescription.
+  if (done) cards.push(<ConsultDoneCard info={done} key={`consult-done-${done.day}`} />);
+
+  // 3 · Breakfast.
+  cards.push(mealCard("breakfast"));
+
+  // 4 · Step goal — minimal reminder.
+  cards.push(
+    <div className={`${styles.car} ${styles.carSteps}`} key="step-goal">
+      <span className={styles.carIcon}><Footprints size={22} /></span>
+      <span className={styles.carEyebrow}>Today&apos;s goal</span>
+      <h3 className={styles.carTitle}>{stepGoal}</h3>
+    </div>,
   );
+
+  // 5 · Hormones · day at work.
+  if (cyclePhase) {
+    cards.push(
+      <Link href="/hormones" className={`${styles.car} ${styles.carLearn}`} key="work">
+        <span className={styles.carIcon}><Briefcase size={22} /></span>
+        <span className={styles.carEyebrow}>Hormones &amp; your day at work</span>
+        <h3 className={styles.carTitle}>{PHASE_LABEL[cyclePhase]} phase</h3>
+        <p className={styles.carSub}>At work: {WORK_PROMPT[cyclePhase]}</p>
+        <span className={styles.carCta}>See your hormones <ArrowRight size={14} /></span>
+      </Link>,
+    );
+  }
+
+  // Morning test reminder (only near the retest).
+  if (nearTest) {
+    cards.push(
+      <div className={`${styles.car} ${styles.carClinical}`} key="test-reminder">
+        <span className={styles.carIcon}><FlaskConical size={22} /></span>
+        <span className={styles.carEyebrow}>This morning</span>
+        <h3 className={styles.carTitle}>Time for your test</h3>
+        <p className={styles.carSub}>Fasting bloods for your Day 90 retest — head in this morning. Water is fine.</p>
+      </div>,
+    );
+  }
+
+  // 6 · Lunch.
+  cards.push(mealCard("lunch"));
+
+  // 7 · Breathing.
+  cards.push(
+    <div className={`${styles.car} ${styles.carBreathe}`} key="breathe">
+      <span className={styles.carIcon}><Wind size={22} /></span>
+      <span className={styles.carEyebrow}>Reset</span>
+      <h3 className={styles.carTitle}>Take a breathing break</h3>
+      <p className={styles.carSub}>A minute of slow breathing to steady cortisol and calm your mind.</p>
+    </div>,
+  );
+
+  // 8 · Dinner.
+  cards.push(mealCard("dinner"));
+
+  // Report download — mid-carousel for the prototype.
+  if (planHasTest) {
+    cards.push(
+      <div className={`${styles.car} ${styles.carClinical}`} key="report">
+        <span className={styles.carIcon}><FileText size={22} /></span>
+        <span className={styles.carEyebrow}>Your results are in</span>
+        <h3 className={styles.carTitle}>Download your report</h3>
+        <p className={styles.carSub}>Your latest labs are ready to view and share.</p>
+        <DownloadBtn label="Download report" />
+      </div>,
+    );
+  }
+
+  // 9 · Step status (live-ish).
+  cards.push(
+    <div className={`${styles.car} ${styles.carSteps}`} key="step-status">
+      <span className={styles.carIcon}><Footprints size={22} /></span>
+      <span className={styles.carEyebrow}>End of day</span>
+      <h3 className={styles.carTitle}>8,240 / 10,000 steps</h3>
+      <p className={styles.carSub}>From your Habit activity — 82% of today&apos;s goal.</p>
+    </div>,
+  );
+
+  // 10 · Community.
+  cards.push(
+    <Link href="/community" className={`${styles.car} ${styles.carCommunity}`} key="community">
+      <span className={styles.carIcon}><MessagesSquare size={22} /></span>
+      <h3 className={styles.carTitle}>Women in your phase are sharing</h3>
+      <p className={styles.carSub}>Tips and check-ins from women like you.</p>
+      <span className={styles.carCta}>Open community <ArrowRight size={14} /></span>
+    </Link>,
+  );
+
+  // 11 · See today's progress.
+  cards.push(
+    <Link href="/progress" className={`${styles.car} ${styles.carMood}`} key="progress">
+      <span className={styles.carIcon}><TrendingUp size={22} /></span>
+      <h3 className={styles.carTitle}>See today&apos;s progress</h3>
+      <p className={styles.carSub}>Habits you&apos;re building + the markers that move.</p>
+      <span className={styles.carCta}>See progress <ArrowRight size={14} /></span>
+    </Link>,
+  );
+
+  return <FocusCarousel>{cards}</FocusCarousel>;
 }

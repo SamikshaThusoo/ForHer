@@ -161,6 +161,17 @@
 .carClinical { background: linear-gradient(135deg, #FBEFE6, #FCF6EE); }
 .carClinical .carIcon { background: rgba(181,83,47,0.14); color: #B5532F; }
 .carClinical .carEyebrow { color: #B5532F; }
+.carBreathe { background: linear-gradient(135deg, #E7F2EE, #F3F9F7); }
+.carBreathe .carIcon { background: rgba(45,122,100,0.14); color: #2F7A64; }
+
+/* Consult rating + in-card download (prescriptions, reports) */
+.stars { display: flex; gap: 5px; margin-top: 12px; }
+.star { background: none; border: none; padding: 2px; cursor: pointer; line-height: 0; }
+.cardBtn {
+  margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  font-family: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer;
+  background: #B5532F; color: #fff; border: none; border-radius: 999px; padding: 9px 15px;
+}
 
 /* Pinned scan (always available) */
 .scanPin {
