@@ -175,6 +175,7 @@ export function ForHerHub() {
       <span className={styles.carIcon}><Footprints size={22} /></span>
       <span className={styles.carEyebrow}>Today&apos;s goal</span>
       <h3 className={styles.carTitle}>{stepGoal}</h3>
+      <p className={styles.carSub}>Short walks after meals help steady your blood sugar.</p>
     </div>,
   );
 
