@@ -174,7 +174,7 @@ export function ForHerHub() {
         <span className={styles.carIcon}><sp.Icon size={22} /></span>
         <span className={styles.carEyebrow}>From your care team</span>
         <h3 className={styles.carTitle}>You&apos;ve a consult today</h3>
-        <p className={styles.carSub}>{consult.label}. Upload your prescription after.</p>
+        <p className={styles.carSub}>{consult.label}. Here&apos;s what to expect.</p>
         <span className={styles.carCta}>View details <ArrowRight size={14} /></span>
       </div>,
     );
