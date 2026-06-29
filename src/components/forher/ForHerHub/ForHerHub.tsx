@@ -7,7 +7,7 @@ import { useForHer } from "@/lib/forher/state";
 import { resolveDailyPlan } from "@/lib/journey";
 import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
 import { todaysMeals, type MealType } from "@/lib/forher/foodlog";
-import { upcomingConsult, lastDoneConsult, hasRetest, type ConsultInfo } from "@/lib/forher/consults";
+import { consultOnDay, isRetestDay, type ConsultInfo } from "@/lib/forher/consults";
 import { getRating, setRating } from "@/lib/forher/consultfeedback";
 import type { CyclePhase } from "@/types/journey";
 import { fmtTarget } from "@/lib/forher/taskmeta";
@@ -101,10 +101,9 @@ export function ForHerHub() {
   const mood = todayMood();
   const meals = todaysMeals();
 
-  const upcoming = upcomingConsult(persona, fh.day);
-  const done = lastDoneConsult(persona, fh.day);
-  const planHasTest = hasRetest(persona);
-  const nearTest = planHasTest && fh.day >= 85 && fh.day <= 90;
+  // Consult + test cards are tied to the exact selected care-plan day.
+  const consult = consultOnDay(persona, fh.day);
+  const isTestDay = isRetestDay(persona, fh.day);
 
   const mealCard = (m: MealType) => {
     const loggedName = meals[m];
@@ -152,23 +151,20 @@ export function ForHerHub() {
     );
   }
 
-  // 2 · Upcoming consult (heads-up).
-  if (upcoming) {
-    const sp = SPECIALIST[upcoming.service] ?? { label: "care team", Icon: Stethoscope };
-    const isToday = upcoming.day === fh.day;
+  // 2 · Consult day only — both states together (you've a consult + rate/prescription).
+  if (consult) {
+    const sp = SPECIALIST[consult.service] ?? { label: "care team", Icon: Stethoscope };
     cards.push(
       <Link href="/cares/care-team" className={`${styles.car} ${styles.carClinical}`} key="consult-up">
         <span className={styles.carIcon}><sp.Icon size={22} /></span>
         <span className={styles.carEyebrow}>From your care team</span>
-        <h3 className={styles.carTitle}>You&apos;ve a consult{isToday ? " today" : ""}</h3>
-        <p className={styles.carSub}>{upcoming.label}{isToday ? "" : ` · day ${upcoming.day}`}. Upload your prescription after.</p>
+        <h3 className={styles.carTitle}>You&apos;ve a consult today</h3>
+        <p className={styles.carSub}>{consult.label}. Upload your prescription after.</p>
         <span className={styles.carCta}>View details <ArrowRight size={14} /></span>
       </Link>,
     );
+    cards.push(<ConsultDoneCard info={consult} key={`consult-done-${consult.day}`} />);
   }
-
-  // Post-consult: rate + prescription.
-  if (done) cards.push(<ConsultDoneCard info={done} key={`consult-done-${done.day}`} />);
 
   // 3 · Breakfast.
   cards.push(mealCard("breakfast"));
@@ -195,18 +191,6 @@ export function ForHerHub() {
     );
   }
 
-  // Morning test reminder (only near the retest).
-  if (nearTest) {
-    cards.push(
-      <div className={`${styles.car} ${styles.carClinical}`} key="test-reminder">
-        <span className={styles.carIcon}><FlaskConical size={22} /></span>
-        <span className={styles.carEyebrow}>This morning</span>
-        <h3 className={styles.carTitle}>Time for your test</h3>
-        <p className={styles.carSub}>Fasting bloods for your Day 90 retest — head in this morning. Water is fine.</p>
-      </div>,
-    );
-  }
-
   // 6 · Lunch.
   cards.push(mealCard("lunch"));
 
@@ -223,8 +207,16 @@ export function ForHerHub() {
   // 8 · Dinner.
   cards.push(mealCard("dinner"));
 
-  // Report download — mid-carousel for the prototype.
-  if (planHasTest) {
+  // Test day only — morning reminder + report together (mid-carousel).
+  if (isTestDay) {
+    cards.push(
+      <div className={`${styles.car} ${styles.carClinical}`} key="test-reminder">
+        <span className={styles.carIcon}><FlaskConical size={22} /></span>
+        <span className={styles.carEyebrow}>This morning</span>
+        <h3 className={styles.carTitle}>Time for your test</h3>
+        <p className={styles.carSub}>Fasting bloods for your Day 90 retest. Water is fine.</p>
+      </div>,
+    );
     cards.push(
       <div className={`${styles.car} ${styles.carClinical}`} key="report">
         <span className={styles.carIcon}><FileText size={22} /></span>
