@@ -68,7 +68,7 @@ export function Routing({
         <span className={styles.eyebrow}>{TRACK_LABELS[outcome]}</span>
         <h2 className={styles.title}>Your 90-day journey</h2>
         <p className={styles.lead}>Here&apos;s the road ahead — milestones and check-ins with your care team. Take a look, then meet your circle.</p>
-        <JourneyRoadmap persona={persona} day={1} />
+        <JourneyRoadmap persona={persona} day={1} preview />
         <button type="button" className={styles.cta} onClick={() => setView("circle")}>
           Next · meet your care circle <ArrowRight size={16} />
         </button>

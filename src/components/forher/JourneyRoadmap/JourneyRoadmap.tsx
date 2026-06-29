@@ -49,7 +49,7 @@ const W = 360, CX = 180, AMP = 48, PITCH = 138, TOP = 82, DIV = 80, BOT = 28;
 /** The gamified 90-day journey: one smooth serpentine path, evenly-pitched nodes
  *  with activity icons, phase dividers between chapters, and a clean detail popup
  *  on tap. `day` drives the "you're here" marker. */
-export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number }) {
+export function JourneyRoadmap({ persona, day, preview = false }: { persona: Persona; day: number; preview?: boolean }) {
   const reduce = useReducedMotion();
   const [sel, setSel] = useState<Group | null>(null);
 
@@ -108,7 +108,8 @@ export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number
     return d.trim();
   };
   const mutedD = buildPath(placed);
-  const doneD = buildPath(placed.slice(0, currentIdx + 1));
+  // Preview (pre-enrolment): show the whole road, no progress state. Enrolled: draw up to today.
+  const doneD = buildPath(preview ? placed : placed.slice(0, currentIdx + 1));
 
   return (
     <div className={styles.path} style={{ height: totalH }}>
@@ -136,14 +137,17 @@ export function JourneyRoadmap({ persona, day }: { persona: Persona; day: number
       ))}
 
       {placed.map((p) => {
-        const done = p.i < currentIdx, current = p.i === currentIdx, locked = p.i > currentIdx;
+        // Preview shows the entire journey unlocked; locking only kicks in once enrolled.
+        const done = !preview && p.i < currentIdx;
+        const current = !preview && p.i === currentIdx;
+        const locked = !preview && p.i > currentIdx;
         const { Icon, short, isMilestone } = meta(p.items);
         const r = isMilestone ? 40 : 32;
         const xPct = (p.x / W) * 100;
         return (
           <Fragment key={p.day}>
             <motion.button type="button" onClick={() => setSel(p)}
-              className={`${styles.node} ${done ? styles.done : current ? styles.current : styles.locked} ${isMilestone ? styles.milestone : ""}`}
+              className={`${styles.node} ${preview || done ? styles.done : current ? styles.current : styles.locked} ${isMilestone ? styles.milestone : ""}`}
               style={{ left: `${xPct}%`, top: p.y }}
               initial={reduce ? false : { opacity: 0, scale: 0.6 }} animate={reduce ? undefined : { opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: Math.min(p.i * 0.03, 0.3) }}>
