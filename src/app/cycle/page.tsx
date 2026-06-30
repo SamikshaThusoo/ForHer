@@ -1,19 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
-import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
+import {
+  cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL, PHASE_COLOR,
+} from "@/lib/forher/cycleview";
+import type { CyclePhase } from "@/types/journey";
 import { CycleOnboarding } from "@/components/forher/CycleOnboarding/CycleOnboarding";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { CycleRing } from "@/components/forher/CycleRing/CycleRing";
+import { Florette, BloodDrop } from "@/components/forher/CycleArt/CycleArt";
+import { ChevronLeft, ChevronRight, ArrowRight, RotateCcw } from "lucide-react";
 import styles from "./cycle.module.css";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
+const OV_TILE = "#2F6B45"; // deep fertile-green for the ovulation florette on the calendar
 const pad = (n: number) => String(n).padStart(2, "0");
 const localISO = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const fromISO = (s: string) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const dayNum = (d: Date) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+
+const INSIGHT: Record<CyclePhase, string> = {
+  menstrual: "Energy is naturally lower right now. Rest counts as progress.",
+  follicular: "Estrogen is climbing. A good window to start something new.",
+  ovulatory: "Estrogen peaks and energy is high. Lean into the big conversations.",
+  luteal: "Winding down. Gentle movement and earlier nights help.",
+};
 
 function readLogged(id: string): string[] {
   try { return JSON.parse(localStorage.getItem(`forher.${id}.loggedperiods`) || "[]"); } catch { return []; }
@@ -25,10 +39,13 @@ function writeLogged(id: string, set: Set<string>) {
 export default function CyclePage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
+  const reduce = useReducedMotion();
   const today = new Date();
   const [logged, setLogged] = useState<Set<string>>(() => new Set(typeof window === "undefined" ? [] : readLogged(persona.id)));
   const [localCycle, setLocalCycle] = useState<CycleLog | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [selCd, setSelCd] = useState<number | null>(null); // scrubbed cycle day (null = today)
+  const navDir = useRef(1);
   const cycle = localCycle ?? fh.cycleLog;
 
   const header = (
@@ -118,13 +135,21 @@ export default function CyclePage() {
   }
 
   const todayCd = cycleDayFromLog(anchorISO, L, today);
-  const todayPhase = phaseForCycleDay(todayCd, L);
+  const cycleDay = selCd ?? todayCd;            // the day the ring + insight reflect
+  const scrubPhase = phaseForCycleDay(cycleDay, L);
+  const isToday = cycleDay === todayCd;
+  const hasSel = selCd !== null;
+  const selISO = localISO(addDays(anchor, cycleDay - 1)); // calendar day in sync with the scrubber
+
   const nextStart = addDays(anchor, dayNum(today) - dayNum(anchor) < L ? L : Math.ceil((dayNum(today) - dayNum(anchor) + 1) / L) * L);
   const fmt = (d: Date) => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
   const daysToOv = ((ovCd - todayCd) % L + L) % L;
   const ovDate = addDays(today, daysToOv);
+  const periodIn = dayNum(nextStart) - dayNum(today);
+  const rel = (n: number) => (n <= 0 ? "today" : `in ${n} day${n === 1 ? "" : "s"}`);
 
   const viewMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+  const insightColor = PHASE_COLOR[scrubPhase];
 
   const renderMonth = (m: Date) => {
     const year = m.getFullYear(); const month = m.getMonth();
@@ -132,33 +157,37 @@ export default function CyclePage() {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const cells: (number | null)[] = [...Array(firstDay).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
     return (
-      <div className={styles.month} key={`${year}-${month}`}>
-        <div className={styles.grid}>
-          {WEEKDAYS.map((w, i) => <span key={`w${i}`} className={styles.wd}>{w}</span>)}
-          {cells.map((d, i) => {
-            if (d == null) return <span key={i} />;
-            const date = new Date(year, month, d);
-            const iso = localISO(date);
-            const isLogged = logged.has(iso);
-            const isPred = !isLogged && predicted.has(iso);
-            const cd = cycleDayFromLog(anchorISO, L, date);
-            const isOv = cd === ovCd;
-            // Ovulation/fertile window shown for everyone, not just TTC.
-            const isFertile = !isLogged && !isPred && cd >= ovCd - 4 && cd <= ovCd + 1;
-            const isToday = iso === localISO(today);
-            return (
-              <button key={i} type="button" onClick={() => toggleDay(iso)}
-                className={[styles.day,
-                  isLogged ? styles.dayLogged : "",
-                  isPred ? styles.dayPred : "",
-                  isFertile ? styles.dayFertile : "",
-                  isOv ? styles.dayOv : "",
-                  isToday ? styles.dayToday : ""].filter(Boolean).join(" ")}>
-                {d}
-              </button>
-            );
-          })}
-        </div>
+      <div className={styles.grid}>
+        {WEEKDAYS.map((w, i) => <span key={`w${i}`} className={styles.wd}>{w}</span>)}
+        {cells.map((d, i) => {
+          if (d == null) return <span key={i} />;
+          const date = new Date(year, month, d);
+          const iso = localISO(date);
+          const isLogged = logged.has(iso);
+          const isPred = !isLogged && predicted.has(iso);
+          const cd = cycleDayFromLog(anchorISO, L, date);
+          const isOv = cd === ovCd;
+          // Ovulation/fertile window shown for everyone, not just TTC.
+          const isFertile = !isLogged && !isPred && cd >= ovCd - 4 && cd <= ovCd + 1;
+          const isTodayCell = iso === localISO(today);
+          const isSel = hasSel && iso === selISO;
+          return (
+            <motion.button key={i} type="button" whileTap={{ scale: 0.85 }}
+              onClick={() => { toggleDay(iso); setSelCd(cycleDayFromLog(anchorISO, L, date)); }}
+              className={[styles.day,
+                isLogged ? styles.dayLogged : "",
+                isPred ? styles.dayPred : "",
+                isFertile ? styles.dayFertile : "",
+                isOv && !isLogged ? styles.dayOv : "",
+                isTodayCell ? styles.dayToday : "",
+                isSel ? styles.daySel : ""].filter(Boolean).join(" ")}>
+              <span className={styles.dayNum}>{d}</span>
+              {isLogged && <span className={styles.dayArt}><BloodDrop size={12} /></span>}
+              {isPred && <span className={styles.dayArt}><BloodDrop size={11} fill={false} /></span>}
+              {isOv && !isLogged && <span className={styles.dayArt}><Florette size={13} color={OV_TILE} bloom /></span>}
+            </motion.button>
+          );
+        })}
       </div>
     );
   };
@@ -169,27 +198,77 @@ export default function CyclePage() {
 
       <div className={styles.hero}>
         <h1 className={styles.h1}>Your <em>cycle</em></h1>
-        <div className={styles.summary}>
-          <span className={styles.dayChip}>Day {todayCd} of {L}</span>
-          <span className={styles.todayPill}>{PHASE_LABEL[todayPhase]} phase</span>
+      </div>
+
+      <CycleRing L={L} cycleDay={cycleDay} todayCd={todayCd} duration={duration} onPhaseTap={(day) => setSelCd(day)} />
+
+      <div className={styles.scrubWrap}>
+        <input
+          className={styles.scrub} type="range" min={1} max={L} value={cycleDay}
+          onChange={(e) => setSelCd(Number(e.target.value))} aria-label="Scrub through your cycle"
+        />
+        <div className={styles.scrubMeta}>
+          <span className={styles.scrubHint}>Drag to explore any day in your cycle</span>
+          {hasSel && selCd !== todayCd && (
+            <button type="button" className={styles.backToday} onClick={() => setSelCd(null)}>
+              <RotateCcw size={12} /> Back to today
+            </button>
+          )}
         </div>
-        <p className={styles.nextNote}>Next period ~ {fmt(nextStart)} · Ovulation ~ {fmt(ovDate)}</p>
+      </div>
+
+      <div className={styles.chips}>
+        <div className={styles.chip}>
+          <span className={styles.chipIcon}><BloodDrop size={19} /></span>
+          <span className={styles.chipText}>
+            <span className={styles.chipLabel}>Next period</span>
+            <span className={styles.chipVal}>{fmt(nextStart)} · {rel(periodIn)}</span>
+          </span>
+        </div>
+        <div className={styles.chip}>
+          <span className={styles.chipIcon}><Florette size={19} color="#4F9D69" /></span>
+          <span className={styles.chipText}>
+            <span className={styles.chipLabel}>Ovulation</span>
+            <span className={styles.chipVal}>{fmt(ovDate)} · {rel(daysToOv)}</span>
+          </span>
+        </div>
+      </div>
+
+      <div className={styles.insight} style={{ background: `${insightColor}14`, borderColor: `${insightColor}33` }}>
+        <span className={styles.insightTag} style={{ color: insightColor }}>
+          {PHASE_LABEL[scrubPhase]} phase{isToday ? " · today" : ""}
+        </span>
+        <p className={styles.insightText}>{INSIGHT[scrubPhase]}</p>
       </div>
 
       <p className={styles.tapHint}>Tap a day to add or remove a period day. Future periods are predicted (outlined).</p>
 
       <div className={styles.monthNav}>
-        <button type="button" className={styles.monthNavBtn} onClick={() => setMonthOffset((o) => Math.max(-3, o - 1))} aria-label="Previous month"><ChevronLeft size={18} /></button>
+        <button type="button" className={styles.monthNavBtn} onClick={() => { navDir.current = -1; setMonthOffset((o) => Math.max(-3, o - 1)); }} aria-label="Previous month"><ChevronLeft size={18} /></button>
         <span className={styles.monthNavLabel}>{viewMonth.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</span>
-        <button type="button" className={styles.monthNavBtn} onClick={() => setMonthOffset((o) => Math.min(10, o + 1))} aria-label="Next month"><ChevronRight size={18} /></button>
+        <button type="button" className={styles.monthNavBtn} onClick={() => { navDir.current = 1; setMonthOffset((o) => Math.min(10, o + 1)); }} aria-label="Next month"><ChevronRight size={18} /></button>
       </div>
-      {renderMonth(viewMonth)}
+
+      <div className={styles.month}>
+        <AnimatePresence mode="wait" initial={false} custom={navDir.current}>
+          <motion.div
+            key={`${viewMonth.getFullYear()}-${viewMonth.getMonth()}`}
+            custom={navDir.current}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, x: navDir.current > 0 ? 26 : -26 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, x: navDir.current > 0 ? -26 : 26 }}
+            transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {renderMonth(viewMonth)}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       <div className={styles.legend}>
-        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.dayLogged}`} />Period</span>
-        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.dayPred}`} />Predicted</span>
-        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.dayFertile}`} />Fertile</span>
-        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.dayOv}`} />Ovulation</span>
+        <span className={styles.legItem}><span className={styles.legArt}><BloodDrop size={15} /></span>Period</span>
+        <span className={styles.legItem}><span className={styles.legArt}><BloodDrop size={14} fill={false} /></span>Predicted</span>
+        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.legFertile}`} />Fertile</span>
+        <span className={styles.legItem}><span className={styles.legArt}><Florette size={15} color={OV_TILE} /></span>Ovulation</span>
       </div>
 
       <Link href="/hormones" className={styles.nextBtn}>Next · your hormone rhythm <ArrowRight size={16} /></Link>

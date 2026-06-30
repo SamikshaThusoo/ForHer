@@ -118,3 +118,65 @@
   background: #fff; border: 1px solid rgba(91,42,74,0.16); color: #5B2A4A; cursor: pointer;
 }
 .monthNavBtn:disabled { opacity: 0.4; cursor: default; }
+
+/* =====================================================================
+   Revamp — ring scrubber, prediction chips, insight, iconographic calendar
+   ===================================================================== */
+
+/* Scrubber (mirrors the hormone-rhythm slider) */
+.scrubWrap { padding: 4px 22px 2px; }
+.scrub {
+  width: 100%; margin: 2px 0 0; accent-color: #5B2A4A; cursor: pointer;
+}
+.scrubMeta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; min-height: 22px; }
+.scrubHint { font-size: 10.5px; color: #9A8A92; }
+.backToday {
+  display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto;
+  font-family: inherit; font-size: 11px; font-weight: 700; color: #5B2A4A; cursor: pointer;
+  background: rgba(142,83,120,0.12); border: none; border-radius: 999px; padding: 5px 11px;
+}
+
+/* Prediction chips */
+.chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 18px 0; }
+.chip {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid rgba(91,42,74,0.1); border-radius: 15px;
+  padding: 11px 12px; box-shadow: 0 3px 12px rgba(91,42,74,0.05);
+}
+.chipIcon {
+  width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; background: rgba(142,83,120,0.08);
+}
+.chipText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.chipLabel { font-size: 9.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #9A8A92; }
+.chipVal { font-size: 12px; font-weight: 700; color: #3E1B33; line-height: 1.25; }
+
+/* Phase insight */
+.insight { margin: 12px 18px 0; border: 1px solid; border-radius: 15px; padding: 12px 14px; }
+.insightTag { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+.insightText { font-size: 12.5px; line-height: 1.5; color: #4A3A44; margin-top: 6px; }
+
+/* Iconographic calendar tiles */
+.day {
+  flex-direction: column; gap: 1px; position: relative;
+  transition: transform 0.14s ease, box-shadow 0.16s ease, background 0.18s ease;
+}
+.dayNum { position: relative; z-index: 1; line-height: 1; }
+.dayArt { display: flex; align-items: center; justify-content: center; height: 12px; line-height: 0; }
+
+.dayLogged { background: rgba(199,107,122,0.18); box-shadow: none; }
+.dayLogged .dayNum { color: #A23C53; font-weight: 800; }
+.dayPred { background: transparent; box-shadow: none; }
+.dayPred .dayNum { color: #C76B7A; font-weight: 700; }
+.dayFertile { background: rgba(79,157,105,0.18); box-shadow: none; }
+.dayFertile .dayNum { color: #2F6B45; font-weight: 700; }
+.dayOv { background: rgba(79,157,105,0.3); box-shadow: none; }
+.dayOv .dayNum { color: #235539; font-weight: 800; }
+.dayToday { box-shadow: 0 0 0 2px #3E1B33; }
+.daySel { box-shadow: 0 0 0 2.5px #8E5378; transform: scale(1.07); z-index: 2; }
+.dayToday.daySel { box-shadow: 0 0 0 2.5px #8E5378; }
+
+/* Legend */
+.legArt { display: inline-flex; align-items: center; justify-content: center; }
+.legFertile { background: rgba(79,157,105,0.45); }
+
