@@ -102,12 +102,12 @@ export function BloodDrop({
         </linearGradient>
       </defs>
       <path
-        d="M12 2.6 C12 2.6 5.2 11 5.2 15.4 A6.8 6.8 0 1 0 18.8 15.4 C18.8 11 12 2.6 12 2.6 Z"
+        d="M12 3.4 C12 3.4 6 11 6 14.8 A6 6 0 1 0 18 14.8 C18 11 12 3.4 12 3.4 Z"
         fill={fill ? `url(#${gid})` : "none"}
         stroke={fill ? "none" : color}
         strokeWidth={fill ? 0 : 1.7}
       />
-      {fill && <ellipse cx="9.5" cy="15.4" rx="1.7" ry="2.5" fill="#fff" opacity="0.34" />}
+      {fill && <ellipse cx="9.8" cy="14.8" rx="1.6" ry="2.4" fill="#fff" opacity="0.34" />}
     </svg>
   );
 }

@@ -68,13 +68,14 @@ export function CycleRing({
   const segs = segsRaw.filter((s) => s.b >= s.a);
 
   const isFertileMarker = cycleDay >= ovStart && cycleDay <= ovEnd;
-  const markerPos = polar(R, dayToAngle(cycleDay));
   const ovPos = polar(R, dayToAngle(ovCd));
   const todayPos = polar(R, dayToAngle(todayCd));
   const isToday = cycleDay === todayCd;
 
-  const drops = Array.from({ length: Math.min(duration, 7) }, (_, i) => {
-    const p = polar(R, dayToAngle(i + 1));
+  // Period drops, capped to the menstrual arc (days 1–5) and placed at each
+  // day's slice centre so they sit cleanly inside the band, not on the gaps.
+  const drops = Array.from({ length: Math.min(duration, 5) }, (_, i) => {
+    const p = polar(R, dayToAngle(i + 1) + 180 / L);
     return { d: i + 1, ...p };
   });
 
@@ -104,7 +105,7 @@ export function CycleRing({
               tabIndex={tap ? 0 : undefined}
               aria-label={tap ? `Jump to ${PHASE_LABEL[s.phase].toLowerCase()} phase` : undefined}
               aria-hidden={tap ? undefined : true}
-              style={{ cursor: tap ? "pointer" : undefined }}
+              style={{ cursor: tap ? "pointer" : undefined, outline: "none", WebkitTapHighlightColor: "transparent" }}
               onClick={tap ? () => tap(s.a) : undefined}
               onKeyDown={tap ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(s.a); } } : undefined}
               initial={reduce ? { pathLength: 1 } : { pathLength: 0 }}
@@ -132,25 +133,27 @@ export function CycleRing({
         <span className={styles.todayTick} style={{ left: pct(todayPos.x), top: pct(todayPos.y) }} aria-hidden />
       )}
 
-      {/* the live marker (selected or today) — springs to its day */}
+      {/* the live marker (selected or today) — a radial arm rotates it so it
+          always travels along the circumference, never across the centre */}
       <div
-        className={styles.marker}
+        className={styles.markerArm}
         style={{
-          left: pct(markerPos.x),
-          top: pct(markerPos.y),
-          transition: reduce ? "none" : "left .5s cubic-bezier(.34,1.4,.5,1), top .5s cubic-bezier(.34,1.4,.5,1)",
+          transform: `rotate(${dayToAngle(cycleDay) + 90}deg)`,
+          transition: reduce ? "none" : "transform .5s cubic-bezier(.34,1.4,.5,1)",
         }}
       >
-        {isFertileMarker ? (
-          <Florette size={30} color={FLORETTE} bright />
-        ) : (
-          <motion.span
-            className={styles.markerDot}
-            style={{ background: markerColor, boxShadow: `0 0 0 5px ${markerColor}22, 0 2px 8px ${markerColor}66` }}
-            animate={isToday && !reduce ? { scale: [1, 1.16, 1] } : { scale: 1 }}
-            transition={isToday && !reduce ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
-          />
-        )}
+        <div className={styles.markerHead} style={{ left: pct(C), top: pct(C - R) }}>
+          {isFertileMarker ? (
+            <Florette size={30} color={FLORETTE} bright />
+          ) : (
+            <motion.span
+              className={styles.markerDot}
+              style={{ background: markerColor, boxShadow: `0 0 0 5px ${markerColor}22, 0 2px 8px ${markerColor}66` }}
+              animate={isToday && !reduce ? { scale: [1, 1.16, 1] } : { scale: 1 }}
+              transition={isToday && !reduce ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
+            />
+          )}
+        </div>
       </div>
 
       {/* centre readout */}
