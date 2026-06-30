@@ -15,11 +15,21 @@
 
 /* Positioned overlays (florette / drops / tick) — placed by % of the ring box. */
 .deco,
-.marker,
+.markerHead,
 .todayTick {
   position: absolute;
   transform: translate(-50%, -50%);
   pointer-events: none;
+}
+
+/* The marker rides a full-size arm that rotates about the ring centre, so the
+   head always moves along the circumference (never cutting across the middle). */
+.markerArm {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  pointer-events: none;
+  will-change: transform;
 }
 .deco {
   filter: drop-shadow(0 1px 2px rgba(62, 27, 51, 0.18));
