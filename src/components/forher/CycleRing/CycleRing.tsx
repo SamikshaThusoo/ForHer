@@ -69,7 +69,10 @@ export function CycleRing({
   ];
   const segs = segsRaw.filter((s) => s.b >= s.a);
 
-  const isFertileMarker = cycleDay >= ovCd - 5 && cycleDay <= ovCd;
+  // The florette is reserved for the ovulation day itself; every other day
+  // (including the rest of the fertile window) uses the round marker, so the
+  // cursor never gets confused with the ovulation flower.
+  const isOvulationMarker = cycleDay === ovCd;
   const ovPos = polar(R, dayToAngle(ovCd));
   const todayPos = polar(R, dayToAngle(todayCd));
   const isToday = cycleDay === todayCd;
@@ -145,7 +148,7 @@ export function CycleRing({
         }}
       >
         <div className={styles.markerHead} style={{ left: pct(C), top: pct(C - R) }}>
-          {isFertileMarker ? (
+          {isOvulationMarker ? (
             <Florette size={30} color={FLORETTE} bright />
           ) : (
             <motion.span
