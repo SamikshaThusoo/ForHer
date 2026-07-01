@@ -5,7 +5,8 @@ import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
 import {
-  cycleDayFromLog, cycleLengthFor, phaseForCycleDay, PHASE_LABEL, PHASE_PROSE, HORMONES,
+  cycleDayFromLog, cycleLengthFor, phaseForCycleDay, ovulationDay, hormoneTemplateDay,
+  PHASE_LABEL, PHASE_PROSE, HORMONES,
 } from "@/lib/forher/cycleview";
 import type { CyclePhase } from "@/types/journey";
 import { ChevronLeft } from "lucide-react";
@@ -31,7 +32,8 @@ export default function HormonesPage() {
   const [dayState, setDayState] = useState<number | null>(null);
   const day = dayState ?? todayCd;
   const setDay = (d: number) => setDayState(d);
-  const phase = phaseForCycleDay(day, L);
+  const duration = fh.cycleLog?.duration ?? 5;
+  const phase = phaseForCycleDay(day, L, duration);
   const carePlan = personaTrack(persona) !== "none";
   const isToday = fh.cycleLog?.lastPeriod != null && day === todayCd;
 
@@ -39,20 +41,24 @@ export default function HormonesPage() {
   const fmtD = (d: Date) => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
   let datesLine: string | null = null;
   if (lp) {
-    const ovCd = Math.floor(L / 2);
+    const ovCd = ovulationDay(L);
     const daysToOv = ((ovCd - todayCd) % L + L) % L;
     const daysToPeriod = todayCd === 1 ? 0 : L - todayCd + 1;
     datesLine = `Next period ~ ${fmtD(new Date(today.getTime() + daysToPeriod * 86400000))} · Ovulation ~ ${fmtD(new Date(today.getTime() + daysToOv * 86400000))}`;
   }
 
+  // Sample the 28-day hormone template through the cycle-length remap, so the
+  // curve landmarks (LH surge, estrogen peak) land on the real ovulation day.
+  const tDay = (d: number) => hormoneTemplateDay(d, L);
+  const ovCd = ovulationDay(L);
   const x = (d: number) => PAD + ((d - 1) / (L - 1)) * (W - 2 * PAD);
   const y = (v: number) => H - PAD - v * (H - 2 * PAD);
   const pathFor = (fn: (d: number) => number) =>
-    "M " + Array.from({ length: L }, (_, i) => `${x(i + 1).toFixed(1)} ${y(fn(i + 1)).toFixed(1)}`).join(" L ");
+    "M " + Array.from({ length: L }, (_, i) => `${x(i + 1).toFixed(1)} ${y(fn(tDay(i + 1))).toFixed(1)}`).join(" L ");
 
   // Dominant hormone at the scrubbed day.
-  const dominant = [...HORMONES].sort((a, b) => b.fn(day) - a.fn(day))[0];
-  const dv = dominant.fn(day);
+  const dominant = [...HORMONES].sort((a, b) => b.fn(tDay(day)) - a.fn(tDay(day)))[0];
+  const dv = dominant.fn(tDay(day));
   const verb = dv > 0.7 ? "peaking" : dv > 0.4 ? "rising" : "easing";
 
   return (
@@ -78,11 +84,15 @@ export default function HormonesPage() {
               strokeLinejoin="round" strokeLinecap="round" opacity={h.key === dominant.key ? 1 : 0.55} />
           ))}
           {HORMONES.map((h) => (
-            <circle key={h.key} cx={x(day)} cy={y(h.fn(day))} r={h.key === dominant.key ? 4.5 : 3.2}
+            <circle key={h.key} cx={x(day)} cy={y(h.fn(tDay(day)))} r={h.key === dominant.key ? 4.5 : 3.2}
               fill={h.color} stroke="#fff" strokeWidth="1.5" />
           ))}
         </svg>
-        <div className={styles.axis}><span>Day 1</span><span>Ovulation</span><span>Day {L}</span></div>
+        <div className={styles.axis}>
+          <span>Day 1</span>
+          <span className={styles.axisOv} style={{ left: `${((ovCd - 1) / (L - 1)) * 100}%` }}>Ovulation</span>
+          <span>Day {L}</span>
+        </div>
 
         {/* Scrubber — drag through the cycle */}
         <input
@@ -112,7 +122,7 @@ export default function HormonesPage() {
 
       <div className={styles.hList}>
         {HORMONES.map((h) => {
-          const v = Math.round(h.fn(day) * 100);
+          const v = Math.round(h.fn(tDay(day)) * 100);
           return (
             <div key={h.key} className={styles.hRow}>
               <span className={styles.hLabel}><span className={styles.hDot} style={{ background: h.color }} />{h.label}</span>

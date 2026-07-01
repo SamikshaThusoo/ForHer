@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
 import {
-  cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL, PHASE_COLOR,
+  cycleLengthFor, cycleDayFromLog, phaseForCycleDay, ovulationDay, PHASE_LABEL, PHASE_COLOR,
 } from "@/lib/forher/cycleview";
 import type { CyclePhase } from "@/types/journey";
 import { CycleOnboarding } from "@/components/forher/CycleOnboarding/CycleOnboarding";
@@ -118,7 +118,7 @@ export default function CyclePage() {
   // ---- Track / TTC calendar ----
   const L = cycleLengthFor(persona, cycle.cycleLength);
   const duration = cycle.duration ?? 5;
-  const ovCd = Math.floor(L / 2);
+  const ovCd = ovulationDay(L);
 
   // Anchor = most recent period start (a logged day whose previous day isn't logged), on/before today.
   const sorted = [...logged].sort();
@@ -136,7 +136,7 @@ export default function CyclePage() {
 
   const todayCd = cycleDayFromLog(anchorISO, L, today);
   const cycleDay = selCd ?? todayCd;            // the day the ring + insight reflect
-  const scrubPhase = phaseForCycleDay(cycleDay, L);
+  const scrubPhase = phaseForCycleDay(cycleDay, L, duration);
   const isToday = cycleDay === todayCd;
   const hasSel = selCd !== null;
   const selISO = localISO(addDays(anchor, cycleDay - 1)); // calendar day in sync with the scrubber
@@ -172,7 +172,7 @@ export default function CyclePage() {
           const fromAnchor = dayNum(date) >= dayNum(anchor);
           const isOv = fromAnchor && cd === ovCd;
           // Ovulation/fertile window shown for everyone, not just TTC.
-          const isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 4 && cd <= ovCd + 1;
+          const isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 5 && cd <= ovCd + 1;
           const isTodayCell = iso === localISO(today);
           const isSel = hasSel && iso === selISO;
           return (

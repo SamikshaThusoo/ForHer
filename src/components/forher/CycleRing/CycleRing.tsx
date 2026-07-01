@@ -1,7 +1,7 @@
 "use client";
 import { motion, useReducedMotion } from "framer-motion";
 import type { CyclePhase } from "@/types/journey";
-import { phaseForCycleDay, PHASE_COLOR, PHASE_LABEL } from "@/lib/forher/cycleview";
+import { phaseForCycleDay, ovulationDay, PHASE_COLOR, PHASE_LABEL } from "@/lib/forher/cycleview";
 import { Florette, BloodDrop } from "../CycleArt/CycleArt";
 import styles from "./CycleRing.module.css";
 
@@ -29,10 +29,10 @@ function arcPath(r: number, a0: number, a1: number) {
   return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
 }
 
-function statusLine(day: number, L: number, ovCd: number, duration: number, ovStart: number, ovEnd: number) {
+function statusLine(day: number, L: number, ovCd: number, duration: number) {
   if (day <= duration) return `Period · day ${day}`;
   if (day === ovCd) return "Ovulation day";
-  if (day >= ovStart && day <= ovEnd) return "Fertile window open";
+  if (day >= ovCd - 5 && day <= ovCd + 1) return "Fertile window open";
   const toNext = day === 1 ? 0 : L - day + 1;
   return toNext === 0 ? "Period due today" : `Next period in ${toNext} day${toNext === 1 ? "" : "s"}`;
 }
@@ -51,30 +51,32 @@ export function CycleRing({
   onPhaseTap?: (day: number) => void;
 }) {
   const reduce = useReducedMotion();
-  const ovCd = Math.floor(L / 2);
-  const ovStart = Math.floor(L / 2) - 1;
-  const ovEnd = Math.floor(L / 2) + 2;
-  const phase = phaseForCycleDay(cycleDay, L);
+  const ovCd = ovulationDay(L);
+  const ovStart = ovCd - 1;
+  const ovEnd = ovCd + 2;
+  const phase = phaseForCycleDay(cycleDay, L, duration);
 
   const dayToAngle = (d: number) => -90 + ((d - 1) / L) * 360;
 
   // Contiguous phase segments → arcs (inset by a small gap for the segmented look).
+  // Menstrual spans the entered period length; ovulatory is anchored on L−14 and
+  // clamped past the period so short cycles never overlap the two bands.
   const segsRaw: { phase: CyclePhase; a: number; b: number }[] = [
-    { phase: "menstrual", a: 1, b: 5 },
-    { phase: "follicular", a: 6, b: ovStart - 1 },
-    { phase: "ovulatory", a: ovStart, b: ovEnd },
+    { phase: "menstrual", a: 1, b: duration },
+    { phase: "follicular", a: duration + 1, b: ovStart - 1 },
+    { phase: "ovulatory", a: Math.max(ovStart, duration + 1), b: ovEnd },
     { phase: "luteal", a: ovEnd + 1, b: L },
   ];
   const segs = segsRaw.filter((s) => s.b >= s.a);
 
-  const isFertileMarker = cycleDay >= ovStart && cycleDay <= ovEnd;
+  const isFertileMarker = cycleDay >= ovCd - 5 && cycleDay <= ovCd + 1;
   const ovPos = polar(R, dayToAngle(ovCd));
   const todayPos = polar(R, dayToAngle(todayCd));
   const isToday = cycleDay === todayCd;
 
-  // Period drops, capped to the menstrual arc (days 1–5) and placed at each
-  // day's slice centre so they sit cleanly inside the band, not on the gaps.
-  const drops = Array.from({ length: Math.min(duration, 5) }, (_, i) => {
+  // Period drops span the entered period length, placed at each day's slice centre
+  // so they sit cleanly inside the menstrual band, not on the gaps.
+  const drops = Array.from({ length: Math.min(duration, 7) }, (_, i) => {
     const p = polar(R, dayToAngle(i + 1) + 180 / L);
     return { d: i + 1, ...p };
   });
@@ -163,7 +165,7 @@ export function CycleRing({
         <span className={styles.phasePill} style={{ color: markerColor, background: `${markerColor}1f` }}>
           {PHASE_LABEL[phase]}
         </span>
-        <div className={styles.status}>{statusLine(cycleDay, L, ovCd, duration, ovStart, ovEnd)}</div>
+        <div className={styles.status}>{statusLine(cycleDay, L, ovCd, duration)}</div>
       </div>
     </div>
   );

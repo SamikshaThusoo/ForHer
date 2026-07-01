@@ -45,14 +45,34 @@ export function cycleDayFromLog(lastPeriodISO: string, length: number, date: Dat
   return (((days % length) + length) % length) + 1;
 }
 
-/** Phase for a 1-based cycle day, matching the engine's boundaries. */
-export function phaseForCycleDay(cycleDay: number, L: number): CyclePhase {
-  const ovStart = Math.floor(L / 2) - 1;
-  const ovEnd = Math.floor(L / 2) + 2;
-  if (cycleDay <= 5) return "menstrual";
+/** Ovulation day. The luteal phase is ~constant at 14 days, so ovulation counts
+ *  back from the next period rather than sitting at the cycle midpoint — correct
+ *  at 28 (= day 14) and for the long cycles this product targets (40 → day 26).
+ *  No clinical floor; the max(1,…) only guards against a non-positive day. */
+export function ovulationDay(L: number): number {
+  return Math.max(1, L - 14);
+}
+
+/** Phase for a 1-based cycle day. Menstrual spans the entered period `duration`,
+ *  and the ovulatory band is anchored on ovulation (L−14), not the midpoint. */
+export function phaseForCycleDay(cycleDay: number, L: number, duration = 5): CyclePhase {
+  const ov = ovulationDay(L);
+  const ovStart = ov - 1;
+  const ovEnd = ov + 2;
+  if (cycleDay <= duration) return "menstrual";
   if (cycleDay < ovStart) return "follicular";
   if (cycleDay <= ovEnd) return "ovulatory";
   return "luteal";
+}
+
+/** Map an actual cycle day (length L, ovulation at L−14) onto the 28-day hormone
+ *  template so the curves' landmarks land on the real ovulation day: the follicular
+ *  half stretches/shrinks to put ovulation at template day 14, the luteal half maps
+ *  ~1:1 (it is already ~14 days). Keeps the educational curve shapes intact. */
+export function hormoneTemplateDay(d: number, L: number): number {
+  const ov = ovulationDay(L);
+  if (d <= ov) return 1 + (d - 1) * 13 / Math.max(1, ov - 1);
+  return 14 + (d - ov) * 14 / Math.max(1, L - ov);
 }
 
 /** Predicted date of the next period (next menstrual start). */
