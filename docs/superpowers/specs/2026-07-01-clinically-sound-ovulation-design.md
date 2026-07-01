@@ -98,8 +98,9 @@ can fall within the bleed; menstrual wins visually, which is the honest edge cas
   - luteal: `ovEnd + 1 … L`
 - Status line "Fertile window open" uses `ovCd - 5 … ovCd` (same as calendar),
   "Ovulation day" on `cd === ovCd`.
-- The marker florette (`isFertileMarker` — florette instead of dot when the scrubbed
-  day is fertile) uses the same `ovCd - 5 … ovCd` bounds, not the narrow phase band.
+- The marker florette is reserved for the **ovulation day only** (`cycleDay === ovCd`);
+  every other day, including the rest of the fertile window, uses the round dot marker,
+  so the cursor is never confused with the permanent ovulation florette.
 - Period drops: `1 … min(duration, 7)` (was capped at 5) so they match the menstrual band.
 - Florette stays at `ovCd`.
 
