@@ -17,6 +17,7 @@ export function CycleOnboarding({ onSave }: { onSave: (log: CycleLog) => void })
   const [intent, setIntent] = useState<CycleIntent | null>(null);
   const [date, setDate] = useState("");
   const [dur, setDur] = useState(0);
+  const [len, setLen] = useState(28);
   const [weeks, setWeeks] = useState(0);
 
   // Step 1 — intent
@@ -62,12 +63,12 @@ export function CycleOnboarding({ onSave }: { onSave: (log: CycleLog) => void })
   }
 
   // Step 2b — track / ttc
-  const valid = !!date && dur > 0;
+  const valid = !!date && dur > 0 && Number.isInteger(len) && len >= 20 && len <= 90;
   return (
     <div className={styles.card}>
       <button type="button" className={styles.back} onClick={() => setIntent(null)}><ArrowLeft size={14} /> Back</button>
       <h3 className={styles.title}>{intent === "ttc" ? "Let's map your fertile window" : "Let's set up your cycle"}</h3>
-      <p className={styles.sub}>Two quick details and we can predict your phases{intent === "ttc" ? " and fertile days" : ""}.</p>
+      <p className={styles.sub}>A few quick details and we can predict your phases{intent === "ttc" ? " and fertile days" : ""}.</p>
       <label className={styles.label}>When did your last period start?</label>
       <input className={styles.date} type="date" value={date} max={today} onChange={(e) => setDate(e.target.value)} />
       <label className={styles.label}>How many days does it usually last?</label>
@@ -78,7 +79,14 @@ export function CycleOnboarding({ onSave }: { onSave: (log: CycleLog) => void })
           </button>
         ))}
       </div>
-      <button type="button" className={styles.save} disabled={!valid} onClick={() => onSave({ intent, lastPeriod: date, duration: dur })}>
+      <label className={styles.label}>How long is your cycle, usually?</label>
+      <p className={styles.sub}>Count from the first day of one period to the first day of the next. Most cycles are 21 to 35 days. If yours varies a lot, give your best estimate.</p>
+      <div className={styles.weeksRow}>
+        <input className={styles.weeksInput} type="number" min={20} max={90} value={len || ""}
+          onChange={(e) => setLen(Number(e.target.value))} />
+        <span className={styles.weeksUnit}>days</span>
+      </div>
+      <button type="button" className={styles.save} disabled={!valid} onClick={() => onSave({ intent, lastPeriod: date, duration: dur, cycleLength: len })}>
         Save my cycle
       </button>
     </div>

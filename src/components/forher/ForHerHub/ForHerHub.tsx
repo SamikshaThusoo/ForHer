@@ -105,7 +105,7 @@ export function ForHerHub() {
   const stepsTask = tasks.find((t) => t.id === "steps");
   const stepGoal = stepsTask ? fmtTarget(stepsTask.target) : "10,000 steps";
 
-  const L = cycleLengthFor(persona);
+  const L = cycleLengthFor(persona, fh.cycleLog?.cycleLength);
   const lp = fh.cycleLog?.lastPeriod;
   const cyclePhase: CyclePhase | null = lp ? phaseForCycleDay(cycleDayFromLog(lp, L, new Date()), L) : null;
   const cycleDay = lp ? cycleDayFromLog(lp, L, new Date()) : null;

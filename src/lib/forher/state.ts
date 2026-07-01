@@ -15,7 +15,8 @@ export type CycleIntent = "track" | "ttc" | "pregnant";
 export type CycleLog = {
   intent: CycleIntent;
   lastPeriod?: string;    // track + ttc
-  duration?: number;      // track + ttc
+  duration?: number;      // track + ttc — days of bleeding
+  cycleLength?: number;   // track + ttc — typical interval, one period start → the next
   weeksPregnant?: number; // pregnant
 };
 

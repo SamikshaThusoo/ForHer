@@ -72,7 +72,7 @@ export default function CommunityPage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const today = new Date();
-  const L = cycleLengthFor(persona);
+  const L = cycleLengthFor(persona, fh.cycleLog?.cycleLength);
   const logged = !!fh.cycleLog?.lastPeriod;
   // Phase comes only from her logged cycle; until then we don't claim a phase.
   const phase: CyclePhase = fh.cycleLog?.lastPeriod

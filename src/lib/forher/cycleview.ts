@@ -14,7 +14,13 @@ function dateDayNum(d: Date): number {
   return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
 }
 
-export function cycleLengthFor(persona: Persona): number {
+export function cycleLengthFor(persona: Persona, storedCycleLength?: number): number {
+  // The user's typical cycle length wins, bypassing the learned [21,40] clamp so
+  // long (often irregular) PCOS cycles up to 90 days actually drive prediction.
+  // Fall back to the learned average from her history — 28 when nothing to learn.
+  if (storedCycleLength && Number.isFinite(storedCycleLength) && storedCycleLength >= 20 && storedCycleLength <= 90) {
+    return Math.round(storedCycleLength);
+  }
   return learnedCycleLength(persona.pmos?.cycleHistory ?? []);
 }
 

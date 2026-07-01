@@ -24,7 +24,7 @@ export default function HormonesPage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const today = new Date();
-  const L = cycleLengthFor(persona);
+  const L = cycleLengthFor(persona, fh.cycleLog?.cycleLength);
   // "Today" is real only once she's logged her cycle; otherwise we centre the
   // scrubber mid-cycle and don't claim a current day.
   const todayCd = fh.cycleLog?.lastPeriod ? cycleDayFromLog(fh.cycleLog.lastPeriod, L, today) : Math.round(L / 2);
