@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { usePersona } from "@/context/PersonaContext";
@@ -7,9 +7,11 @@ import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
 import {
   cycleLengthFor, cycleDayFromLog, phaseForCycleDay, ovulationDay, PHASE_LABEL, PHASE_COLOR,
 } from "@/lib/forher/cycleview";
+import { readDayLog, writeDayLog, periodDaysSet, isEmptyEntry, type DayLog, type DayEntry } from "@/lib/forher/daylog";
 import type { CyclePhase } from "@/types/journey";
 import { CycleOnboarding } from "@/components/forher/CycleOnboarding/CycleOnboarding";
 import { CycleRing } from "@/components/forher/CycleRing/CycleRing";
+import { DayLogSheet } from "@/components/forher/DayLogSheet/DayLogSheet";
 import { Florette, BloodDrop } from "@/components/forher/CycleArt/CycleArt";
 import { ChevronLeft, ChevronRight, ArrowRight, RotateCcw } from "lucide-react";
 import styles from "./cycle.module.css";
@@ -29,24 +31,19 @@ const INSIGHT: Record<CyclePhase, string> = {
   luteal: "Winding down. Gentle movement and earlier nights help.",
 };
 
-function readLogged(id: string): string[] {
-  try { return JSON.parse(localStorage.getItem(`forher.${id}.loggedperiods`) || "[]"); } catch { return []; }
-}
-function writeLogged(id: string, set: Set<string>) {
-  try { localStorage.setItem(`forher.${id}.loggedperiods`, JSON.stringify([...set])); } catch { /* ignore */ }
-}
-
 export default function CyclePage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const reduce = useReducedMotion();
   const today = new Date();
-  const [logged, setLogged] = useState<Set<string>>(() => new Set(typeof window === "undefined" ? [] : readLogged(persona.id)));
+  const [dayLog, setDayLog] = useState<DayLog>(() => (typeof window === "undefined" ? {} : readDayLog(persona.id)));
   const [localCycle, setLocalCycle] = useState<CycleLog | null>(null);
   const [monthOffset, setMonthOffset] = useState(0);
   const [selCd, setSelCd] = useState<number | null>(null); // scrubbed cycle day (null = today)
+  const [sheetISO, setSheetISO] = useState<string | null>(null); // open day-log sheet
   const navDir = useRef(1);
   const cycle = localCycle ?? fh.cycleLog;
+  const logged = useMemo(() => periodDaysSet(dayLog), [dayLog]); // period days feed the cycle math
 
   const header = (
     <header className={styles.head}>
@@ -55,11 +52,18 @@ export default function CyclePage() {
     </header>
   );
 
-  const toggleDay = (iso: string) => {
-    setLogged((prev) => {
-      const next = new Set(prev);
-      next.has(iso) ? next.delete(iso) : next.add(iso);
-      writeLogged(persona.id, next);
+  // Focus the trigger first so the sheet can return focus to it on close
+  // (buttons don't always focus on click in Safari/Firefox).
+  const openSheet = (iso: string, trigger: HTMLElement) => {
+    trigger.focus();
+    setSheetISO(iso);
+  };
+  const saveDay = (iso: string, entry: DayEntry) => {
+    setDayLog((prev) => {
+      const next = { ...prev };
+      if (isEmptyEntry(entry)) delete next[iso];
+      else next[iso] = entry;
+      writeDayLog(persona.id, next);
       return next;
     });
   };
@@ -79,10 +83,13 @@ export default function CyclePage() {
           saveCycleLog(persona.id, log);
           if (log.lastPeriod && log.duration) {
             const start = fromISO(log.lastPeriod);
-            const next = new Set(logged);
-            for (let i = 0; i < log.duration; i++) next.add(localISO(addDays(start, i)));
-            setLogged(next);
-            writeLogged(persona.id, next);
+            const next: DayLog = { ...dayLog };
+            for (let i = 0; i < log.duration; i++) {
+              const iso = localISO(addDays(start, i));
+              next[iso] = { ...(next[iso] ?? {}), period: true };
+            }
+            setDayLog(next);
+            writeDayLog(persona.id, next);
           }
           setLocalCycle(log); // stay here and show the calendar
         }} />
@@ -177,7 +184,9 @@ export default function CyclePage() {
           const isSel = hasSel && iso === selISO;
           return (
             <motion.button key={i} type="button" whileTap={{ scale: 0.85 }}
-              onClick={() => { toggleDay(iso); setSelCd(cycleDayFromLog(anchorISO, L, date)); }}
+              onClick={(e) => { setSelCd(cycleDayFromLog(anchorISO, L, date)); openSheet(iso, e.currentTarget); }}
+              aria-label={`Log ${date.toLocaleDateString(undefined, { day: "numeric", month: "long" })}`}
+              aria-haspopup="dialog"
               className={[styles.day,
                 isLogged ? styles.dayLogged : "",
                 isPred ? styles.dayPred : "",
@@ -245,7 +254,7 @@ export default function CyclePage() {
         <p className={styles.insightText}>{INSIGHT[scrubPhase]}</p>
       </div>
 
-      <p className={styles.tapHint}>Tap a day to add or remove a period day. Future periods are predicted (outlined).</p>
+      <p className={styles.tapHint}>Tap any day to log your flow &amp; symptoms. Future periods are predicted (outlined).</p>
 
       <div className={styles.monthNav}>
         <button type="button" className={styles.monthNavBtn} onClick={() => { navDir.current = -1; setMonthOffset((o) => Math.max(-3, o - 1)); }} aria-label="Previous month"><ChevronLeft size={18} /></button>
@@ -276,6 +285,14 @@ export default function CyclePage() {
       </div>
 
       <Link href="/hormones" className={styles.nextBtn}>Next · your hormone rhythm <ArrowRight size={16} /></Link>
+
+      <DayLogSheet
+        dateISO={sheetISO}
+        entry={sheetISO ? (dayLog[sheetISO] ?? {}) : {}}
+        labelDate={sheetISO ? fromISO(sheetISO).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "long" }) : ""}
+        onSave={saveDay}
+        onClose={() => setSheetISO(null)}
+      />
     </main>
   );
 }
