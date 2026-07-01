@@ -27,8 +27,9 @@ assumption. Clinically sound throughout.
    (not the midpoint). No artificial floor — short cycles ovulate early, which is
    real biology. (Defensive `max(1, …)` only to avoid a non-positive day; never
    triggers for the 20–90 input range, where `ovCd` runs 6→76.)
-2. **Fertile window:** `ovCd − 5 … ovCd + 1` (5 days before + ovulation day + 1 day
-   after as a buffer = 7 days). Calendar green tiles and the ring's "Fertile window
+2. **Fertile window:** `ovCd − 5 … ovCd` (the standard 6-day window: 5 days before
+   ovulation + ovulation day; the egg is viable only ~12–24h so the day after is
+   effectively non-fertile). Calendar green tiles and the ring's "Fertile window
    open" status use the **same** bounds.
 3. **Menstrual band = days `1 … duration`** (the entered period length), not 1–5.
    Follicular then starts at `duration + 1`.
@@ -81,8 +82,8 @@ can fall within the bleed; menstrual wins visually, which is the honest edge cas
 ### 3. Calendar (`src/app/cycle/page.tsx`)
 
 - `const ovCd = ovulationDay(L);` (was `Math.floor(L / 2)`).
-- Fertile: `isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 5 && cd <= ovCd + 1;`
-  (was `ovCd - 4 … ovCd + 1`; keeps the existing `fromAnchor` past-month guard).
+- Fertile: `isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 5 && cd <= ovCd;`
+  (6-day window ending on ovulation; keeps the existing `fromAnchor` past-month guard).
 - `isOv = fromAnchor && cd === ovCd;` (unchanged shape).
 - `daysToOv` / `ovDate` unchanged (already derive from `ovCd`).
 
@@ -95,10 +96,10 @@ can fall within the bleed; menstrual wins visually, which is the honest edge cas
   - follicular: `duration + 1 … ovStart - 1` (dropped when empty)
   - ovulatory: `max(ovStart, duration + 1) … ovEnd`
   - luteal: `ovEnd + 1 … L`
-- Status line "Fertile window open" uses `ovCd - 5 … ovCd + 1` (same as calendar),
+- Status line "Fertile window open" uses `ovCd - 5 … ovCd` (same as calendar),
   "Ovulation day" on `cd === ovCd`.
 - The marker florette (`isFertileMarker` — florette instead of dot when the scrubbed
-  day is fertile) uses the same `ovCd - 5 … ovCd + 1` bounds, not the narrow phase band.
+  day is fertile) uses the same `ovCd - 5 … ovCd` bounds, not the narrow phase band.
 - Period drops: `1 … min(duration, 7)` (was capped at 5) so they match the menstrual band.
 - Florette stays at `ovCd`.
 

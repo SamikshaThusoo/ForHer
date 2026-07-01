@@ -32,7 +32,7 @@ function arcPath(r: number, a0: number, a1: number) {
 function statusLine(day: number, L: number, ovCd: number, duration: number) {
   if (day <= duration) return `Period · day ${day}`;
   if (day === ovCd) return "Ovulation day";
-  if (day >= ovCd - 5 && day <= ovCd + 1) return "Fertile window open";
+  if (day >= ovCd - 5 && day <= ovCd) return "Fertile window open";
   const toNext = day === 1 ? 0 : L - day + 1;
   return toNext === 0 ? "Period due today" : `Next period in ${toNext} day${toNext === 1 ? "" : "s"}`;
 }
@@ -69,7 +69,7 @@ export function CycleRing({
   ];
   const segs = segsRaw.filter((s) => s.b >= s.a);
 
-  const isFertileMarker = cycleDay >= ovCd - 5 && cycleDay <= ovCd + 1;
+  const isFertileMarker = cycleDay >= ovCd - 5 && cycleDay <= ovCd;
   const ovPos = polar(R, dayToAngle(ovCd));
   const todayPos = polar(R, dayToAngle(todayCd));
   const isToday = cycleDay === todayCd;
