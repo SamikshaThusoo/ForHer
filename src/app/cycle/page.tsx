@@ -166,9 +166,13 @@ export default function CyclePage() {
           const isLogged = logged.has(iso);
           const isPred = !isLogged && predicted.has(iso);
           const cd = cycleDayFromLog(anchorISO, L, date);
-          const isOv = cd === ovCd;
+          // cd repeats in both directions, so gate fertile/ovulation to the
+          // logged period forward — otherwise the green backfills into earlier
+          // months (predicted periods are already forward-only).
+          const fromAnchor = dayNum(date) >= dayNum(anchor);
+          const isOv = fromAnchor && cd === ovCd;
           // Ovulation/fertile window shown for everyone, not just TTC.
-          const isFertile = !isLogged && !isPred && cd >= ovCd - 4 && cd <= ovCd + 1;
+          const isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 4 && cd <= ovCd + 1;
           const isTodayCell = iso === localISO(today);
           const isSel = hasSel && iso === selISO;
           return (
