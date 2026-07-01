@@ -116,7 +116,7 @@ export default function CyclePage() {
   }
 
   // ---- Track / TTC calendar ----
-  const L = cycleLengthFor(persona);
+  const L = cycleLengthFor(persona, cycle.cycleLength);
   const duration = cycle.duration ?? 5;
   const ovCd = Math.floor(L / 2);
 

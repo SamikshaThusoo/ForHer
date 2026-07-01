@@ -26,7 +26,7 @@ export function ForHerCompanionHub() {
   if (!fh.hydrated) return null;
 
   const logged = !!fh.cycleLog?.lastPeriod;
-  const L = cycleLengthFor(persona);
+  const L = cycleLengthFor(persona, fh.cycleLog?.cycleLength);
   const phase: CyclePhase | null = fh.cycleLog?.lastPeriod
     ? phaseForCycleDay(cycleDayFromLog(fh.cycleLog.lastPeriod, L, new Date()), L)
     : null;
