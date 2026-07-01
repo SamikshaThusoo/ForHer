@@ -107,7 +107,7 @@ export function ForHerHub() {
 
   const L = cycleLengthFor(persona, fh.cycleLog?.cycleLength);
   const lp = fh.cycleLog?.lastPeriod;
-  const cyclePhase: CyclePhase | null = lp ? phaseForCycleDay(cycleDayFromLog(lp, L, new Date()), L) : null;
+  const cyclePhase: CyclePhase | null = lp ? phaseForCycleDay(cycleDayFromLog(lp, L, new Date()), L, fh.cycleLog?.duration ?? 5) : null;
   const cycleDay = lp ? cycleDayFromLog(lp, L, new Date()) : null;
   const mood = todayMood();
   const meals = todaysMeals();
