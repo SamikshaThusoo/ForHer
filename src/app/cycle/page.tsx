@@ -172,7 +172,7 @@ export default function CyclePage() {
           const fromAnchor = dayNum(date) >= dayNum(anchor);
           const isOv = fromAnchor && cd === ovCd;
           // Ovulation/fertile window shown for everyone, not just TTC.
-          const isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 5 && cd <= ovCd + 1;
+          const isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 5 && cd <= ovCd;
           const isTodayCell = iso === localISO(today);
           const isSel = hasSel && iso === selISO;
           return (
