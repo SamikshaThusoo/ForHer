@@ -3,15 +3,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
-import { Home, Activity, Moon, BookOpen, Users } from "lucide-react";
+import { Home, Activity, Moon, BookOpen } from "lucide-react";
 import styles from "./BottomNav.module.css";
 
+// Clinic is reached from the For Her card/space, not a bottom-nav tab (product call).
 const TABS = [
   { href: "/forher", label: "Home", icon: Home, carePlanOnly: false },
   { href: "/plan", label: "Plan", icon: Activity, carePlanOnly: true },
   { href: "/log/mood", label: "Track", icon: Moon, carePlanOnly: false },
   { href: "/learn", label: "Learn", icon: BookOpen, carePlanOnly: false },
-  { href: "/cares/care-team", label: "Care", icon: Users, carePlanOnly: true },
 ];
 
 export function BottomNav() {

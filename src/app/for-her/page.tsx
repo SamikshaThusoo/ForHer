@@ -82,7 +82,7 @@ export default function ForHerPage() {
 
       {step === "schedule" && (
         <ScheduleCollection
-          onComplete={(s) => { saveSchedule(persona.id, s); markAssessed(persona.id); router.push("/"); }}
+          onComplete={(s) => { saveSchedule(persona.id, s); markAssessed(persona.id); router.push("/clinic"); }}
         />
       )}
     </main>

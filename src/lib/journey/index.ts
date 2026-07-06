@@ -3,6 +3,7 @@ export * from "./phase";
 export * from "./risk";
 export * from "./cycle";
 export * from "./touchpoints";
+export * from "./careplan";
 export * from "./tasks";
 export * from "./markers";
 export * from "./entryFraming";
