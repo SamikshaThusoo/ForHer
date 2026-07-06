@@ -1,0 +1,37 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(62, 27, 51, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -14px 40px rgba(62, 27, 51, 0.28);
+  padding: 8px 18px calc(18px + env(safe-area-inset-bottom));
+}
+
+.grab {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(91, 42, 74, 0.22);
+  margin: 4px auto 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim {
+    backdrop-filter: none;
+  }
+}

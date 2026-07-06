@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getCareTests, getClinicPlan } from "./careplan";
+import { getCareTests, getClinicPlan, clinicPlanFor } from "./careplan";
 import type { Persona } from "@/types/persona";
 import type { AhcMarkers, AssessmentAnswers } from "@/types/journey";
 
@@ -89,5 +89,15 @@ describe("getClinicPlan", () => {
   it("primary is never duplicated in the secondary list", () => {
     const p = getClinicPlan(HIGH, {});
     expect(p.secondary.some((i) => i.kind === p.primary?.kind && i.id === p.primary?.id)).toBe(false);
+  });
+});
+
+describe("clinicPlanFor (explicit tier + flags, for onboarding)", () => {
+  it("builds the same high plan from a tier + flags directly", () => {
+    const p = clinicPlanFor("high", { acneOrHirsutism: true, ttc: false, highMetabolic: true });
+    expect(p.tier).toBe("high");
+    expect(p.primary?.id).toBe("gynaecologist");
+    expect(p.primary?.priority).toBe(true);
+    expect(p.showBooking).toBe(true);
   });
 });

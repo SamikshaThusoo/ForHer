@@ -71,8 +71,15 @@ const testItem = (t: CareTest): CareItem => ({ id: t.id, kind: "test", label: t.
 /** Assembles the one-primary-then-secondary care plan for a tier from the existing
  *  care-circle engine + tier tests. Enforces "one action, not five". */
 export function getClinicPlan(persona: Persona, profile: HealthProfile): ClinicPlan {
-  const tier = personaTrack(persona);
-  const flags = careCircleFlags(persona, profile);
+  return clinicPlanFor(personaTrack(persona), careCircleFlags(persona, profile));
+}
+
+/** Same assembly from an explicit tier + flags — used during onboarding, where the
+ *  tier comes from the live assessment answers rather than the persona seed. */
+export function clinicPlanFor(
+  tier: CareTrack,
+  flags: { acneOrHirsutism: boolean; ttc: boolean; highMetabolic: boolean },
+): ClinicPlan {
   const consults = getCareCircle(tier, flags);
   const tests = getCareTests(tier, flags);
 
