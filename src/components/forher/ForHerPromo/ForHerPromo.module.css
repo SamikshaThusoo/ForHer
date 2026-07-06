@@ -107,3 +107,60 @@
   background: rgba(47,122,122,0.1); border: 1px solid rgba(47,122,122,0.22);
   border-radius: 12px; padding: 8px 12px;
 }
+
+/* ClinicForHer entry card — the clinical layer, inside the For Her space */
+.clinicEntry {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 4px 0 12px;
+  background: linear-gradient(135deg, #FBEFE6, #FCF6EE);
+  border: 1px solid rgba(181, 83, 47, 0.14);
+  border-radius: 16px;
+  padding: 13px 14px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(91, 42, 74, 0.08);
+}
+.clinicEntry:focus-visible {
+  outline: 2px solid #8E5378;
+  outline-offset: 2px;
+}
+.clinicIcon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(181, 83, 47, 0.14);
+  color: #B5532F;
+}
+.clinicText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.clinicEyebrow {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #B5532F;
+}
+.clinicTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #3E1B33;
+}
+.clinicCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8E5378;
+}

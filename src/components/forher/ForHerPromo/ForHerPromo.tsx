@@ -5,7 +5,7 @@ import { useForHer } from "@/lib/forher/state";
 import { entryFraming, personaTrack } from "@/lib/journey";
 import { ForHerHub } from "@/components/forher/ForHerHub/ForHerHub";
 import { ForHerCompanionHub } from "@/components/forher/ForHerCompanionHub/ForHerCompanionHub";
-import { Sparkles, ArrowRight, ScanLine } from "lucide-react";
+import { Sparkles, ArrowRight, ScanLine, Stethoscope } from "lucide-react";
 import styles from "./ForHerPromo.module.css";
 
 /** The For Her card on the Habit Health home — the hub. Three states:
@@ -73,6 +73,14 @@ export function ForHerPromo() {
         </div>
         <Link href="/cares/scan" className={styles.hubScan}><ScanLine size={18} /><span>Scan</span></Link>
       </div>
+      <Link href="/clinic" className={styles.clinicEntry}>
+        <span className={styles.clinicIcon}><Stethoscope size={18} /></span>
+        <span className={styles.clinicText}>
+          <span className={styles.clinicEyebrow}>ClinicForHer</span>
+          <strong className={styles.clinicTitle}>Your care circle &amp; next visit</strong>
+        </span>
+        <span className={styles.clinicCta}>Open <ArrowRight size={14} /></span>
+      </Link>
       <ForHerHub />
     </div>
   );

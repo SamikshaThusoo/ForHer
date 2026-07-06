@@ -112,7 +112,7 @@ export default function CyclePage() {
           <div><span className={styles.pregWeeks}>{weeks}</span><span className={styles.pregUnit}> weeks</span></div>
           <span className={styles.pregTri}>{trimester} trimester</span>
         </div>
-        <Link href="/cares/care-team" className={styles.tulipCard}>
+        <Link href="/clinic" className={styles.tulipCard}>
           <span className={styles.tulipEyebrow}>Recommended for you</span>
           <h3 className={styles.tulipTitle}>Tulip — pregnancy care with PCOS</h3>
           <p className={styles.tulipSub}>PCOS can raise some pregnancy risks. Tulip adds closer monitoring and a dedicated team.</p>
