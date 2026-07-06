@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
+import { useForHer } from "@/lib/forher/state";
 import { ClinicHub } from "@/components/forher/ClinicHub/ClinicHub";
 import styles from "./ClinicForHer.module.css";
 
@@ -15,6 +16,7 @@ const TIER_COPY: Record<string, string> = {
 
 export function ClinicForHer() {
   const { persona } = usePersona();
+  const fh = useForHer(persona.id);
   const tier = personaTrack(persona);
 
   return (
@@ -32,7 +34,7 @@ export function ClinicForHer() {
         <p className={styles.lede}>{TIER_COPY[tier]}</p>
       </section>
 
-      <ClinicHub persona={persona} tier={tier} showRecommended />
+      <ClinicHub persona={persona} tier={tier} showRecommended day={fh.day} />
 
       <p className={styles.disclaimer}>
         This is a screening tool, not a diagnosis. Please consult a qualified clinician for medical decisions.
