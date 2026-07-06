@@ -27,7 +27,7 @@ export function ClinicForHer() {
       </header>
 
       <section className={styles.hero}>
-        <span className={styles.eyebrow}>ClinicForHer</span>
+        <span className={styles.eyebrow}>Clinic ForHer</span>
         <h1 className={styles.h1}>Your next step</h1>
         <p className={styles.lede}>{TIER_COPY[tier]}</p>
       </section>

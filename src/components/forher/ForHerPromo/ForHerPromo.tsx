@@ -76,7 +76,7 @@ export function ForHerPromo() {
       <Link href="/clinic" className={styles.clinicEntry}>
         <span className={styles.clinicIcon}><Stethoscope size={18} /></span>
         <span className={styles.clinicText}>
-          <span className={styles.clinicEyebrow}>ClinicForHer</span>
+          <span className={styles.clinicEyebrow}>Clinic ForHer</span>
           <strong className={styles.clinicTitle}>Your care circle &amp; next visit</strong>
         </span>
         <span className={styles.clinicCta}>Open <ArrowRight size={14} /></span>
