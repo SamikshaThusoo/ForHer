@@ -186,7 +186,11 @@ export function ClinicHub({
           </span>
           <strong className={styles.tileTitle}>Your bookings</strong>
           <span className={styles.tileMeta}>
-            {bookedCount > 0 ? `${bookedCount} booked` : visits.length ? `${visits.length} scheduled` : "None yet"}
+            {bookedCount > 0
+              ? `${bookedCount} booked`
+              : shownVisits.length
+                ? `${shownVisits.length} scheduled`
+                : "None yet"}
           </span>
         </button>
 
