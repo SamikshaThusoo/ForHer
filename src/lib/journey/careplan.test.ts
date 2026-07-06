@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getCareTests, getClinicPlan, clinicPlanFor } from "./careplan";
+import { getCareTests, getClinicPlan, clinicPlanFor, getPlanTouchpoints, serviceForItem } from "./careplan";
 import type { Persona } from "@/types/persona";
 import type { AhcMarkers, AssessmentAnswers } from "@/types/journey";
 
@@ -99,5 +99,27 @@ describe("clinicPlanFor (explicit tier + flags, for onboarding)", () => {
     expect(p.primary?.id).toBe("gynaecologist");
     expect(p.primary?.priority).toBe(true);
     expect(p.showBooking).toBe(true);
+  });
+});
+
+describe("getPlanTouchpoints", () => {
+  it("returns the plan's clinical visits in day order, starting with the day-5 doctor baseline", () => {
+    const visits = getPlanTouchpoints(HIGH);
+    expect(visits.length).toBeGreaterThan(0);
+    expect(visits[0]).toMatchObject({ day: 5, kind: "consult" });
+    for (let i = 1; i < visits.length; i++) expect(visits[i].day).toBeGreaterThanOrEqual(visits[i - 1].day);
+    // the day-90 retest is a test
+    expect(visits.some((v) => v.day === 90 && v.kind === "test")).toBe(true);
+    // care-coordinator connects are excluded
+    expect(visits.some((v) => v.service === "care-coordinator")).toBe(false);
+  });
+});
+
+describe("serviceForItem", () => {
+  it("maps care-item ids to the schedule's service keys", () => {
+    expect(serviceForItem("gynaecologist")).toBe("gynae");
+    expect(serviceForItem("dermatologist")).toBe("dermatology");
+    expect(serviceForItem("doctor")).toBe("doctor");
+    expect(serviceForItem("unknown-x")).toBe("unknown-x");
   });
 });
