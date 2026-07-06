@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import type { AssessmentAnswers } from "@/types/journey";
 import { getDomainSignals, getRiskOutcome } from "@/lib/journey";
-import { markAssessed, saveSchedule } from "@/lib/forher/state";
-import { ScheduleCollection } from "@/components/forher/ScheduleCollection/ScheduleCollection";
+import { markAssessed } from "@/lib/forher/state";
 import { Assessment } from "@/components/forher/Assessment/Assessment";
 import { RiskResult } from "@/components/forher/RiskResult/RiskResult";
-import { Routing } from "@/components/forher/Routing/Routing";
+import { Recommendations } from "@/components/forher/Recommendations/Recommendations";
+import { ClinicHub } from "@/components/forher/ClinicHub/ClinicHub";
 import { ChevronLeft } from "lucide-react";
 import styles from "./for-her.module.css";
 
-type Step = "questions" | "result" | "routing" | "schedule";
+type Step = "questions" | "result" | "recommend" | "hub";
 
 const BLANK: AssessmentAnswers = {
   irregularPeriods: false, acneSkin: false, hairChanges: false, weightDifficulty: false, familyHistory: false,
@@ -25,12 +25,21 @@ export default function ForHerPage() {
   const pmos = persona.pmos;
   const [step, setStep] = useState<Step>("questions");
   const [answers, setAnswers] = useState<AssessmentAnswers>(pmos?.assessment ?? BLANK);
+  const [consented, setConsented] = useState(false);
 
   const signals = useMemo(() => getDomainSignals(answers, pmos?.ahcMarkers), [answers, pmos]);
   const outcome = useMemo(() => getRiskOutcome(answers, pmos?.ahcMarkers), [answers, pmos]);
-  // Cold start (no AHC) is always indicative — the metabolic picture is incomplete
-  // regardless of outcome, so the result surfaces the book-labs prompt (spec §2.1).
+  // Cold start (no AHC) is always indicative — the metabolic picture is incomplete.
   const confidence = !pmos?.hasAhc ? "low" : signals.confidence;
+  const flags = useMemo(
+    () => ({ acneOrHirsutism: signals.androgenic, ttc: !!pmos?.ttc, highMetabolic: outcome === "high" }),
+    [signals, pmos, outcome],
+  );
+
+  const enroll = () => {
+    markAssessed(persona.id);
+    router.push("/");
+  };
 
   if (!pmos?.eligible) {
     return (
@@ -64,26 +73,28 @@ export default function ForHerPage() {
           signals={signals}
           outcome={outcome}
           confidence={confidence}
-          onContinue={() => setStep("routing")}
+          onContinue={() => { if (outcome === "none") enroll(); else setStep("recommend"); }}
         />
       )}
 
-      {step === "routing" && (
-        <Routing
-          outcome={outcome}
-          signals={signals}
-          persona={persona}
-          onConsent={() => {
-            if (outcome === "none") { markAssessed(persona.id); router.push("/"); }
-            else setStep("schedule");
-          }}
-        />
+      {step === "recommend" && (
+        <Recommendations tier={outcome} flags={flags} onContinue={() => setStep("hub")} />
       )}
 
-      {step === "schedule" && (
-        <ScheduleCollection
-          onComplete={(s) => { saveSchedule(persona.id, s); markAssessed(persona.id); router.push("/clinic"); }}
-        />
+      {step === "hub" && (
+        <div className={styles.hubStep}>
+          <span className={styles.hubEyebrow}>A few ways we&apos;ll support you</span>
+          <h2 className={styles.hubH2}>Your care, in one place</h2>
+          <p className={styles.hubLede}>Book a visit, meet your team, keep your profile current — anytime.</p>
+          <ClinicHub persona={persona} tier={outcome} showRecommended={false} />
+          <label className={styles.consent}>
+            <input type="checkbox" checked={consented} onChange={(e) => setConsented(e.target.checked)} />
+            <span>I understand this is lifestyle support — not a diagnosis or prescription.</span>
+          </label>
+          <button type="button" className={styles.start} disabled={!consented} onClick={enroll}>
+            Start my plan →
+          </button>
+        </div>
       )}
     </main>
   );

@@ -33,6 +33,28 @@
   text-decoration: none;
 }
 
+/* Onboarding hub step (3 cards + consent + enrol) */
+.hubStep { padding: 4px 16px 20px; }
+.hubEyebrow {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #8E5378;
+}
+.hubH2 {
+  font-family: var(--font-forher-serif), Georgia, serif; font-weight: 400; font-size: 26px; color: #3E1B33; margin: 4px 0 6px;
+}
+.hubLede { font-size: 13.5px; line-height: 1.5; color: #6B5A65; margin-bottom: 16px; }
+.consent {
+  display: flex; align-items: flex-start; gap: 9px; margin: 18px 2px 14px;
+  font-size: 12.5px; line-height: 1.45; color: #6B5A65; cursor: pointer;
+}
+.consent input { margin-top: 2px; width: 17px; height: 17px; accent-color: #8E5378; flex: 0 0 auto; }
+.start {
+  width: 100%; font-family: inherit; font-size: 15px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #5B2A4A, #8E5378); border: none; border-radius: 14px; padding: 14px;
+  cursor: pointer; box-shadow: 0 6px 16px rgba(91, 42, 74, 0.22);
+}
+.start:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.start:focus-visible { outline: 2px solid #3E1B33; outline-offset: 2px; }
+
 .done { padding: 40px 24px; text-align: center; }
 .doneMark { color: var(--band-excellent, #2e8b57); }
 .doneTitle {
