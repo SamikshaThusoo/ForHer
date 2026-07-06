@@ -101,75 +101,78 @@
   margin-top: 8px;
 }
 
-/* --- Cards 2–4: nav cards --- */
-.nav {
+/* --- Cards 2–4: tiles --- */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.tile {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   width: 100%;
+  min-height: 138px;
   text-align: left;
   font-family: inherit;
   background: #fff;
   border: 1px solid rgba(91, 42, 74, 0.08);
-  border-radius: 16px;
-  padding: 14px 15px;
+  border-radius: 18px;
+  padding: 14px 12px;
   cursor: pointer;
-  box-shadow: 0 5px 15px rgba(91, 42, 74, 0.07);
+  box-shadow: 0 6px 16px rgba(91, 42, 74, 0.08);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
-.nav:focus-visible {
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(91, 42, 74, 0.13);
+}
+.tile:focus-visible {
   outline: 2px solid #8e5378;
   outline-offset: 2px;
 }
-.navIcon {
-  width: 42px;
-  height: 42px;
+.tileIcon {
+  width: 44px;
+  height: 44px;
   flex: 0 0 auto;
-  border-radius: 13px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.navVisit {
+.tVisit {
   background: rgba(181, 83, 47, 0.13);
   color: #b5532f;
 }
-.navTeam {
+.tTeam {
   background: rgba(142, 83, 120, 0.13);
   color: #8e5378;
 }
-.navProfile {
+.tProfile {
   background: rgba(47, 122, 122, 0.12);
   color: #2f7a7a;
 }
-.navText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.navText strong {
-  font-size: 14.5px;
+.tileTitle {
+  margin-top: auto;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
   color: #3e1b33;
 }
-.navText span {
-  font-size: 12px;
+.tileMeta {
+  font-size: 11px;
+  line-height: 1.25;
   color: #6b5a65;
 }
-.navMeta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-  color: #b79caa;
-}
-.navBadge {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #4f9d69;
-  background: rgba(79, 157, 105, 0.12);
-  border-radius: 999px;
-  padding: 3px 8px;
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+  }
+  .tile:hover {
+    transform: none;
+  }
 }
 
 /* --- shared rows inside sheets --- */

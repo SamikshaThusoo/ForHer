@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Video, Users, ClipboardEdit, Stethoscope, FlaskConical, Check, ChevronRight } from "lucide-react";
+import { Video, Users, ClipboardEdit, Stethoscope, FlaskConical, Check } from "lucide-react";
 import type { Persona } from "@/types/persona";
 import type { CareTrack } from "@/types/journey";
 import { clinicPlanFor, careCircleFlags, getCareCircle, type CareItem } from "@/lib/journey";
@@ -150,46 +150,32 @@ export function ClinicHub({
           </section>
         ))}
 
-      {/* Cards 2–4 — nav cards that open sheets */}
-      <button type="button" className={styles.nav} onClick={() => setView("visit")}>
-        <span className={`${styles.navIcon} ${styles.navVisit}`}>
-          <Video size={20} />
-        </span>
-        <span className={styles.navText}>
-          <strong>Video visit</strong>
-          <span>Book a consult with your care team</span>
-        </span>
-        <span className={styles.navMeta}>
-          {bookedCount > 0 && <span className={styles.navBadge}>{bookedCount} booked</span>}
-          <ChevronRight size={18} />
-        </span>
-      </button>
+      {/* Cards 2–4 — tiles that open sheets */}
+      <div className={styles.tiles}>
+        <button type="button" className={styles.tile} onClick={() => setView("visit")}>
+          <span className={`${styles.tileIcon} ${styles.tVisit}`}>
+            <Video size={22} />
+          </span>
+          <strong className={styles.tileTitle}>Video visit</strong>
+          <span className={styles.tileMeta}>{bookedCount > 0 ? `${bookedCount} booked` : "Book a consult"}</span>
+        </button>
 
-      <button type="button" className={styles.nav} onClick={() => setView("team")}>
-        <span className={`${styles.navIcon} ${styles.navTeam}`}>
-          <Users size={20} />
-        </span>
-        <span className={styles.navText}>
-          <strong>Care plan team</strong>
-          <span>The {team.length} people supporting you</span>
-        </span>
-        <span className={styles.navMeta}>
-          <ChevronRight size={18} />
-        </span>
-      </button>
+        <button type="button" className={styles.tile} onClick={() => setView("team")}>
+          <span className={`${styles.tileIcon} ${styles.tTeam}`}>
+            <Users size={22} />
+          </span>
+          <strong className={styles.tileTitle}>Care plan team</strong>
+          <span className={styles.tileMeta}>{team.length} people</span>
+        </button>
 
-      <button type="button" className={styles.nav} onClick={() => setView("profile")}>
-        <span className={`${styles.navIcon} ${styles.navProfile}`}>
-          <ClipboardEdit size={20} />
-        </span>
-        <span className={styles.navText}>
-          <strong>Health profile</strong>
-          <span>{bmi ? `BMI ${bmi} · tap to update` : "Add your height, weight & history"}</span>
-        </span>
-        <span className={styles.navMeta}>
-          <ChevronRight size={18} />
-        </span>
-      </button>
+        <button type="button" className={styles.tile} onClick={() => setView("profile")}>
+          <span className={`${styles.tileIcon} ${styles.tProfile}`}>
+            <ClipboardEdit size={22} />
+          </span>
+          <strong className={styles.tileTitle}>Health profile</strong>
+          <span className={styles.tileMeta}>{bmi ? `BMI ${bmi}` : "Update"}</span>
+        </button>
+      </div>
 
       {/* Video visit sheet */}
       <Sheet open={view === "visit"} onClose={() => setView(null)} ariaLabel="Book a video visit">
