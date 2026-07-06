@@ -1,16 +1,16 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Video, Users, ClipboardEdit, Stethoscope, FlaskConical, Check } from "lucide-react";
+import { Video, CalendarCheck, ClipboardEdit, Stethoscope, FlaskConical, Check } from "lucide-react";
 import type { Persona } from "@/types/persona";
 import type { CareTrack } from "@/types/journey";
-import { clinicPlanFor, careCircleFlags, getCareCircle, type CareItem } from "@/lib/journey";
+import { clinicPlanFor, careCircleFlags, type CareItem } from "@/lib/journey";
 import { readHealthProfile, writeHealthProfile, bmiFrom, type HealthProfile } from "@/lib/forher/healthprofile";
 import { readBookings, writeBookings, upsertBooking, isBooked, type Bookings } from "@/lib/forher/clinic";
 import { BookingSheet } from "@/components/forher/BookingSheet/BookingSheet";
 import { Sheet } from "@/components/forher/Sheet/Sheet";
 import styles from "./ClinicHub.module.css";
 
-type View = "visit" | "team" | "profile" | null;
+type View = "visit" | "bookings" | "profile" | null;
 
 const TIER_LEDE: Record<string, string> = {
   high: "Your screen points to a higher hormonal-health risk. Let's get you seen.",
@@ -41,7 +41,6 @@ export function ClinicHub({
 
   const flags = useMemo(() => careCircleFlags(persona, profile), [persona, profile]);
   const plan = useMemo(() => clinicPlanFor(tier, flags), [tier, flags]);
-  const team = useMemo(() => getCareCircle(tier, flags), [tier, flags]);
 
   const allItems = useMemo(
     () => [plan.primary, ...plan.secondary].filter(Boolean) as CareItem[],
@@ -73,8 +72,17 @@ export function ClinicHub({
       return next;
     });
 
+  const cancel = (itemId: string) =>
+    setBookings((prev) => {
+      const next = { ...prev };
+      delete next[itemId];
+      writeBookings(persona.id, next);
+      return next;
+    });
+
   const bmi = bmiFrom(profile);
-  const bookedCount = Object.keys(bookings).length;
+  const bookingList = Object.values(bookings);
+  const bookedCount = bookingList.length;
 
   const MiniRow = ({ item }: { item: CareItem }) => {
     const booked = isBooked(bookings, item.id);
@@ -160,12 +168,12 @@ export function ClinicHub({
           <span className={styles.tileMeta}>{bookedCount > 0 ? `${bookedCount} booked` : "Book a consult"}</span>
         </button>
 
-        <button type="button" className={styles.tile} onClick={() => setView("team")}>
-          <span className={`${styles.tileIcon} ${styles.tTeam}`}>
-            <Users size={22} />
+        <button type="button" className={styles.tile} onClick={() => setView("bookings")}>
+          <span className={`${styles.tileIcon} ${styles.tBookings}`}>
+            <CalendarCheck size={22} />
           </span>
-          <strong className={styles.tileTitle}>Care plan team</strong>
-          <span className={styles.tileMeta}>{team.length} people</span>
+          <strong className={styles.tileTitle}>Your bookings</strong>
+          <span className={styles.tileMeta}>{bookedCount > 0 ? `${bookedCount} booked` : "None yet"}</span>
         </button>
 
         <button type="button" className={styles.tile} onClick={() => setView("profile")}>
@@ -188,18 +196,38 @@ export function ClinicHub({
         </div>
       </Sheet>
 
-      {/* Care plan team sheet */}
-      <Sheet open={view === "team"} onClose={() => setView(null)} ariaLabel="Your care plan team">
-        <h2 className={styles.sheetTitle}>Care plan team</h2>
-        <p className={styles.sheetSub}>The people who&apos;ll support you — humans make any clinical calls.</p>
-        <div className={styles.sheetList}>
-          {team.map((s) => (
-            <div key={s.role} className={styles.member}>
-              <strong>{s.label}</strong>
-              <span>{s.reason}</span>
-            </div>
-          ))}
-        </div>
+      {/* Your bookings sheet */}
+      <Sheet open={view === "bookings"} onClose={() => setView(null)} ariaLabel="Your bookings">
+        <h2 className={styles.sheetTitle}>Your bookings</h2>
+        <p className={styles.sheetSub}>Consults and tests you&apos;ve booked. Prototype — no real appointment is scheduled.</p>
+        {bookingList.length === 0 ? (
+          <p className={styles.empty}>Nothing booked yet. Book from &ldquo;Recommended now&rdquo; or &ldquo;Video visit&rdquo;.</p>
+        ) : (
+          <div className={styles.sheetList}>
+            {bookingList.map((bk) => {
+              const Icon = bk.kind === "test" ? FlaskConical : Stethoscope;
+              return (
+                <div key={bk.itemId} className={styles.row}>
+                  <span className={styles.rowIcon}>
+                    <Icon size={17} />
+                  </span>
+                  <div className={styles.rowBody}>
+                    <strong className={styles.rowTitle}>{bk.label}</strong>
+                    <span className={styles.rowWhy}>{bk.slot}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.cancel}
+                    onClick={() => cancel(bk.itemId)}
+                    aria-label={`Cancel ${bk.label}`}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Sheet>
 
       {/* Health profile sheet */}

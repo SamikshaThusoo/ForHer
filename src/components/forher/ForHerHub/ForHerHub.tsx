@@ -299,8 +299,8 @@ export function ForHerHub() {
                 <li key={i} className={styles.detailItem}><Check size={15} /> {it}</li>
               ))}
             </ul>
-            <p className={styles.detailNote}>In the full app this opens your appointment in My Bookings.</p>
-            <button type="button" className={styles.detailBtn} onClick={() => setDetail(null)}>Got it</button>
+            <p className={styles.detailNote}>Book it and track it in your clinic.</p>
+            <button type="button" className={styles.detailBtn} onClick={() => { setDetail(null); router.push("/clinic"); }}>Go to clinic <ArrowRight size={14} /></button>
           </div>
         </div>
       )}

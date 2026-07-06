@@ -145,7 +145,7 @@
   background: rgba(181, 83, 47, 0.13);
   color: #b5532f;
 }
-.tTeam {
+.tBookings {
   background: rgba(142, 83, 120, 0.13);
   color: #8e5378;
 }
@@ -273,6 +273,29 @@
 .member span {
   font-size: 12px;
   color: #6b5a65;
+}
+
+.cancel {
+  flex: 0 0 auto;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8e5378;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px 2px;
+}
+.cancel:focus-visible {
+  outline: 2px solid #8e5378;
+  outline-offset: 2px;
+}
+.empty {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6b5a65;
+  padding: 14px 2px 6px;
 }
 
 /* --- profile editor (in sheet) --- */
