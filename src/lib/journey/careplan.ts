@@ -1,8 +1,9 @@
 import type { Persona } from "@/types/persona";
 import type { CareTrack, Specialist } from "@/types/journey";
 import type { HealthProfile } from "@/lib/forher/healthprofile";
-import { getCareCircle, personaTrack } from "./touchpoints";
+import { getCareCircle, personaTrack, getTouchpointsDue } from "./touchpoints";
 import { getDomainSignals } from "./risk";
+import { PROGRAM_LAST_DAY } from "./constants";
 
 /** A recommended diagnostic test/panel, tier-driven. Sibling to getCareCircle's
  *  consults — one source of truth for "what care does this tier get". */
@@ -99,4 +100,40 @@ export function clinicPlanFor(
   const secondary = all.filter((i) => !(primary && i.kind === primary.kind && i.id === primary.id));
 
   return { tier, primary, secondary, showBooking: tier !== "none" };
+}
+
+/** A clinical visit scheduled on a specific day of the 90-day plan. */
+export type PlanVisit = { day: number; kind: "consult" | "test"; label: string; service: string };
+
+/** The clinical visits scheduled across the 90-day plan (consults + retests), one
+ *  per touchpoint day, in order. The prototype shows "Your bookings" against these. */
+export function getPlanTouchpoints(persona: Persona): PlanVisit[] {
+  const out: PlanVisit[] = [];
+  for (let d = 1; d <= PROGRAM_LAST_DAY; d++) {
+    for (const tp of getTouchpointsDue(persona, d)) {
+      if (tp.kind === "cc-connect") continue;
+      out.push({
+        day: tp.day,
+        kind: tp.kind === "retest" ? "test" : "consult",
+        label: tp.label,
+        service: tp.services[0],
+      });
+    }
+  }
+  return out;
+}
+
+/** Maps a CareItem id (specialist role / test id) to the touchpoint schedule's
+ *  service key, so a booked item can be matched to its plan day. */
+const SERVICE_OF_ITEM: Record<string, string> = {
+  doctor: "doctor",
+  nutritionist: "nutritionist",
+  psychologist: "psychologist",
+  dermatologist: "dermatology",
+  "care-coordinator": "care-coordinator",
+  gynaecologist: "gynae",
+  "hormone-panel": "hormone-panel",
+};
+export function serviceForItem(itemId: string): string {
+  return SERVICE_OF_ITEM[itemId] ?? itemId;
 }

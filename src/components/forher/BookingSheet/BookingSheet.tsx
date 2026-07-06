@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { X, Stethoscope, FlaskConical, ShieldCheck } from "lucide-react";
 import type { CareItem } from "@/lib/journey";
-import { PLACEHOLDER_SLOTS } from "@/lib/forher/clinic";
 import styles from "./BookingSheet.module.css";
 
 const SPRING = { type: "spring" as const, stiffness: 380, damping: 38 };
@@ -13,10 +12,12 @@ const SPRING = { type: "spring" as const, stiffness: 380, damping: 38 };
  *  Modal semantics: focus trap, Esc, scroll lock, return focus. */
 export function BookingSheet({
   item,
+  slot,
   onConfirm,
   onClose,
 }: {
   item: CareItem | null;
+  slot: string;
   onConfirm: (item: CareItem, slot: string) => void;
   onClose: () => void;
 }) {
@@ -64,7 +65,6 @@ export function BookingSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const slot = item ? PLACEHOLDER_SLOTS[item.kind] : "";
   const Icon = item?.kind === "test" ? FlaskConical : Stethoscope;
 
   return (

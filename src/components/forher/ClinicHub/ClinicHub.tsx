@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Video, CalendarCheck, ClipboardEdit, Stethoscope, FlaskConical, Check } from "lucide-react";
 import type { Persona } from "@/types/persona";
 import type { CareTrack } from "@/types/journey";
-import { clinicPlanFor, careCircleFlags, type CareItem } from "@/lib/journey";
+import { clinicPlanFor, careCircleFlags, getPlanTouchpoints, serviceForItem, type CareItem } from "@/lib/journey";
 import { readHealthProfile, writeHealthProfile, bmiFrom, type HealthProfile } from "@/lib/forher/healthprofile";
 import { readBookings, writeBookings, upsertBooking, isBooked, type Bookings } from "@/lib/forher/clinic";
 import { BookingSheet } from "@/components/forher/BookingSheet/BookingSheet";
@@ -41,6 +41,7 @@ export function ClinicHub({
 
   const flags = useMemo(() => careCircleFlags(persona, profile), [persona, profile]);
   const plan = useMemo(() => clinicPlanFor(tier, flags), [tier, flags]);
+  const visits = useMemo(() => getPlanTouchpoints(persona), [persona]);
 
   const allItems = useMemo(
     () => [plan.primary, ...plan.secondary].filter(Boolean) as CareItem[],
@@ -72,17 +73,19 @@ export function ClinicHub({
       return next;
     });
 
-  const cancel = (itemId: string) =>
-    setBookings((prev) => {
-      const next = { ...prev };
-      delete next[itemId];
-      writeBookings(persona.id, next);
-      return next;
-    });
-
   const bmi = bmiFrom(profile);
   const bookingList = Object.values(bookings);
   const bookedCount = bookingList.length;
+
+  // "Your bookings" is the 90-day plan's clinical schedule; booked items overlay it.
+  const bookedServices = new Set(bookingList.map((b) => serviceForItem(b.itemId)));
+  const scheduledServices = new Set(visits.map((v) => v.service));
+  const extras = bookingList.filter((b) => !scheduledServices.has(serviceForItem(b.itemId)));
+  const planSlotFor = (item: CareItem) => {
+    const day = visits.find((v) => v.service === serviceForItem(item.id))?.day;
+    return day ? `Day ${day} of your 90-day plan` : "Added to your plan";
+  };
+  const sheetSlot = sheetItem ? planSlotFor(sheetItem) : "";
 
   const MiniRow = ({ item }: { item: CareItem }) => {
     const booked = isBooked(bookings, item.id);
@@ -173,7 +176,9 @@ export function ClinicHub({
             <CalendarCheck size={22} />
           </span>
           <strong className={styles.tileTitle}>Your bookings</strong>
-          <span className={styles.tileMeta}>{bookedCount > 0 ? `${bookedCount} booked` : "None yet"}</span>
+          <span className={styles.tileMeta}>
+            {bookedCount > 0 ? `${bookedCount} booked` : visits.length ? `${visits.length} scheduled` : "None yet"}
+          </span>
         </button>
 
         <button type="button" className={styles.tile} onClick={() => setView("profile")}>
@@ -196,15 +201,37 @@ export function ClinicHub({
         </div>
       </Sheet>
 
-      {/* Your bookings sheet */}
+      {/* Your bookings sheet — the 90-day plan's clinical schedule, with booked overlay */}
       <Sheet open={view === "bookings"} onClose={() => setView(null)} ariaLabel="Your bookings">
         <h2 className={styles.sheetTitle}>Your bookings</h2>
-        <p className={styles.sheetSub}>Consults and tests you&apos;ve booked. Prototype — no real appointment is scheduled.</p>
-        {bookingList.length === 0 ? (
-          <p className={styles.empty}>Nothing booked yet. Book from &ldquo;Recommended now&rdquo; or &ldquo;Video visit&rdquo;.</p>
+        <p className={styles.sheetSub}>Your 90-day plan schedules these visits. Prototype — no real appointment is booked.</p>
+        {visits.length === 0 && extras.length === 0 ? (
+          <p className={styles.empty}>Nothing scheduled yet. Book from &ldquo;Recommended now&rdquo; or &ldquo;Video visit&rdquo;.</p>
         ) : (
           <div className={styles.sheetList}>
-            {bookingList.map((bk) => {
+            {visits.map((v) => {
+              const Icon = v.kind === "test" ? FlaskConical : Stethoscope;
+              const booked = bookedServices.has(v.service);
+              return (
+                <div key={`${v.day}-${v.service}`} className={styles.row}>
+                  <span className={styles.dayChip}>Day {v.day}</span>
+                  <span className={styles.rowIcon}>
+                    <Icon size={17} />
+                  </span>
+                  <div className={styles.rowBody}>
+                    <strong className={styles.rowTitle}>{v.label}</strong>
+                  </div>
+                  {booked ? (
+                    <span className={styles.booked}>
+                      <Check size={14} aria-hidden /> Booked
+                    </span>
+                  ) : (
+                    <span className={styles.inPlan}>In plan</span>
+                  )}
+                </div>
+              );
+            })}
+            {extras.map((bk) => {
               const Icon = bk.kind === "test" ? FlaskConical : Stethoscope;
               return (
                 <div key={bk.itemId} className={styles.row}>
@@ -215,14 +242,9 @@ export function ClinicHub({
                     <strong className={styles.rowTitle}>{bk.label}</strong>
                     <span className={styles.rowWhy}>{bk.slot}</span>
                   </div>
-                  <button
-                    type="button"
-                    className={styles.cancel}
-                    onClick={() => cancel(bk.itemId)}
-                    aria-label={`Cancel ${bk.label}`}
-                  >
-                    Cancel
-                  </button>
+                  <span className={styles.booked}>
+                    <Check size={14} aria-hidden /> Booked
+                  </span>
                 </div>
               );
             })}
@@ -293,7 +315,7 @@ export function ClinicHub({
       </Sheet>
 
       {/* Booking confirm */}
-      <BookingSheet item={sheetItem} onConfirm={book} onClose={() => setSheetItem(null)} />
+      <BookingSheet item={sheetItem} slot={sheetSlot} onConfirm={book} onClose={() => setSheetItem(null)} />
     </div>
   );
 }
