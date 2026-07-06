@@ -144,10 +144,9 @@
   min-width: 0;
 }
 .clinicEyebrow {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: #B5532F;
 }
 .clinicTitle {
