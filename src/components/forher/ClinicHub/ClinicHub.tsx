@@ -84,6 +84,12 @@ export function ClinicHub({
   const bookedServices = new Set(bookingList.map((b) => serviceForItem(b.itemId)));
   const scheduledServices = new Set(visits.map((v) => v.service));
   const extras = bookingList.filter((b) => !scheduledServices.has(serviceForItem(b.itemId)));
+  // Show only what's relevant now: today's visit + the next one, plus anything booked.
+  const todayVisit = visits.find((v) => v.day === day);
+  const nextVisit = visits.find((v) => v.day > day);
+  const shownVisits = visits.filter(
+    (v) => v === todayVisit || v === nextVisit || bookedServices.has(v.service),
+  );
   const planSlotFor = (item: CareItem) => {
     const day = visits.find((v) => v.service === serviceForItem(item.id))?.day;
     return day ? `Day ${day} of your 90-day plan` : "Added to your plan";
@@ -208,13 +214,13 @@ export function ClinicHub({
       <Sheet open={view === "bookings"} onClose={() => setView(null)} ariaLabel="Your bookings">
         <h2 className={styles.sheetTitle}>Your bookings</h2>
         <p className={styles.sheetSub}>
-          Your 90-day plan schedules these visits — you&apos;re on Day {day}. Prototype, no real appointment is booked.
+          What&apos;s next on your 90-day plan — you&apos;re on Day {day}. Prototype, no real appointment is booked.
         </p>
-        {visits.length === 0 && extras.length === 0 ? (
-          <p className={styles.empty}>Nothing scheduled yet. Book from &ldquo;Recommended now&rdquo; or &ldquo;Video visit&rdquo;.</p>
+        {shownVisits.length === 0 && extras.length === 0 ? (
+          <p className={styles.empty}>Nothing coming up. Book from &ldquo;Recommended now&rdquo; or &ldquo;Video visit&rdquo;.</p>
         ) : (
           <div className={styles.sheetList}>
-            {visits.map((v) => {
+            {shownVisits.map((v) => {
               const Icon = v.kind === "test" ? FlaskConical : Stethoscope;
               const booked = bookedServices.has(v.service);
               const isToday = v.day === day;
