@@ -25,10 +25,13 @@ export function ClinicHub({
   persona,
   tier,
   showRecommended = true,
+  day = 1,
 }: {
   persona: Persona;
   tier: CareTrack;
   showRecommended?: boolean;
+  /** The selected day on the 90-day plan simulator — appointments render relative to it. */
+  day?: number;
 }) {
   const [profile, setProfile] = useState<HealthProfile>(() =>
     typeof window === "undefined" ? {} : readHealthProfile(persona.id),
@@ -204,7 +207,9 @@ export function ClinicHub({
       {/* Your bookings sheet — the 90-day plan's clinical schedule, with booked overlay */}
       <Sheet open={view === "bookings"} onClose={() => setView(null)} ariaLabel="Your bookings">
         <h2 className={styles.sheetTitle}>Your bookings</h2>
-        <p className={styles.sheetSub}>Your 90-day plan schedules these visits. Prototype — no real appointment is booked.</p>
+        <p className={styles.sheetSub}>
+          Your 90-day plan schedules these visits — you&apos;re on Day {day}. Prototype, no real appointment is booked.
+        </p>
         {visits.length === 0 && extras.length === 0 ? (
           <p className={styles.empty}>Nothing scheduled yet. Book from &ldquo;Recommended now&rdquo; or &ldquo;Video visit&rdquo;.</p>
         ) : (
@@ -212,8 +217,9 @@ export function ClinicHub({
             {visits.map((v) => {
               const Icon = v.kind === "test" ? FlaskConical : Stethoscope;
               const booked = bookedServices.has(v.service);
+              const isToday = v.day === day;
               return (
-                <div key={`${v.day}-${v.service}`} className={styles.row}>
+                <div key={`${v.day}-${v.service}`} className={`${styles.row} ${isToday ? styles.rowToday : ""}`}>
                   <span className={styles.dayChip}>Day {v.day}</span>
                   <span className={styles.rowIcon}>
                     <Icon size={17} />
@@ -225,8 +231,12 @@ export function ClinicHub({
                     <span className={styles.booked}>
                       <Check size={14} aria-hidden /> Booked
                     </span>
+                  ) : isToday ? (
+                    <span className={styles.today}>Today</span>
+                  ) : v.day < day ? (
+                    <span className={styles.inPlan}>Passed</span>
                   ) : (
-                    <span className={styles.inPlan}>In plan</span>
+                    <span className={styles.inPlan}>In {v.day - day}d</span>
                   )}
                 </div>
               );
