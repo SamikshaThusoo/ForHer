@@ -43,15 +43,16 @@ describe("activeNudge — tier gate", () => {
 
 describe("activeNudge — missed period", () => {
   const missed: CycleLog = { intent: "track", lastPeriod: "2026-01-01" }; // 120d before today, > 2*28
+  const content = (n: ReturnType<typeof activeNudge>) => [n?.body, ...(n?.points ?? [])].join(" ");
   it("fires the clinical copy for a tracking user past 2 cycles", () => {
     const n = activeNudge({ ...base, tier: "none", cycleLog: missed });
     expect(n?.type).toBe("missed-period");
-    expect(n?.body).toMatch(/doctor/i);
+    expect(content(n)).toMatch(/doctor/i);
   });
   it("fires the TTC copy when intent is ttc", () => {
     const n = activeNudge({ ...base, tier: "none", cycleLog: { intent: "ttc", lastPeriod: "2026-01-01" } });
     expect(n?.type).toBe("missed-period");
-    expect(n?.body).toMatch(/test|chat/i);
+    expect(content(n)).toMatch(/test|conceive/i);
   });
   it("does not fire when a period was logged recently", () => {
     const n = activeNudge({ ...base, tier: "none", cycleLog: missed, dayLog: { "2026-04-20": { period: true } } });

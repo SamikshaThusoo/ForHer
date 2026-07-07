@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Check } from "lucide-react";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
 import { useForHer } from "@/lib/forher/state";
@@ -50,6 +50,13 @@ export function ClinicForHer() {
         <span className={styles.eyebrow}>Clinic ForHer</span>
         <h1 className={styles.h1}>{isConditionNudge(condition) ? "Let's look into this" : "Your next step"}</h1>
         <p className={styles.lede}>{lede}</p>
+        {condition && (
+          <ul className={styles.points}>
+            {condition.points.map((p) => (
+              <li key={p} className={styles.point}><Check size={14} aria-hidden /> {p}</li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <ClinicHub persona={persona} tier={tier} showRecommended day={fh.day} condition={condition} />

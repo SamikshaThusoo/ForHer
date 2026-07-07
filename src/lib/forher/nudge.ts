@@ -8,7 +8,7 @@ import { periodDaysSet, type DayLog } from "./daylog";
 import type { CycleLog } from "./state";
 
 export type NudgeType = "missed-period" | "irregular" | "symptom" | "wellness";
-export type Nudge = { type: NudgeType; title: string; body: string; cta: string; href: string };
+export type Nudge = { type: NudgeType; title: string; body: string; points: string[]; cta: string; href: string };
 
 const HREF = "/clinic";
 const CTA = "Book a check-in";
@@ -34,8 +34,30 @@ function missedPeriodNudge(cycleLog: CycleLog | null, dayLog: DayLog, cycleLengt
   const daysSince = Math.floor((today.getTime() - new Date(`${lastISO}T00:00:00`).getTime()) / DAY_MS);
   if (daysSince <= 2 * cycleLength) return null;
   return cycleLog.intent === "ttc"
-    ? { type: "missed-period", title: "Your period's late", body: "This could be worth a test or a quick chat — book a check-in.", cta: CTA, href: HREF }
-    : { type: "missed-period", title: "A missed period is worth a look", body: "Worth checking with a doctor — thyroid, hormones, and ruling a few things out.", cta: CTA, href: HREF };
+    ? {
+        type: "missed-period",
+        title: "Your period's late",
+        body: "A late period can mean a few things when you're trying to conceive — a quick check-in can tell you.",
+        points: [
+          "Talk it through with a doctor who can see your cycle log",
+          "Clear guidance on when to take a test",
+          "Next steps for conception, whatever the result",
+        ],
+        cta: CTA,
+        href: HREF,
+      }
+    : {
+        type: "missed-period",
+        title: "A missed period is worth a look",
+        body: "Missed periods are worth checking — it's usually nothing serious, but worth ruling things out.",
+        points: [
+          "A doctor reviews the cycle you've logged",
+          "Simple checks — thyroid, hormones, and ruling out pregnancy",
+          "Advice on what, if anything, to do next",
+        ],
+        cta: CTA,
+        href: HREF,
+      };
 }
 
 function dayDiff(a: string, b: string): number {
@@ -68,7 +90,18 @@ function irregularNudge(persona: Persona, dayLog: DayLog): Nudge | null {
   const combined = [...(persona.pmos?.cycleHistory ?? []), ...periodStarts(dayLog)];
   const irregular = isIrregularHistory(combined) || shouldResurfaceAssessment(persona, 0);
   if (!irregular) return null;
-  return { type: "irregular", title: "Your cycles have been irregular", body: "A check-in could help rule a few things out.", cta: CTA, href: HREF };
+  return {
+    type: "irregular",
+    title: "Your cycles have been irregular",
+    body: "Irregular cycles can point to something worth understanding — a check-in helps.",
+    points: [
+      "A doctor reviews the cycles you've logged",
+      "Checks that can explain irregular periods",
+      "A simple plan to help steady your cycle",
+    ],
+    cta: CTA,
+    href: HREF,
+  };
 }
 
 function symptomNudge(dayLog: DayLog): Nudge | null {
@@ -83,11 +116,33 @@ function symptomNudge(dayLog: DayLog): Nudge | null {
   }
   if (days < 3) return null;
   const top = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
-  return { type: "symptom", title: "Some symptoms worth a check", body: `You've logged ${SYMPTOM_LABEL[top]} a few times — a check-in could help get ahead of it.`, cta: CTA, href: HREF };
+  return {
+    type: "symptom",
+    title: "Some symptoms worth a check",
+    body: `You've logged ${SYMPTOM_LABEL[top]} a few times — a check-in can help you get ahead of it.`,
+    points: [
+      "Share the symptoms you've been logging",
+      "A doctor advises on skin, hair or pain concerns",
+      "Early steps before things build up",
+    ],
+    cta: CTA,
+    href: HREF,
+  };
 }
 
 function wellnessNudge(): Nudge {
-  return { type: "wellness", title: "Here whenever you need", body: "A question about your hormonal health? A wellness check-in is here whenever you want one.", cta: CTA, href: HREF };
+  return {
+    type: "wellness",
+    title: "Here whenever you need",
+    body: "A wellness check-in with a doctor who can see your tracking — no referral needed.",
+    points: [
+      "Talk through your cycle, mood and symptoms",
+      "Ask anything about your hormonal health",
+      "No lab report or AHC required",
+    ],
+    cta: CTA,
+    href: HREF,
+  };
 }
 
 export function activeNudge(args: {

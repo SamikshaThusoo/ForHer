@@ -108,40 +108,38 @@
   border-radius: 12px; padding: 8px 12px;
 }
 
-/* ClinicForHer entry card — the clinical layer, inside the For Her space */
-.clinicEntry {
+/* ClinicForHer card — the clinical layer, inside the For Her space */
+.clinicCard {
   display: flex;
-  align-items: center;
-  gap: 11px;
+  flex-direction: column;
+  gap: 6px;
   margin: 4px 0 12px;
   background: linear-gradient(135deg, #FBEFE6, #FCF6EE);
-  border: 1px solid rgba(181, 83, 47, 0.14);
-  border-radius: 16px;
-  padding: 13px 14px;
+  border: 1px solid rgba(181, 83, 47, 0.16);
+  border-radius: 18px;
+  padding: 15px 16px;
   text-decoration: none;
   box-shadow: 0 6px 18px rgba(91, 42, 74, 0.08);
 }
-.clinicEntry:focus-visible {
+.clinicCard:focus-visible {
   outline: 2px solid #8E5378;
   outline-offset: 2px;
 }
+.clinicHead {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
 .clinicIcon {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   flex: 0 0 auto;
-  border-radius: 12px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(181, 83, 47, 0.14);
   color: #B5532F;
-}
-.clinicText {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 .clinicEyebrow {
   font-size: 11px;
@@ -150,22 +148,43 @@
   color: #B5532F;
 }
 .clinicTitle {
-  font-size: 13.5px;
+  font-size: 15.5px;
   font-weight: 700;
   color: #3E1B33;
+  margin-top: 2px;
 }
 .clinicBody {
-  font-size: 11.5px;
-  line-height: 1.35;
+  font-size: 12.5px;
+  line-height: 1.4;
   color: #6B5A65;
+}
+.clinicPoints {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 4px 0 2px;
+  padding: 0;
+  list-style: none;
+}
+.clinicPoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #5B2A4A;
+}
+.clinicPoint svg {
+  flex: 0 0 auto;
   margin-top: 2px;
+  color: #B5532F;
 }
 .clinicCta {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  flex: 0 0 auto;
-  font-size: 12px;
+  gap: 5px;
+  margin-top: 6px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #8E5378;
 }
