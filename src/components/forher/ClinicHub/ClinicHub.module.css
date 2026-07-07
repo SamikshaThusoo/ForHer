@@ -51,6 +51,27 @@
   color: #6b5a65;
   margin-top: 3px;
 }
+.heroIncludes {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.heroInclude {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #5b2a4a;
+}
+.heroInclude svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #b5532f;
+}
 .heroBook {
   width: 100%;
   font-family: inherit;

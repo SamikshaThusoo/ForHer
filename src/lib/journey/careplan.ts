@@ -137,3 +137,52 @@ const SERVICE_OF_ITEM: Record<string, string> = {
 export function serviceForItem(itemId: string): string {
   return SERVICE_OF_ITEM[itemId] ?? itemId;
 }
+
+/** Plain-language "what's included" for each consult/test — so a clinical card is
+ *  more than a title + one line, across every risk profile. Keyed by CareItem id. */
+const INCLUDES: Record<string, string[]> = {
+  doctor: [
+    "A review of your screen and markers",
+    "Your plan and any next steps",
+    "Answers to your questions",
+  ],
+  gynaecologist: [
+    "A review of your cycle and hormonal markers",
+    "Any pelvic exam or scan you need",
+    "A plan for irregular or painful periods",
+  ],
+  nutritionist: [
+    "A diet built around steady blood sugar",
+    "Simple food swaps for your routine",
+    "A follow-up to adjust as you go",
+  ],
+  dermatologist: [
+    "A look at skin and hair changes",
+    "Options for acne or hair loss",
+    "What's hormone-driven and what isn't",
+  ],
+  psychologist: [
+    "Space to talk through mood and stress",
+    "Coping tools that fit your cycle",
+    "Ongoing support if you want it",
+  ],
+  "care-coordinator": [
+    "Your single point of contact",
+    "Help booking and prepping visits",
+    "Chasing results and next steps",
+  ],
+  "hormone-panel": [
+    "Key reproductive & thyroid hormones",
+    "Insulin and metabolic markers",
+    "A doctor talks you through the results",
+  ],
+  "pelvic-ultrasound": [
+    "A look at your ovaries and uterus",
+    "Part of a full PMOS work-up",
+    "Reviewed with your gynaecologist",
+  ],
+};
+
+export function careItemIncludes(id: string): string[] {
+  return INCLUDES[id] ?? [];
+}

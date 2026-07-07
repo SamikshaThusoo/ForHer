@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { X, Stethoscope, FlaskConical, ShieldCheck } from "lucide-react";
-import type { CareItem } from "@/lib/journey";
+import { X, Stethoscope, FlaskConical, ShieldCheck, Check } from "lucide-react";
+import { careItemIncludes, type CareItem } from "@/lib/journey";
 import styles from "./BookingSheet.module.css";
 
 const SPRING = { type: "spring" as const, stiffness: 380, damping: 38 };
@@ -110,6 +110,13 @@ export function BookingSheet({
               </button>
             </div>
             <p className={styles.why}>{item.reason}</p>
+            {careItemIncludes(item.id).length > 0 && (
+              <ul className={styles.includes}>
+                {careItemIncludes(item.id).map((p) => (
+                  <li key={p} className={styles.include}><Check size={13} aria-hidden /> {p}</li>
+                ))}
+              </ul>
+            )}
             <div className={styles.slot}>{slot}</div>
             <p className={styles.shared}>
               <ShieldCheck size={14} aria-hidden /> Your health context is shared, so your clinician arrives informed.

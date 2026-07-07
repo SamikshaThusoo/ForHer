@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Video, CalendarCheck, ClipboardEdit, Stethoscope, FlaskConical, Check } from "lucide-react";
 import type { Persona } from "@/types/persona";
 import type { CareTrack } from "@/types/journey";
-import { clinicPlanFor, careCircleFlags, getPlanTouchpoints, serviceForItem, type CareItem } from "@/lib/journey";
+import { clinicPlanFor, careCircleFlags, getPlanTouchpoints, serviceForItem, careItemIncludes, type CareItem } from "@/lib/journey";
 import { isConditionNudge, type Nudge } from "@/lib/forher/nudge";
 import { readHealthProfile, writeHealthProfile, bmiFrom, type HealthProfile } from "@/lib/forher/healthprofile";
 import { readBookings, writeBookings, upsertBooking, isBooked, type Bookings } from "@/lib/forher/clinic";
@@ -152,6 +152,13 @@ export function ClinicHub({
           <p className={styles.heroWhy}>{item.reason}</p>
         </div>
       </div>
+      {careItemIncludes(item.id).length > 0 && (
+        <ul className={styles.heroIncludes}>
+          {careItemIncludes(item.id).map((p) => (
+            <li key={p} className={styles.heroInclude}><Check size={13} aria-hidden /> {p}</li>
+          ))}
+        </ul>
+      )}
       {isBooked(bookings, item.id) ? (
         <span className={styles.heroBooked}>
           <Check size={16} aria-hidden /> Booked
