@@ -64,13 +64,23 @@ describe("activeNudge — missed period", () => {
 });
 
 describe("activeNudge — irregular", () => {
-  it("fires for an irregular history when nothing higher fires", () => {
+  it("fires for an irregular seed history when nothing higher fires", () => {
     const n = activeNudge({ ...base, tier: "none", persona: IRREGULAR });
     expect(n?.type).toBe("irregular");
   });
   it("does not fire for a regular history", () => {
     const n = activeNudge({ ...base, tier: "low", persona: REGULAR });
     expect(n).toBeNull();
+  });
+  it("fires when logged period dates are irregular, even for a regular-seed persona", () => {
+    // 3 logged period starts: gaps 73d and 56d — both out of the 21–35 range
+    const dayLog: DayLog = {
+      "2026-01-01": { period: true },
+      "2026-03-15": { period: true },
+      "2026-05-10": { period: true },
+    };
+    const n = activeNudge({ ...base, tier: "low", persona: REGULAR, dayLog });
+    expect(n?.type).toBe("irregular");
   });
 });
 

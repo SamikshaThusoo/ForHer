@@ -38,8 +38,36 @@ function missedPeriodNudge(cycleLog: CycleLog | null, dayLog: DayLog, cycleLengt
     : { type: "missed-period", title: "A missed period is worth a look", body: "Worth checking with a doctor — thyroid, hormones, and ruling a few things out.", cta: CTA, href: HREF };
 }
 
-function irregularNudge(persona: Persona): Nudge | null {
-  if (!shouldResurfaceAssessment(persona, 0)) return null;
+function dayDiff(a: string, b: string): number {
+  return Math.round((new Date(`${b}T00:00:00`).getTime() - new Date(`${a}T00:00:00`).getTime()) / DAY_MS);
+}
+
+/** Collapse logged period days into period-start dates (first day of each run). */
+function periodStarts(dayLog: DayLog): string[] {
+  const days = [...periodDaysSet(dayLog)].sort();
+  const starts: string[] = [];
+  for (let i = 0; i < days.length; i++) {
+    if (i === 0 || dayDiff(days[i - 1], days[i]) > 1) starts.push(days[i]);
+  }
+  return starts;
+}
+
+/** ≥2 cycle gaps outside the normal 21–35 day range → irregular (the 2-cycle rule). */
+function isIrregularHistory(starts: string[]): boolean {
+  const sorted = [...new Set(starts)].sort();
+  let out = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    const gap = dayDiff(sorted[i - 1], sorted[i]);
+    if (gap > 35 || gap < 21) out++;
+  }
+  return out >= 2;
+}
+
+function irregularNudge(persona: Persona, dayLog: DayLog): Nudge | null {
+  // Prefer her own logged periods; fall back to (and combine with) the seed history.
+  const combined = [...(persona.pmos?.cycleHistory ?? []), ...periodStarts(dayLog)];
+  const irregular = isIrregularHistory(combined) || shouldResurfaceAssessment(persona, 0);
+  if (!irregular) return null;
   return { type: "irregular", title: "Your cycles have been irregular", body: "A check-in could help rule a few things out.", cta: CTA, href: HREF };
 }
 
@@ -75,7 +103,7 @@ export function activeNudge(args: {
   if (tier === "medium" || tier === "high") return null;
   const candidates: (Nudge | null)[] = [
     missedPeriodNudge(cycleLog, dayLog, cycleLength, today),
-    irregularNudge(persona),
+    irregularNudge(persona, dayLog),
     symptomNudge(dayLog),
     tier === "none" ? wellnessNudge() : null,
   ];
