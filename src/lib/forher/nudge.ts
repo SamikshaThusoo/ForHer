@@ -12,10 +12,6 @@ export type Nudge = { type: NudgeType; title: string; body: string; points: stri
 
 const HREF = "/clinic";
 const CTA = "Book a check-in";
-// Cycle/symptom signals are exactly what the PMOS screen looks for — route these
-// back to a re-assessment rather than a generic clinic booking.
-const REASSESS_HREF = "/for-her";
-const REASSESS_CTA = "Re-check your risk";
 const DAY_MS = 86400000;
 
 const CONCERNING = ["acne", "hair_loss", "pelvic_pain", "bladder_incontinence"];
@@ -59,8 +55,8 @@ function missedPeriodNudge(cycleLog: CycleLog | null, dayLog: DayLog, cycleLengt
           "Simple checks — thyroid, hormones, and ruling out pregnancy",
           "Advice on what, if anything, to do next",
         ],
-        cta: REASSESS_CTA,
-        href: REASSESS_HREF,
+        cta: CTA,
+        href: HREF,
       };
 }
 
@@ -103,8 +99,8 @@ function irregularNudge(persona: Persona, dayLog: DayLog): Nudge | null {
       "Checks that can explain irregular periods",
       "A simple plan to help steady your cycle",
     ],
-    cta: REASSESS_CTA,
-    href: REASSESS_HREF,
+    cta: CTA,
+    href: HREF,
   };
 }
 
@@ -129,8 +125,8 @@ function symptomNudge(dayLog: DayLog): Nudge | null {
       "A doctor advises on skin, hair or pain concerns",
       "Early steps before things build up",
     ],
-    cta: REASSESS_CTA,
-    href: REASSESS_HREF,
+    cta: CTA,
+    href: HREF,
   };
 }
 

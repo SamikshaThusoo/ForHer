@@ -1,9 +1,11 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, Baby, RefreshCw } from "lucide-react";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
-import { useForHer } from "@/lib/forher/state";
+import { useForHer, readCycleLog, saveCycleLog } from "@/lib/forher/state";
 import { activeNudge, activeConditions } from "@/lib/forher/nudge";
 import { readDayLog } from "@/lib/forher/daylog";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
@@ -19,20 +21,30 @@ const TIER_COPY: Record<string, string> = {
 
 export function ClinicForHer() {
   const { persona } = usePersona();
+  const router = useRouter();
   const fh = useForHer(persona.id);
   const tier = personaTrack(persona);
+  const [cycleLog, setCycleLog] = useState(() => (typeof window === "undefined" ? null : readCycleLog(persona.id)));
 
   const sig = {
     persona,
-    cycleLog: fh.cycleLog,
+    cycleLog,
     dayLog: typeof window === "undefined" ? {} : readDayLog(persona.id),
-    cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
+    cycleLength: cycleLengthFor(persona, cycleLog?.cycleLength),
     today: new Date(),
   };
-  // The card showed only the top signal; the page shows every one that's firing.
   const conditions = typeof window === "undefined" ? [] : activeConditions(sig);
   const condition = typeof window === "undefined" ? null : activeNudge({ tier, ...sig });
   const hasConditions = conditions.length > 0;
+  // A long gap for a plain-tracking user could mean she's now trying to conceive.
+  const missedTrack = conditions.some((c) => c.type === "missed-period") && cycleLog?.intent === "track";
+
+  const setTtc = () => {
+    if (!cycleLog) return;
+    const next = { ...cycleLog, intent: "ttc" as const };
+    saveCycleLog(persona.id, next);
+    setCycleLog(next);
+  };
 
   return (
     <main className={`${styles.page} fhTheme`}>
@@ -67,7 +79,22 @@ export function ClinicForHer() {
         </section>
       )}
 
+      {missedTrack && (
+        <div className={styles.intent}>
+          <span className={styles.intentIcon}><Baby size={18} /></span>
+          <div className={styles.intentBody}>
+            <strong>Trying to conceive?</strong>
+            <span>A long gap can also mean you&apos;re trying for a baby — telling us changes what we look for.</span>
+          </div>
+          <button type="button" className={styles.intentBtn} onClick={setTtc}>Yes, I am</button>
+        </div>
+      )}
+
       <ClinicHub persona={persona} tier={tier} showRecommended day={fh.day} condition={condition} />
+
+      <button type="button" className={styles.recheck} onClick={() => router.push("/for-her")}>
+        <RefreshCw size={13} /> Re-check your PMOS risk
+      </button>
 
       <p className={styles.disclaimer}>
         This is a screening tool, not a diagnosis. Please consult a qualified clinician for medical decisions.
