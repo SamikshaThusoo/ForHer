@@ -8,7 +8,7 @@ import { readDayLog } from "@/lib/forher/daylog";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { ForHerHub } from "@/components/forher/ForHerHub/ForHerHub";
 import { ForHerCompanionHub } from "@/components/forher/ForHerCompanionHub/ForHerCompanionHub";
-import { Sparkles, ArrowRight, ScanLine, Stethoscope, HeartPulse, Check } from "lucide-react";
+import { Sparkles, ArrowRight, ScanLine, Stethoscope, HeartPulse } from "lucide-react";
 import styles from "./ForHerPromo.module.css";
 
 /** The For Her card on the Habit Health home — the hub. Three states:
@@ -64,31 +64,19 @@ export function ForHerPromo() {
         cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
         today: new Date(),
       });
-  const STANDING = {
-    title: "Your care circle & next visit",
-    body: "Your clinic — recommendations, bookings and your care team, all in one place.",
-    points: [
-      "Book your recommended tests & consults",
-      "Track visits across your 90-day plan",
-      "Meet the care team supporting you",
-    ],
-    cta: "Open clinic",
-    href: "/clinic",
-  };
-  const content = isStanding ? STANDING : nudge;
+  // Compact entry point only — the rich detail lives on the /clinic page.
+  const content = isStanding
+    ? { title: "Your care circle & next visit", cta: "Open", href: "/clinic" }
+    : nudge
+      ? { title: nudge.title, cta: nudge.cta, href: nudge.href }
+      : null;
   const clinicCard = content ? (
-    <Link href={content.href} className={styles.clinicCard}>
-      <div className={styles.clinicHead}>
-        <span className={styles.clinicIcon}>{isStanding ? <Stethoscope size={18} /> : <HeartPulse size={18} />}</span>
+    <Link href={content.href} className={styles.clinicEntry}>
+      <span className={styles.clinicIcon}>{isStanding ? <Stethoscope size={18} /> : <HeartPulse size={18} />}</span>
+      <span className={styles.clinicText}>
         <span className={styles.clinicEyebrow}>Clinic ForHer</span>
-      </div>
-      <strong className={styles.clinicTitle}>{content.title}</strong>
-      <p className={styles.clinicBody}>{content.body}</p>
-      <ul className={styles.clinicPoints}>
-        {content.points.map((p) => (
-          <li key={p} className={styles.clinicPoint}><Check size={13} aria-hidden /> {p}</li>
-        ))}
-      </ul>
+        <strong className={styles.clinicTitle}>{content.title}</strong>
+      </span>
       <span className={styles.clinicCta}>{content.cta} <ArrowRight size={14} /></span>
     </Link>
   ) : null;
