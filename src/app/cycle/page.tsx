@@ -182,6 +182,7 @@ export default function CyclePage() {
           const isFertile = fromAnchor && !isLogged && !isPred && cd >= ovCd - 5 && cd <= ovCd;
           const isTodayCell = iso === localISO(today);
           const isSel = hasSel && iso === selISO;
+          const hasSymptoms = (dayLog[iso]?.symptoms?.length ?? 0) > 0;
           return (
             <motion.button key={i} type="button" whileTap={{ scale: 0.85 }}
               onClick={(e) => { setSelCd(cycleDayFromLog(anchorISO, L, date)); openSheet(iso, e.currentTarget); }}
@@ -198,6 +199,7 @@ export default function CyclePage() {
               {isLogged && <span className={styles.dayArt}><BloodDrop size={12} /></span>}
               {isPred && <span className={styles.dayArt}><BloodDrop size={11} fill={false} /></span>}
               {isOv && !isLogged && <span className={styles.dayArt}><Florette size={13} color={OV_TILE} bloom /></span>}
+              {hasSymptoms && <span className={styles.daySymptom} aria-hidden />}
             </motion.button>
           );
         })}
@@ -282,6 +284,7 @@ export default function CyclePage() {
         <span className={styles.legItem}><span className={styles.legArt}><BloodDrop size={14} fill={false} /></span>Predicted</span>
         <span className={styles.legItem}><span className={`${styles.legDot} ${styles.legFertile}`} />Fertile</span>
         <span className={styles.legItem}><span className={styles.legArt}><Florette size={15} color={OV_TILE} /></span>Ovulation</span>
+        <span className={styles.legItem}><span className={`${styles.legDot} ${styles.legSymptom}`} />Symptoms</span>
       </div>
 
       <Link href="/hormones" className={styles.nextBtn}>Next · your hormone rhythm <ArrowRight size={16} /></Link>

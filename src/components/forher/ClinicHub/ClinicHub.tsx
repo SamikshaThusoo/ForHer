@@ -4,7 +4,7 @@ import { Video, CalendarCheck, ClipboardEdit, Stethoscope, FlaskConical, Check }
 import type { Persona } from "@/types/persona";
 import type { CareTrack } from "@/types/journey";
 import { clinicPlanFor, careCircleFlags, getPlanTouchpoints, serviceForItem, careItemIncludes, type CareItem } from "@/lib/journey";
-import { isConditionNudge, type Nudge } from "@/lib/forher/nudge";
+import { type Nudge } from "@/lib/forher/nudge";
 import { readHealthProfile, writeHealthProfile, bmiFrom, type HealthProfile } from "@/lib/forher/healthprofile";
 import { readBookings, writeBookings, upsertBooking, isBooked, type Bookings } from "@/lib/forher/clinic";
 import { BookingSheet } from "@/components/forher/BookingSheet/BookingSheet";
@@ -61,8 +61,8 @@ export function ClinicHub({
   // none/low don't get a tier care plan — but if she arrived via a condition, offer a
   // single bookable check-in instead of the "great shape" message.
   const checkInItem: CareItem | null =
-    !plan.showBooking && isConditionNudge(condition)
-      ? { id: "doctor", kind: "consult", label: "Book a check-in", reason: condition!.body }
+    !plan.showBooking && condition
+      ? { id: "doctor", kind: "consult", label: "Book a check-in", reason: condition.body }
       : null;
 
   const book = (item: CareItem, slot: string) => {
