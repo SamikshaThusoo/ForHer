@@ -32,7 +32,8 @@ function missedPeriodNudge(cycleLog: CycleLog | null, dayLog: DayLog, cycleLengt
   const lastISO = latestPeriodISO(cycleLog, dayLog);
   if (!lastISO) return null;
   const daysSince = Math.floor((today.getTime() - new Date(`${lastISO}T00:00:00`).getTime()) / DAY_MS);
-  if (daysSince <= 2 * cycleLength) return null;
+  // Past 2 cycles, but not a log that's a year+ old (they've simply stopped tracking).
+  if (daysSince <= 2 * cycleLength || daysSince > 365) return null;
   return cycleLog.intent === "ttc"
     ? {
         type: "missed-period",
@@ -64,6 +65,11 @@ function dayDiff(a: string, b: string): number {
   return Math.round((new Date(`${b}T00:00:00`).getTime() - new Date(`${a}T00:00:00`).getTime()) / DAY_MS);
 }
 
+/** Recency guard so stale logs don't nag forever — is this ISO day within n days of today? */
+function withinDays(iso: string, today: Date, n: number): boolean {
+  return Math.abs((today.getTime() - new Date(`${iso}T00:00:00`).getTime()) / DAY_MS) <= n;
+}
+
 /** Collapse logged period days into period-start dates (first day of each run). */
 function periodStarts(dayLog: DayLog): string[] {
   const days = [...periodDaysSet(dayLog)].sort();
@@ -85,9 +91,12 @@ function isIrregularHistory(starts: string[]): boolean {
   return out >= 2;
 }
 
-function irregularNudge(persona: Persona, dayLog: DayLog): Nudge | null {
+function irregularNudge(persona: Persona, dayLog: DayLog, today: Date): Nudge | null {
   // Prefer her own logged periods; fall back to (and combine with) the seed history.
-  const combined = [...(persona.pmos?.cycleHistory ?? []), ...periodStarts(dayLog)];
+  // Only recent starts count, so an old logged run doesn't flag irregular forever.
+  const combined = [...(persona.pmos?.cycleHistory ?? []), ...periodStarts(dayLog)].filter((iso) =>
+    withinDays(iso, today, 365),
+  );
   const irregular = isIrregularHistory(combined) || shouldResurfaceAssessment(persona, 0);
   if (!irregular) return null;
   return {
@@ -104,10 +113,11 @@ function irregularNudge(persona: Persona, dayLog: DayLog): Nudge | null {
   };
 }
 
-function symptomNudge(dayLog: DayLog): Nudge | null {
+function symptomNudge(dayLog: DayLog, today: Date): Nudge | null {
   const counts: Record<string, number> = {};
   let days = 0;
-  for (const entry of Object.values(dayLog)) {
+  for (const [iso, entry] of Object.entries(dayLog)) {
+    if (!withinDays(iso, today, 90)) continue; // only the last ~3 months count
     const hit = (entry.symptoms ?? []).filter((s) => CONCERNING.includes(s));
     if (hit.length) {
       days++;
@@ -157,8 +167,8 @@ export function activeNudge(args: {
   if (tier === "medium" || tier === "high") return null;
   const candidates: (Nudge | null)[] = [
     missedPeriodNudge(cycleLog, dayLog, cycleLength, today),
-    irregularNudge(persona, dayLog),
-    symptomNudge(dayLog),
+    irregularNudge(persona, dayLog, today),
+    symptomNudge(dayLog, today),
     tier === "none" ? wellnessNudge() : null,
   ];
   for (const n of candidates) if (n) return n;
@@ -182,7 +192,7 @@ export function activeConditions(args: {
   const { persona, cycleLog, dayLog, cycleLength, today } = args;
   return [
     missedPeriodNudge(cycleLog, dayLog, cycleLength, today),
-    irregularNudge(persona, dayLog),
-    symptomNudge(dayLog),
+    irregularNudge(persona, dayLog, today),
+    symptomNudge(dayLog, today),
   ].filter(Boolean) as Nudge[];
 }

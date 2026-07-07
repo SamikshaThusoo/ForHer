@@ -8,6 +8,7 @@ import { personaTrack } from "@/lib/journey";
 import { useForHer, readCycleLog, saveCycleLog } from "@/lib/forher/state";
 import { activeNudge, activeConditions } from "@/lib/forher/nudge";
 import { readDayLog } from "@/lib/forher/daylog";
+import { readHealthProfile, writeHealthProfile } from "@/lib/forher/healthprofile";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { ClinicHub } from "@/components/forher/ClinicHub/ClinicHub";
 import styles from "./ClinicForHer.module.css";
@@ -44,6 +45,8 @@ export function ClinicForHer() {
     const next = { ...cycleLog, intent: "ttc" as const };
     saveCycleLog(persona.id, next);
     setCycleLog(next);
+    // Keep the care-circle flag in sync so the gynaecologist is added too.
+    writeHealthProfile(persona.id, { ...readHealthProfile(persona.id), ttc: true });
   };
 
   return (
