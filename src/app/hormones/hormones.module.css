@@ -16,17 +16,58 @@
   margin: 0 18px; background: #fff; border: 1px solid rgba(91,42,74,0.1);
   border-radius: 18px; padding: 14px; box-shadow: 0 3px 12px rgba(91,42,74,0.05);
 }
-.chart { width: 100%; height: 130px; display: block; }
+.chartWrap { position: relative; }
+.atmosphere {
+  position: absolute; inset: -12px -6px; border-radius: 18px; opacity: 0.16;
+  transition: background-color 0.55s ease;
+  -webkit-mask: radial-gradient(78% 72% at 50% 45%, #000 38%, transparent 100%);
+  mask: radial-gradient(78% 72% at 50% 45%, #000 38%, transparent 100%);
+  pointer-events: none;
+}
+.chart { width: 100%; height: 130px; display: block; position: relative; }
 .dominant {
   text-align: center; font-size: 13px; font-weight: 800; margin-bottom: 6px;
   transition: color 0.2s ease;
 }
 .axis { position: relative; display: flex; justify-content: space-between; font-size: 9.5px; color: #9A8A92; margin-top: 4px; }
 .axisOv { position: absolute; transform: translateX(-50%); white-space: nowrap; }
-.range { width: 100%; margin: 12px 0 4px; accent-color: #5B2A4A; }
+.trackWrap { position: relative; margin: 14px 0 4px; height: 22px; display: flex; align-items: center; }
+.phaseMap {
+  position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+  height: 8px; border-radius: 999px; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(91, 42, 74, 0.06);
+}
+.range {
+  position: relative; width: 100%; height: 22px; margin: 0; background: transparent;
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+}
+.range:focus { outline: none; }
+.range::-webkit-slider-runnable-track { background: transparent; height: 22px; }
+.range::-moz-range-track { background: transparent; height: 22px; }
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--thumb, #5B2A4A); border: 2.5px solid #fff; box-shadow: 0 2px 7px rgba(91, 42, 74, 0.35);
+  transition: transform 0.16s cubic-bezier(.34, 1.4, .5, 1), box-shadow 0.16s ease;
+}
+.range::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; background: var(--thumb, #5B2A4A);
+  border: 2.5px solid #fff; box-shadow: 0 2px 7px rgba(91, 42, 74, 0.35);
+  transition: transform 0.16s cubic-bezier(.34, 1.4, .5, 1), box-shadow 0.16s ease;
+}
+.range:active::-webkit-slider-thumb { transform: scale(1.28); box-shadow: 0 0 0 7px rgba(142, 83, 120, 0.18), 0 3px 10px rgba(91, 42, 74, 0.4); }
+.range:active::-moz-range-thumb { transform: scale(1.28); box-shadow: 0 0 0 7px rgba(142, 83, 120, 0.18), 0 3px 10px rgba(91, 42, 74, 0.4); }
+.range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px #8E5378; }
+.range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px #8E5378; }
 .scrubHint { font-size: 10px; color: #9A8A92; text-align: center; margin-bottom: 4px; }
 .legend { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 11px; }
-.legItem { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 600; color: #6B5A65; }
+.legItem {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 600; color: #6B5A65;
+  font-family: inherit; background: none; border: 1px solid transparent; border-radius: 999px;
+  padding: 4px 9px; cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.legItem:focus-visible { outline: 2px solid #8E5378; outline-offset: 2px; }
+.legOn { background: rgba(142, 83, 120, 0.1); border-color: rgba(142, 83, 120, 0.3); color: #3E1B33; }
+.legDim { opacity: 0.45; }
 .legDot { width: 9px; height: 9px; border-radius: 50%; }
 
 .phaseBox {
@@ -66,3 +107,10 @@
 }
 .recLabel { font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #8E5378; padding-top: 1px; }
 .recText { font-size: 12.5px; line-height: 1.45; color: #3E1B33; }
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere { transition: none; }
+  .range::-webkit-slider-thumb, .range::-moz-range-thumb { transition: none; }
+  .range:active::-webkit-slider-thumb, .range:active::-moz-range-thumb { transform: none; }
+  .legItem { transition: none; }
+}
