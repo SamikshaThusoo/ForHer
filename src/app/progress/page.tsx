@@ -1,32 +1,19 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
-import { getMarkerSnapshot, personaTrack } from "@/lib/journey";
-import type { MarkerSet } from "@/types/journey";
-import { ChevronLeft, TrendingDown, Minus, Trophy } from "lucide-react";
+import { personaTrack } from "@/lib/journey";
+import { DailyView } from "@/components/forher/Progress/DailyView";
+import { MilestoneView } from "@/components/forher/Progress/MilestoneView";
+import { ChevronLeft } from "lucide-react";
 import styles from "./progress.module.css";
-
-type Metric = { key: keyof MarkerSet; label: string; unit: string; decimals: number };
-const METRICS: Metric[] = [
-  { key: "bmi", label: "BMI", unit: "", decimals: 1 },
-  { key: "hba1c", label: "HbA1c", unit: "%", decimals: 1 },
-  { key: "weightKg", label: "Weight", unit: "kg", decimals: 0 },
-  { key: "waistCm", label: "Waist", unit: "cm", decimals: 0 },
-  { key: "homaIr", label: "HOMA-IR", unit: "", decimals: 1 },
-];
-
-function milestone(day: number): { title: string; sub: string } | null {
-  if (day >= 90) return { title: "90-day program complete", sub: "You reached the full-retest milestone. Here's what moved." };
-  if (day >= 60) return { title: "Build phase done", sub: "Two months in — momentum is building." };
-  if (day >= 30) return { title: "You completed Foundation", sub: "The first 30 days are the hardest. Nicely done." };
-  return null;
-}
 
 export default function ProgressPage() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const track = personaTrack(persona);
+  const [tab, setTab] = useState<"daily" | "milestone">("daily");
 
   if (!fh.hydrated) return <main className={`${styles.page} fhTheme`} />;
 
@@ -45,23 +32,6 @@ export default function ProgressPage() {
     );
   }
 
-  const d0 = getMarkerSnapshot(persona, 0);
-  const d90 = getMarkerSnapshot(persona, 90);
-  const ms = milestone(fh.day);
-  const ttc = !!persona.pmos?.ttc;
-
-  const rows = METRICS
-    .map((m) => ({ m, a: d0[m.key] as number | undefined, b: d90[m.key] as number | undefined }))
-    .filter((r) => r.a != null && r.b != null);
-
-  const improved = (d90.hba1c != null && d0.hba1c != null && d90.hba1c < d0.hba1c)
-    || (d90.weightKg != null && d0.weightKg != null && d90.weightKg < d0.weightKg);
-  const rec: "step-down" | "continue" | "tulip" = ttc ? "tulip" : improved ? "step-down" : "continue";
-
-  // Adherence half — the engagement story, from her daily tasks.
-  const tasksDone = Object.values(fh.done).reduce((s, a) => s + a.length, 0);
-  const daysActive = Object.values(fh.done).filter((a) => a.length > 0).length;
-
   return (
     <main className={`${styles.page} fhTheme`}>
       <header className={styles.head}>
@@ -71,66 +41,31 @@ export default function ProgressPage() {
 
       <div className={styles.hero}>
         <h1 className={styles.h1}>Your <em>progress</em></h1>
-        <p className={styles.sub}>Two halves: the habits you&apos;re building, and the markers that move.</p>
+        <p className={styles.sub}>Today is the cursor; the 90 days is the frame.</p>
       </div>
 
-      {ms && (
-        <div className={styles.milestone}>
-          <span className={styles.trophy}><Trophy size={18} /></span>
-          <div><div className={styles.msTitle}>{ms.title}</div><div className={styles.msSub}>{ms.sub}</div></div>
-        </div>
-      )}
-
-      <div className={styles.sectionHead}>How you&apos;re showing up</div>
-      <div className={styles.stats}>
-        <div className={styles.stat}><span className={styles.statNum}>{fh.streak}</span><span className={styles.statLab}>day streak</span></div>
-        <div className={styles.stat}><span className={styles.statNum}>{tasksDone}</span><span className={styles.statLab}>tasks done</span></div>
-        <div className={styles.stat}><span className={styles.statNum}>{daysActive}</span><span className={styles.statLab}>active days</span></div>
+      <div className={styles.tabs} role="tablist" aria-label="Progress views">
+        <button
+          role="tab"
+          type="button"
+          aria-selected={tab === "daily"}
+          className={`${styles.tab} ${tab === "daily" ? styles.tabOn : ""}`}
+          onClick={() => setTab("daily")}
+        >
+          Daily
+        </button>
+        <button
+          role="tab"
+          type="button"
+          aria-selected={tab === "milestone"}
+          className={`${styles.tab} ${tab === "milestone" ? styles.tabOn : ""}`}
+          onClick={() => setTab("milestone")}
+        >
+          Milestone
+        </button>
       </div>
 
-      <div className={styles.sectionHead}>
-        What&apos;s changing {fh.day < 90 && <span className={styles.proj}>· projected to Day 90</span>}
-      </div>
-      <div className={styles.metrics}>
-        {rows.map(({ m, a, b }) => {
-          const delta = (b as number) - (a as number);
-          const better = delta < 0;
-          const pctMove = Math.min(100, Math.abs(delta) / Math.max(0.01, a as number) * 100 * 4);
-          return (
-            <div key={m.key} className={styles.metric}>
-              <div className={styles.metricTop}>
-                <span className={styles.metricLabel}>{m.label}</span>
-                <span className={`${styles.delta} ${better ? styles.deltaGood : styles.deltaFlat}`}>
-                  {better ? <TrendingDown size={13} /> : <Minus size={13} />}
-                  {delta === 0 ? "no change" : `${delta > 0 ? "+" : ""}${delta.toFixed(m.decimals)}${m.unit}`}
-                </span>
-              </div>
-              <div className={styles.values}>
-                <span className={styles.from}>{(a as number).toFixed(m.decimals)}{m.unit}</span>
-                <div className={styles.track}><i style={{ width: `${pctMove}%`, background: better ? "#4F9D69" : "#9A8A92" }} /></div>
-                <span className={styles.to}>{(b as number).toFixed(m.decimals)}{m.unit}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {fh.day >= 90 && (
-        <div className={styles.transition}>
-          <div className={styles.transTitle}>What&apos;s next?</div>
-          {[
-            { key: "step-down", title: "Step down to maintenance", sub: "Companion mode + a quarterly check." },
-            { key: "continue", title: "Continue structured care", sub: "Another focused block with your team." },
-            { key: "tulip", title: "Warm handoff to Tulip", sub: "Move into pre-conception care; your record carries over." },
-          ].map((o) => (
-            <div key={o.key} className={`${styles.option} ${rec === o.key ? styles.optionRec : ""}`}>
-              <div><div className={styles.optTitle}>{o.title}</div><div className={styles.optSub}>{o.sub}</div></div>
-              {rec === o.key && <span className={styles.recTag}>Recommended</span>}
-            </div>
-          ))}
-        </div>
-      )}
-
+      {tab === "daily" ? <DailyView /> : <MilestoneView />}
     </main>
   );
 }
