@@ -1,6 +1,7 @@
 import type { Persona } from "@/types/persona";
 import type { CareTrack, Specialist } from "@/types/journey";
 import type { HealthProfile } from "@/lib/forher/healthprofile";
+import type { CycleLog } from "@/lib/forher/state";
 import { getCareCircle, personaTrack, getTouchpointsDue } from "./touchpoints";
 import { getDomainSignals } from "./risk";
 import { PROGRAM_LAST_DAY } from "./constants";
@@ -33,13 +34,14 @@ export function getCareTests(
 
 /** Care-circle flags, with the health profile overriding persona defaults for the
  *  two live flags (skin/hair → androgenic, TTC). The tier itself is never changed. */
-export function careCircleFlags(persona: Persona, profile: HealthProfile) {
+export function careCircleFlags(persona: Persona, profile: HealthProfile, cycleLog?: CycleLog | null) {
   const androgenic = persona.pmos
     ? getDomainSignals(persona.pmos.assessment, persona.pmos.ahcMarkers).androgenic
     : false;
   return {
     acneOrHirsutism: profile.skinHairChanges ?? androgenic,
-    ttc: profile.ttc ?? !!persona.pmos?.ttc,
+    // One TTC truth from any declaration: the cycle intent, the profile toggle, or the seed.
+    ttc: cycleLog?.intent === "ttc" || !!profile.ttc || !!persona.pmos?.ttc,
     highMetabolic: personaTrack(persona) === "high",
   };
 }
@@ -71,8 +73,8 @@ const testItem = (t: CareTest): CareItem => ({ id: t.id, kind: "test", label: t.
 
 /** Assembles the one-primary-then-secondary care plan for a tier from the existing
  *  care-circle engine + tier tests. Enforces "one action, not five". */
-export function getClinicPlan(persona: Persona, profile: HealthProfile): ClinicPlan {
-  return clinicPlanFor(personaTrack(persona), careCircleFlags(persona, profile));
+export function getClinicPlan(persona: Persona, profile: HealthProfile, cycleLog?: CycleLog | null): ClinicPlan {
+  return clinicPlanFor(personaTrack(persona), careCircleFlags(persona, profile, cycleLog));
 }
 
 /** Same assembly from an explicit tier + flags — used during onboarding, where the

@@ -99,6 +99,18 @@ describe("activeNudge — symptom", () => {
     const n = activeNudge({ ...base, tier: "low", dayLog: symptomDays(3, "bloating") });
     expect(n).toBeNull();
   });
+  it("ignores symptoms older than ~3 months (recency)", () => {
+    const stale: DayLog = { "2026-01-01": { symptoms: ["acne"] }, "2026-01-02": { symptoms: ["acne"] }, "2026-01-03": { symptoms: ["acne"] } };
+    // today is 2026-05-01 → those are ~120 days old
+    expect(activeNudge({ ...base, tier: "low", dayLog: stale })).toBeNull();
+  });
+});
+
+describe("activeNudge — recency", () => {
+  it("does not fire missed-period for a period logged over a year ago", () => {
+    const n = activeNudge({ ...base, tier: "none", cycleLog: { intent: "track", lastPeriod: "2024-06-01" } });
+    expect(n?.type).not.toBe("missed-period");
+  });
 });
 
 describe("activeNudge — wellness", () => {

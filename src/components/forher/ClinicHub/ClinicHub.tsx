@@ -7,6 +7,7 @@ import { clinicPlanFor, careCircleFlags, getPlanTouchpoints, serviceForItem, car
 import { type Nudge } from "@/lib/forher/nudge";
 import { readHealthProfile, writeHealthProfile, bmiFrom, type HealthProfile } from "@/lib/forher/healthprofile";
 import { readBookings, writeBookings, upsertBooking, isBooked, type Bookings } from "@/lib/forher/clinic";
+import { readCycleLog, saveCycleLog } from "@/lib/forher/state";
 import { BookingSheet } from "@/components/forher/BookingSheet/BookingSheet";
 import { Sheet } from "@/components/forher/Sheet/Sheet";
 import styles from "./ClinicHub.module.css";
@@ -45,8 +46,9 @@ export function ClinicHub({
   );
   const [view, setView] = useState<View>(null);
   const [sheetItem, setSheetItem] = useState<CareItem | null>(null);
+  const [cycleLog, setCycleLog] = useState(() => (typeof window === "undefined" ? null : readCycleLog(persona.id)));
 
-  const flags = useMemo(() => careCircleFlags(persona, profile), [persona, profile]);
+  const flags = useMemo(() => careCircleFlags(persona, profile, cycleLog), [persona, profile, cycleLog]);
   const plan = useMemo(() => clinicPlanFor(tier, flags), [tier, flags]);
   const visits = useMemo(() => getPlanTouchpoints(persona), [persona]);
 
@@ -86,6 +88,20 @@ export function ClinicHub({
       writeHealthProfile(persona.id, next);
       return next;
     });
+
+  // One "trying to conceive" state — the toggle writes both the profile flag and the
+  // cycle intent, so it stays in sync with the tracker + the missed-period framing.
+  const isTtc = cycleLog?.intent === "ttc" || !!profile.ttc;
+  const toggleTtc = () => {
+    const next = !isTtc;
+    patch({ ttc: next });
+    if (cycleLog && cycleLog.intent !== "pregnant") {
+      const intent: "ttc" | "track" = next ? "ttc" : "track";
+      const cl = { ...cycleLog, intent };
+      saveCycleLog(persona.id, cl);
+      setCycleLog(cl);
+    }
+  };
 
   const bmi = bmiFrom(profile);
   const bookingList = Object.values(bookings);
@@ -329,9 +345,9 @@ export function ClinicHub({
         <div className={styles.toggles}>
           <button
             type="button"
-            className={`${styles.toggle} ${profile.ttc ? styles.toggleOn : ""}`}
-            aria-pressed={!!profile.ttc}
-            onClick={() => patch({ ttc: !profile.ttc })}
+            className={`${styles.toggle} ${isTtc ? styles.toggleOn : ""}`}
+            aria-pressed={isTtc}
+            onClick={toggleTtc}
           >
             Trying to conceive
           </button>
