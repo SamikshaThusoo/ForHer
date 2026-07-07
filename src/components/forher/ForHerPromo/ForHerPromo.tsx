@@ -8,7 +8,7 @@ import { readDayLog } from "@/lib/forher/daylog";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { ForHerHub } from "@/components/forher/ForHerHub/ForHerHub";
 import { ForHerCompanionHub } from "@/components/forher/ForHerCompanionHub/ForHerCompanionHub";
-import { Sparkles, ArrowRight, ScanLine, Stethoscope, HeartPulse } from "lucide-react";
+import { Sparkles, ArrowRight, ScanLine, Stethoscope, HeartPulse, Check } from "lucide-react";
 import styles from "./ForHerPromo.module.css";
 
 /** The For Her card on the Habit Health home — the hub. Three states:
@@ -64,24 +64,32 @@ export function ForHerPromo() {
         cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
         today: new Date(),
       });
-  const clinicCard = isStanding ? (
-    <Link href="/clinic" className={styles.clinicEntry}>
-      <span className={styles.clinicIcon}><Stethoscope size={18} /></span>
-      <span className={styles.clinicText}>
+  const STANDING = {
+    title: "Your care circle & next visit",
+    body: "Your clinic — recommendations, bookings and your care team, all in one place.",
+    points: [
+      "Book your recommended tests & consults",
+      "Track visits across your 90-day plan",
+      "Meet the care team supporting you",
+    ],
+    cta: "Open clinic",
+    href: "/clinic",
+  };
+  const content = isStanding ? STANDING : nudge;
+  const clinicCard = content ? (
+    <Link href={content.href} className={styles.clinicCard}>
+      <div className={styles.clinicHead}>
+        <span className={styles.clinicIcon}>{isStanding ? <Stethoscope size={18} /> : <HeartPulse size={18} />}</span>
         <span className={styles.clinicEyebrow}>Clinic ForHer</span>
-        <strong className={styles.clinicTitle}>Your care circle &amp; next visit</strong>
-      </span>
-      <span className={styles.clinicCta}>Open <ArrowRight size={14} /></span>
-    </Link>
-  ) : nudge ? (
-    <Link href={nudge.href} className={styles.clinicEntry}>
-      <span className={styles.clinicIcon}><HeartPulse size={18} /></span>
-      <span className={styles.clinicText}>
-        <span className={styles.clinicEyebrow}>Clinic ForHer</span>
-        <strong className={styles.clinicTitle}>{nudge.title}</strong>
-        <span className={styles.clinicBody}>{nudge.body}</span>
-      </span>
-      <span className={styles.clinicCta}>{nudge.cta} <ArrowRight size={14} /></span>
+      </div>
+      <strong className={styles.clinicTitle}>{content.title}</strong>
+      <p className={styles.clinicBody}>{content.body}</p>
+      <ul className={styles.clinicPoints}>
+        {content.points.map((p) => (
+          <li key={p} className={styles.clinicPoint}><Check size={13} aria-hidden /> {p}</li>
+        ))}
+      </ul>
+      <span className={styles.clinicCta}>{content.cta} <ArrowRight size={14} /></span>
     </Link>
   ) : null;
 
