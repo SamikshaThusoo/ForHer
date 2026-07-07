@@ -13,7 +13,6 @@ const INTENTS: { key: CycleIntent; label: string; sub: string; icon: React.Compo
 /** Tracker setup. First asks intent (track / TTC / pregnant) — each opens its
  *  own journey — then the details that unlock predictions. */
 export function CycleOnboarding({ onSave }: { onSave: (log: CycleLog) => void }) {
-  const today = new Date().toISOString().slice(0, 10);
   const [intent, setIntent] = useState<CycleIntent | null>(null);
   const [date, setDate] = useState("");
   const [dur, setDur] = useState(0);
@@ -70,7 +69,7 @@ export function CycleOnboarding({ onSave }: { onSave: (log: CycleLog) => void })
       <h3 className={styles.title}>{intent === "ttc" ? "Let's map your fertile window" : "Let's set up your cycle"}</h3>
       <p className={styles.sub}>A few quick details and we can predict your phases{intent === "ttc" ? " and fertile days" : ""}.</p>
       <label className={styles.label}>When did your last period start?</label>
-      <input className={styles.date} type="date" value={date} max={today} onChange={(e) => setDate(e.target.value)} />
+      <input className={styles.date} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
       <label className={styles.label}>How many days does it usually last?</label>
       <div className={styles.chips}>
         {[3, 4, 5, 6, 7].map((d) => (

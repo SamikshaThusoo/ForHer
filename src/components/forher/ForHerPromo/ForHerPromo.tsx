@@ -1,25 +1,23 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { entryFraming, personaTrack } from "@/lib/journey";
-import { activeNudge, readDismissed, dismissNudge, type NudgeType } from "@/lib/forher/nudge";
+import { activeNudge } from "@/lib/forher/nudge";
 import { readDayLog } from "@/lib/forher/daylog";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { ForHerHub } from "@/components/forher/ForHerHub/ForHerHub";
 import { ForHerCompanionHub } from "@/components/forher/ForHerCompanionHub/ForHerCompanionHub";
-import { ClinicNudge } from "@/components/forher/ClinicNudge/ClinicNudge";
-import { Sparkles, ArrowRight, ScanLine, Stethoscope } from "lucide-react";
+import { Sparkles, ArrowRight, ScanLine, Stethoscope, HeartPulse } from "lucide-react";
 import styles from "./ForHerPromo.module.css";
 
 /** The For Her card on the Habit Health home — the hub. Three states:
  *  first-time entry (-> assessment), personalised care-plan view, or a minimal
- *  companion card. */
+ *  companion card. The clinic card adapts: a standing strip for care-plan tiers,
+ *  or a contextual nudge for companion/low users (symptom / late / irregular / wellness). */
 export function ForHerPromo() {
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
-  const [justDismissed, setJustDismissed] = useState<Set<NudgeType>>(new Set());
   const f = entryFraming(persona);
   if (!f) return null; // not eligible
   const track = personaTrack(persona);
@@ -53,32 +51,44 @@ export function ForHerPromo() {
     );
   }
 
-  // Phase 3 nudge — companion (none) + low only. activeNudge returns null for medium/high.
-  const dismissed = new Set<NudgeType>([...readDismissed(persona.id), ...justDismissed]);
-  const nudge = activeNudge({
-    tier: track,
-    persona,
-    cycleLog: fh.cycleLog,
-    dayLog: readDayLog(persona.id),
-    cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
-    today: new Date(),
-    dismissed,
-  });
-  const banner = nudge ? (
-    <ClinicNudge
-      nudge={nudge}
-      onDismiss={() => {
-        dismissNudge(persona.id, nudge.type);
-        setJustDismissed((prev) => new Set([...prev, nudge.type]));
-      }}
-    />
+  // The clinic card: standing strip for care-plan tiers; a contextual nudge for
+  // none/low (activeNudge returns null for medium/high, and for low with no signal).
+  const isStanding = track === "medium" || track === "high";
+  const nudge = isStanding
+    ? null
+    : activeNudge({
+        tier: track,
+        persona,
+        cycleLog: fh.cycleLog,
+        dayLog: readDayLog(persona.id),
+        cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
+        today: new Date(),
+      });
+  const clinicCard = isStanding ? (
+    <Link href="/clinic" className={styles.clinicEntry}>
+      <span className={styles.clinicIcon}><Stethoscope size={18} /></span>
+      <span className={styles.clinicText}>
+        <span className={styles.clinicEyebrow}>Clinic ForHer</span>
+        <strong className={styles.clinicTitle}>Your care circle &amp; next visit</strong>
+      </span>
+      <span className={styles.clinicCta}>Open <ArrowRight size={14} /></span>
+    </Link>
+  ) : nudge ? (
+    <Link href={nudge.href} className={styles.clinicEntry}>
+      <span className={styles.clinicIcon}><HeartPulse size={18} /></span>
+      <span className={styles.clinicText}>
+        <span className={styles.clinicEyebrow}>Clinic ForHer</span>
+        <strong className={styles.clinicTitle}>{nudge.title}</strong>
+        <span className={styles.clinicBody}>{nudge.body}</span>
+      </span>
+      <span className={styles.clinicCta}>{nudge.cta} <ArrowRight size={14} /></span>
+    </Link>
   ) : null;
 
   // ---- Assessed, no care plan: companion carousel (same treatment as the plan) ----
   if (track === "none") {
     return (
       <div className={`${styles.hubWrap} fhReveal`}>
-        {banner}
         <div className={styles.hubHead}>
           <div className={styles.hubLeft}>
             <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>Companion</span></span>
@@ -86,6 +96,7 @@ export function ForHerPromo() {
           </div>
           <Link href="/cares/scan" className={styles.hubScan}><ScanLine size={18} /><span>Scan</span></Link>
         </div>
+        {clinicCard}
         <ForHerCompanionHub />
       </div>
     );
@@ -94,7 +105,6 @@ export function ForHerPromo() {
   // ---- Assessed, on care plan: the live carousel, right on the home ----
   return (
     <div className={`${styles.hubWrap} fhReveal`}>
-      {banner}
       <div className={styles.hubHead}>
         <div className={styles.hubLeft}>
           <span className={styles.hubBrand}>For Her <span className={styles.hubTag}>PMOS</span></span>
@@ -102,16 +112,7 @@ export function ForHerPromo() {
         </div>
         <Link href="/cares/scan" className={styles.hubScan}><ScanLine size={18} /><span>Scan</span></Link>
       </div>
-      {(track === "medium" || track === "high") && (
-        <Link href="/clinic" className={styles.clinicEntry}>
-          <span className={styles.clinicIcon}><Stethoscope size={18} /></span>
-          <span className={styles.clinicText}>
-            <span className={styles.clinicEyebrow}>Clinic ForHer</span>
-            <strong className={styles.clinicTitle}>Your care circle &amp; next visit</strong>
-          </span>
-          <span className={styles.clinicCta}>Open <ArrowRight size={14} /></span>
-        </Link>
-      )}
+      {clinicCard}
       <ForHerHub />
     </div>
   );

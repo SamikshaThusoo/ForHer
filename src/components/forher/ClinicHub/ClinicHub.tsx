@@ -4,6 +4,7 @@ import { Video, CalendarCheck, ClipboardEdit, Stethoscope, FlaskConical, Check }
 import type { Persona } from "@/types/persona";
 import type { CareTrack } from "@/types/journey";
 import { clinicPlanFor, careCircleFlags, getPlanTouchpoints, serviceForItem, type CareItem } from "@/lib/journey";
+import { isConditionNudge, type Nudge } from "@/lib/forher/nudge";
 import { readHealthProfile, writeHealthProfile, bmiFrom, type HealthProfile } from "@/lib/forher/healthprofile";
 import { readBookings, writeBookings, upsertBooking, isBooked, type Bookings } from "@/lib/forher/clinic";
 import { BookingSheet } from "@/components/forher/BookingSheet/BookingSheet";
@@ -26,12 +27,15 @@ export function ClinicHub({
   tier,
   showRecommended = true,
   day = 1,
+  condition = null,
 }: {
   persona: Persona;
   tier: CareTrack;
   showRecommended?: boolean;
   /** The selected day on the 90-day plan simulator — appointments render relative to it. */
   day?: number;
+  /** Why she arrived (symptom / late / irregular) — surfaces a bookable check-in for none/low. */
+  condition?: Nudge | null;
 }) {
   const [profile, setProfile] = useState<HealthProfile>(() =>
     typeof window === "undefined" ? {} : readHealthProfile(persona.id),
@@ -53,6 +57,13 @@ export function ClinicHub({
   const consults = allItems.filter((i) => i.kind === "consult");
   const tests = allItems.filter((i) => i.kind === "test");
   const extraTests = tests.filter((t) => !(plan.primary && plan.primary.kind === "test" && plan.primary.id === t.id));
+
+  // none/low don't get a tier care plan — but if she arrived via a condition, offer a
+  // single bookable check-in instead of the "great shape" message.
+  const checkInItem: CareItem | null =
+    !plan.showBooking && isConditionNudge(condition)
+      ? { id: "doctor", kind: "consult", label: "Book a check-in", reason: condition!.body }
+      : null;
 
   const book = (item: CareItem, slot: string) => {
     setBookings((prev) => {
@@ -129,40 +140,46 @@ export function ClinicHub({
     );
   };
 
+  const primaryHero = (item: CareItem, extra: CareItem[]) => (
+    <section className={styles.hero}>
+      <span className={styles.heroEyebrow}>Recommended now</span>
+      <div className={styles.heroMain}>
+        <span className={styles.heroIcon}>
+          {item.kind === "test" ? <FlaskConical size={22} /> : <Stethoscope size={22} />}
+        </span>
+        <div className={styles.heroBody}>
+          <h3 className={styles.heroTitle}>{item.label}</h3>
+          <p className={styles.heroWhy}>{item.reason}</p>
+        </div>
+      </div>
+      {isBooked(bookings, item.id) ? (
+        <span className={styles.heroBooked}>
+          <Check size={16} aria-hidden /> Booked
+        </span>
+      ) : (
+        <button type="button" className={styles.heroBook} onClick={() => setSheetItem(item)}>
+          Book now
+        </button>
+      )}
+      {extra.length > 0 && (
+        <div className={styles.heroTests}>
+          <span className={styles.heroTestsLabel}>Recommended tests</span>
+          {extra.map((t) => (
+            <MiniRow key={t.id} item={t} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+
   return (
     <div className={styles.hub}>
       {/* Card 1 — Recommended now */}
       {showRecommended &&
         (plan.showBooking && plan.primary ? (
-          <section className={styles.hero}>
-            <span className={styles.heroEyebrow}>Recommended now</span>
-            <div className={styles.heroMain}>
-              <span className={styles.heroIcon}>
-                {plan.primary.kind === "test" ? <FlaskConical size={22} /> : <Stethoscope size={22} />}
-              </span>
-              <div className={styles.heroBody}>
-                <h3 className={styles.heroTitle}>{plan.primary.label}</h3>
-                <p className={styles.heroWhy}>{plan.primary.reason}</p>
-              </div>
-            </div>
-            {isBooked(bookings, plan.primary.id) ? (
-              <span className={styles.heroBooked}>
-                <Check size={16} aria-hidden /> Booked
-              </span>
-            ) : (
-              <button type="button" className={styles.heroBook} onClick={() => setSheetItem(plan.primary!)}>
-                Book now
-              </button>
-            )}
-            {extraTests.length > 0 && (
-              <div className={styles.heroTests}>
-                <span className={styles.heroTestsLabel}>Recommended tests</span>
-                {extraTests.map((t) => (
-                  <MiniRow key={t.id} item={t} />
-                ))}
-              </div>
-            )}
-          </section>
+          primaryHero(plan.primary, extraTests)
+        ) : checkInItem ? (
+          primaryHero(checkInItem, [])
         ) : (
           <section className={styles.hero}>
             <span className={styles.heroEyebrow}>You&apos;re in great shape</span>

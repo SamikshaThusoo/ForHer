@@ -257,9 +257,9 @@ export default function CyclePage() {
       <p className={styles.tapHint}>Tap any day to log your flow &amp; symptoms. Future periods are predicted (outlined).</p>
 
       <div className={styles.monthNav}>
-        <button type="button" className={styles.monthNavBtn} onClick={() => { navDir.current = -1; setMonthOffset((o) => Math.max(-3, o - 1)); }} aria-label="Previous month"><ChevronLeft size={18} /></button>
+        <button type="button" className={styles.monthNavBtn} onClick={() => { navDir.current = -1; setMonthOffset((o) => Math.max(-12, o - 1)); }} aria-label="Previous month"><ChevronLeft size={18} /></button>
         <span className={styles.monthNavLabel}>{viewMonth.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</span>
-        <button type="button" className={styles.monthNavBtn} onClick={() => { navDir.current = 1; setMonthOffset((o) => Math.min(10, o + 1)); }} aria-label="Next month"><ChevronRight size={18} /></button>
+        <button type="button" className={styles.monthNavBtn} onClick={() => { navDir.current = 1; setMonthOffset((o) => Math.min(12, o + 1)); }} aria-label="Next month"><ChevronRight size={18} /></button>
       </div>
 
       <div className={styles.month}>

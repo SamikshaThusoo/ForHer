@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { activeNudge, type NudgeType } from "./nudge";
+import { activeNudge } from "./nudge";
 import type { Persona } from "@/types/persona";
 import type { AssessmentAnswers } from "@/types/journey";
 import type { CycleLog } from "./state";
@@ -26,7 +26,7 @@ const IRREGULAR = persona(["2025-10-02", "2025-11-20", "2026-01-01"]); // gaps 4
 
 const base = {
   persona: REGULAR, cycleLog: null as CycleLog | null, dayLog: {} as DayLog,
-  cycleLength: 28, today: new Date("2026-05-01T00:00:00"), dismissed: new Set<NudgeType>(),
+  cycleLength: 28, today: new Date("2026-05-01T00:00:00"),
 };
 const symptomDays = (n: number, id = "acne"): DayLog => {
   const out: DayLog = {};
@@ -64,13 +64,23 @@ describe("activeNudge — missed period", () => {
 });
 
 describe("activeNudge — irregular", () => {
-  it("fires for an irregular history when nothing higher fires", () => {
+  it("fires for an irregular seed history when nothing higher fires", () => {
     const n = activeNudge({ ...base, tier: "none", persona: IRREGULAR });
     expect(n?.type).toBe("irregular");
   });
   it("does not fire for a regular history", () => {
     const n = activeNudge({ ...base, tier: "low", persona: REGULAR });
     expect(n).toBeNull();
+  });
+  it("fires when logged period dates are irregular, even for a regular-seed persona", () => {
+    // 3 logged period starts: gaps 73d and 56d — both out of the 21–35 range
+    const dayLog: DayLog = {
+      "2026-01-01": { period: true },
+      "2026-03-15": { period: true },
+      "2026-05-10": { period: true },
+    };
+    const n = activeNudge({ ...base, tier: "low", persona: REGULAR, dayLog });
+    expect(n?.type).toBe("irregular");
   });
 });
 
@@ -106,9 +116,5 @@ describe("activeNudge — priority + dismissal", () => {
   });
   it("irregular beats symptom", () => {
     expect(activeNudge({ ...base, tier: "none", persona: IRREGULAR, dayLog: symptomDays(3) })?.type).toBe("irregular");
-  });
-  it("a dismissed nudge is skipped for the next one", () => {
-    const n = activeNudge({ ...base, tier: "none", persona: IRREGULAR, cycleLog: missed, dismissed: new Set(["missed-period"]) });
-    expect(n?.type).toBe("irregular");
   });
 });
