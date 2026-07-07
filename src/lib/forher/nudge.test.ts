@@ -119,3 +119,15 @@ describe("activeNudge — priority + dismissal", () => {
     expect(activeNudge({ ...base, tier: "none", persona: IRREGULAR, dayLog: symptomDays(3) })?.type).toBe("irregular");
   });
 });
+
+describe("activeNudge — routing", () => {
+  it("routes irregular / symptom / missed(track) to re-assessment", () => {
+    expect(activeNudge({ ...base, tier: "none", persona: IRREGULAR })?.href).toBe("/for-her");
+    expect(activeNudge({ ...base, tier: "low", dayLog: symptomDays(3) })?.href).toBe("/for-her");
+    expect(activeNudge({ ...base, tier: "none", cycleLog: { intent: "track", lastPeriod: "2026-01-01" } })?.href).toBe("/for-her");
+  });
+  it("routes TTC missed-period and wellness to the clinic", () => {
+    expect(activeNudge({ ...base, tier: "none", cycleLog: { intent: "ttc", lastPeriod: "2026-01-01" } })?.href).toBe("/clinic");
+    expect(activeNudge({ ...base, tier: "none" })?.href).toBe("/clinic");
+  });
+});

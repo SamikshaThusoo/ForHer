@@ -35,7 +35,7 @@ export function ClinicForHer() {
           cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
           today: new Date(),
         });
-  const lede = isConditionNudge(condition) ? condition!.body : TIER_COPY[tier];
+  const lede = condition ? condition.body : TIER_COPY[tier];
 
   return (
     <main className={`${styles.page} fhTheme`}>

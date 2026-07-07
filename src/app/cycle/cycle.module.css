@@ -163,6 +163,7 @@
 }
 .dayNum { position: relative; z-index: 1; line-height: 1; }
 .dayArt { display: flex; align-items: center; justify-content: center; height: 12px; line-height: 0; }
+.daySymptom { position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: #8E5378; z-index: 2; }
 
 .dayLogged { background: rgba(199,107,122,0.18); box-shadow: none; }
 .dayLogged .dayNum { color: #A23C53; font-weight: 800; }
@@ -179,4 +180,5 @@
 /* Legend */
 .legArt { display: inline-flex; align-items: center; justify-content: center; }
 .legFertile { background: rgba(79,157,105,0.45); }
+.legSymptom { background: #8E5378; }
 
