@@ -54,6 +54,12 @@
 }
 .start:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 .start:focus-visible { outline: 2px solid #3E1B33; outline-offset: 2px; }
+.skip {
+  display: block; width: 100%; margin-top: 12px; padding: 8px;
+  font-family: inherit; font-size: 13px; font-weight: 600; color: #8E5378;
+  background: none; border: none; cursor: pointer; text-decoration: underline;
+}
+.skip:focus-visible { outline: 2px solid #8E5378; outline-offset: 2px; border-radius: 6px; }
 
 .done { padding: 40px 24px; text-align: center; }
 .doneMark { color: var(--band-excellent, #2e8b57); }

@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { ChevronLeft, Check } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack } from "@/lib/journey";
 import { useForHer } from "@/lib/forher/state";
-import { activeNudge, isConditionNudge } from "@/lib/forher/nudge";
+import { activeNudge, activeConditions } from "@/lib/forher/nudge";
 import { readDayLog } from "@/lib/forher/daylog";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { ClinicHub } from "@/components/forher/ClinicHub/ClinicHub";
@@ -22,20 +22,17 @@ export function ClinicForHer() {
   const fh = useForHer(persona.id);
   const tier = personaTrack(persona);
 
-  // Why she's here — a logged symptom / late or irregular cycle changes the framing
-  // away from "you're in great shape".
-  const condition =
-    typeof window === "undefined"
-      ? null
-      : activeNudge({
-          tier,
-          persona,
-          cycleLog: fh.cycleLog,
-          dayLog: readDayLog(persona.id),
-          cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
-          today: new Date(),
-        });
-  const lede = condition ? condition.body : TIER_COPY[tier];
+  const sig = {
+    persona,
+    cycleLog: fh.cycleLog,
+    dayLog: typeof window === "undefined" ? {} : readDayLog(persona.id),
+    cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength),
+    today: new Date(),
+  };
+  // The card showed only the top signal; the page shows every one that's firing.
+  const conditions = typeof window === "undefined" ? [] : activeConditions(sig);
+  const condition = typeof window === "undefined" ? null : activeNudge({ tier, ...sig });
+  const hasConditions = conditions.length > 0;
 
   return (
     <main className={`${styles.page} fhTheme`}>
@@ -48,16 +45,27 @@ export function ClinicForHer() {
 
       <section className={styles.hero}>
         <span className={styles.eyebrow}>Clinic ForHer</span>
-        <h1 className={styles.h1}>{isConditionNudge(condition) ? "Let's look into this" : "Your next step"}</h1>
-        <p className={styles.lede}>{lede}</p>
-        {condition && (
-          <ul className={styles.points}>
-            {condition.points.map((p) => (
-              <li key={p} className={styles.point}><Check size={14} aria-hidden /> {p}</li>
+        <h1 className={styles.h1}>{hasConditions ? "Let's look into this" : "Your next step"}</h1>
+        <p className={styles.lede}>
+          {hasConditions
+            ? "Here's what your tracking has flagged — and what a check-in can do about it."
+            : TIER_COPY[tier]}
+        </p>
+      </section>
+
+      {hasConditions && (
+        <section className={styles.noticed}>
+          <span className={styles.noticedLabel}>What we&apos;ve noticed</span>
+          <ul className={styles.noticedList}>
+            {conditions.map((c) => (
+              <li key={c.type} className={styles.noticedItem}>
+                <strong>{c.title}</strong>
+                <span>{c.body}</span>
+              </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      )}
 
       <ClinicHub persona={persona} tier={tier} showRecommended day={fh.day} condition={condition} />
 

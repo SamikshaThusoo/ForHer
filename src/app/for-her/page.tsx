@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { usePersona } from "@/context/PersonaContext";
 import type { AssessmentAnswers } from "@/types/journey";
 import { getDomainSignals, getRiskOutcome } from "@/lib/journey";
-import { markAssessed } from "@/lib/forher/state";
+import { markAssessed, readCycleLog } from "@/lib/forher/state";
+import { activeConditions } from "@/lib/forher/nudge";
+import { readDayLog } from "@/lib/forher/daylog";
+import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { Assessment } from "@/components/forher/Assessment/Assessment";
 import { RiskResult } from "@/components/forher/RiskResult/RiskResult";
 import { Recommendations } from "@/components/forher/Recommendations/Recommendations";
@@ -36,9 +39,26 @@ export default function ForHerPage() {
     [signals, pmos, outcome],
   );
 
+  // Has she logged irregularities (missed / irregular / symptoms)? If so, even a
+  // no-/low-risk result should still route to the clinic for a check-in.
+  const cycleLog = typeof window === "undefined" ? null : readCycleLog(persona.id);
+  const hasConditions =
+    typeof window !== "undefined" &&
+    activeConditions({
+      persona,
+      cycleLog,
+      dayLog: readDayLog(persona.id),
+      cycleLength: cycleLengthFor(persona, cycleLog?.cycleLength),
+      today: new Date(),
+    }).length > 0;
+
   const enroll = () => {
     markAssessed(persona.id);
     router.push("/");
+  };
+  const goClinic = () => {
+    markAssessed(persona.id);
+    router.push("/clinic");
   };
 
   if (!pmos?.eligible) {
@@ -73,7 +93,10 @@ export default function ForHerPage() {
           signals={signals}
           outcome={outcome}
           confidence={confidence}
-          onContinue={() => { if (outcome === "none") enroll(); else setStep("recommend"); }}
+          onContinue={() => {
+            if (outcome === "none") { if (hasConditions) goClinic(); else enroll(); }
+            else setStep("recommend");
+          }}
         />
       )}
 
@@ -93,6 +116,9 @@ export default function ForHerPage() {
           </label>
           <button type="button" className={styles.start} disabled={!consented} onClick={enroll}>
             Start my plan →
+          </button>
+          <button type="button" className={styles.skip} onClick={goClinic}>
+            Not now — just book a check-in
           </button>
         </div>
       )}
