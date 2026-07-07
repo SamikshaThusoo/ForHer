@@ -83,7 +83,28 @@
 .why {
   font-size: 13px;
   color: #6b5a65;
-  margin: 4px 0 12px;
+  margin: 4px 0 10px;
+}
+.includes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.include {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #5b2a4a;
+}
+.include svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #b5532f;
 }
 .slot {
   font-size: 13px;
