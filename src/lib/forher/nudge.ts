@@ -173,3 +173,20 @@ export function activeNudge(args: {
 export function isConditionNudge(nudge: Nudge | null): boolean {
   return !!nudge && nudge.type !== "wellness";
 }
+
+/** Every firing clinical signal (missed / irregular / symptom), regardless of tier —
+ *  the home card shows only the top one; the clinic page shows them all. */
+export function activeConditions(args: {
+  persona: Persona;
+  cycleLog: CycleLog | null;
+  dayLog: DayLog;
+  cycleLength: number;
+  today: Date;
+}): Nudge[] {
+  const { persona, cycleLog, dayLog, cycleLength, today } = args;
+  return [
+    missedPeriodNudge(cycleLog, dayLog, cycleLength, today),
+    irregularNudge(persona, dayLog),
+    symptomNudge(dayLog),
+  ].filter(Boolean) as Nudge[];
+}

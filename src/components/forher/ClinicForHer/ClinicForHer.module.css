@@ -55,26 +55,43 @@
   line-height: 1.5;
   color: #6b5a65;
 }
-.points {
+.noticed {
+  margin-top: 18px;
+}
+.noticedLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8e5378;
+  margin-bottom: 9px;
+}
+.noticedList {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin: 12px 0 0;
+  gap: 8px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
-.point {
+.noticedItem {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 12.5px;
-  line-height: 1.4;
-  color: #5b2a4a;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(91, 42, 74, 0.06);
 }
-.point svg {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  color: #b5532f;
+.noticedItem strong {
+  font-size: 13.5px;
+  color: #3e1b33;
+}
+.noticedItem span {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #6b5a65;
 }
 
 .disclaimer {

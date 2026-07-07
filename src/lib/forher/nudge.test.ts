@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { activeNudge } from "./nudge";
+import { activeNudge, activeConditions } from "./nudge";
 import type { Persona } from "@/types/persona";
 import type { AssessmentAnswers } from "@/types/journey";
 import type { CycleLog } from "./state";
@@ -117,6 +117,24 @@ describe("activeNudge — priority + dismissal", () => {
   });
   it("irregular beats symptom", () => {
     expect(activeNudge({ ...base, tier: "none", persona: IRREGULAR, dayLog: symptomDays(3) })?.type).toBe("irregular");
+  });
+});
+
+describe("activeConditions", () => {
+  it("returns every firing signal, not just the top one", () => {
+    const types = activeConditions({
+      persona: IRREGULAR,
+      cycleLog: { intent: "track", lastPeriod: "2026-01-01" },
+      dayLog: symptomDays(3),
+      cycleLength: 28,
+      today: new Date("2026-05-01T00:00:00"),
+    }).map((c) => c.type);
+    expect(types).toContain("missed-period");
+    expect(types).toContain("irregular");
+    expect(types).toContain("symptom");
+  });
+  it("is empty when nothing is logged", () => {
+    expect(activeConditions({ persona: REGULAR, cycleLog: null, dayLog: {}, cycleLength: 28, today: new Date("2026-05-01T00:00:00") })).toEqual([]);
   });
 });
 
