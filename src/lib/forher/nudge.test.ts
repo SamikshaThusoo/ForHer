@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { activeNudge, type NudgeType } from "./nudge";
+import { activeNudge } from "./nudge";
 import type { Persona } from "@/types/persona";
 import type { AssessmentAnswers } from "@/types/journey";
 import type { CycleLog } from "./state";
@@ -26,7 +26,7 @@ const IRREGULAR = persona(["2025-10-02", "2025-11-20", "2026-01-01"]); // gaps 4
 
 const base = {
   persona: REGULAR, cycleLog: null as CycleLog | null, dayLog: {} as DayLog,
-  cycleLength: 28, today: new Date("2026-05-01T00:00:00"), dismissed: new Set<NudgeType>(),
+  cycleLength: 28, today: new Date("2026-05-01T00:00:00"),
 };
 const symptomDays = (n: number, id = "acne"): DayLog => {
   const out: DayLog = {};
@@ -116,9 +116,5 @@ describe("activeNudge — priority + dismissal", () => {
   });
   it("irregular beats symptom", () => {
     expect(activeNudge({ ...base, tier: "none", persona: IRREGULAR, dayLog: symptomDays(3) })?.type).toBe("irregular");
-  });
-  it("a dismissed nudge is skipped for the next one", () => {
-    const n = activeNudge({ ...base, tier: "none", persona: IRREGULAR, cycleLog: missed, dismissed: new Set(["missed-period"]) });
-    expect(n?.type).toBe("irregular");
   });
 });

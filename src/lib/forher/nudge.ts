@@ -97,9 +97,8 @@ export function activeNudge(args: {
   dayLog: DayLog;
   cycleLength: number;
   today: Date;
-  dismissed: Set<NudgeType>;
 }): Nudge | null {
-  const { tier, persona, cycleLog, dayLog, cycleLength, today, dismissed } = args;
+  const { tier, persona, cycleLog, dayLog, cycleLength, today } = args;
   if (tier === "medium" || tier === "high") return null;
   const candidates: (Nudge | null)[] = [
     missedPeriodNudge(cycleLog, dayLog, cycleLength, today),
@@ -107,26 +106,11 @@ export function activeNudge(args: {
     symptomNudge(dayLog),
     tier === "none" ? wellnessNudge() : null,
   ];
-  for (const n of candidates) if (n && !dismissed.has(n.type)) return n;
+  for (const n of candidates) if (n) return n;
   return null;
 }
 
-const key = (id: string) => `forher.${id}.nudgeDismissed`;
-
-export function readDismissed(id: string): Set<NudgeType> {
-  try {
-    const raw = JSON.parse(localStorage.getItem(key(id)) ?? "null");
-    return new Set(Array.isArray(raw) ? (raw as NudgeType[]) : []);
-  } catch {
-    return new Set();
-  }
-}
-export function dismissNudge(id: string, type: NudgeType) {
-  try {
-    const next = readDismissed(id);
-    next.add(type);
-    localStorage.setItem(key(id), JSON.stringify([...next]));
-  } catch {
-    /* ignore */
-  }
+/** True when this nudge reflects a clinical condition (not the soft wellness card). */
+export function isConditionNudge(nudge: Nudge | null): boolean {
+  return !!nudge && nudge.type !== "wellness";
 }
