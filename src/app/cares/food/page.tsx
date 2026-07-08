@@ -8,6 +8,7 @@ import { logMeal, type MealType } from "@/lib/forher/foodlog";
 import { ModeTabs } from "@/components/cares/FoodLogger/ModeTabs/ModeTabs";
 import { PhotoMode } from "@/components/cares/FoodLogger/PhotoMode/PhotoMode";
 import { ManualMode } from "@/components/cares/FoodLogger/ManualMode/ManualMode";
+import { WriteMode } from "@/components/cares/FoodLogger/WriteMode/WriteMode";
 import { VoiceMode } from "@/components/cares/FoodLogger/VoiceMode/VoiceMode";
 import { VerdictCard } from "@/components/cares/FoodLogger/VerdictCard/VerdictCard";
 import { Check } from "lucide-react";
@@ -37,10 +38,9 @@ export default function FoodLogPage() {
       <p className={styles.sub}>4 ways to log. Pick what&apos;s fastest right now.</p>
       <ModeTabs value={mode} onChange={setMode} />
       <div className={styles.modeBody}>
-        {(mode === "photo" || mode === "barcode") && (
-          <PhotoMode onLog={(id) => setLastFoodId(id)} />
-        )}
-        {mode === "voice" && <VoiceMode onLog={(id) => setLastFoodId(id)} />}
+        {mode === "photo" && <PhotoMode onLog={(id) => setLastFoodId(id)} />}
+        {mode === "write" && <WriteMode meal={meal} />}
+        {mode === "voice" && <VoiceMode meal={meal} />}
         {mode === "manual" && <ManualMode onLog={(id) => setLastFoodId(id)} />}
       </div>
       {lastFood && verdict && (
