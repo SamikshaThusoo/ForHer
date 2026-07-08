@@ -99,41 +99,68 @@ export const PHASE_PROSE: Record<CyclePhase, string> = {
   luteal: "Progesterone rises — focus can deepen, but bloating, cravings and acne may build.",
 };
 
-// ---- Normalized hormone model curves (0..1) over the cycle day ----
-// Mirrors the For Her prototype's educational rhythm (not real serum units).
-export function hEstrogen(d: number): number {
-  if (d <= 5) return 0.1 + 0.05 * d;
-  if (d <= 13) return 0.3 + 0.55 * ((d - 5) / 8);
-  if (d <= 14) return 0.85;
-  if (d <= 16) return 0.85 - 0.4 * ((d - 14) / 2);
-  if (d <= 22) return 0.45 + 0.15 * Math.sin(((d - 16) / 6) * Math.PI);
-  return Math.max(0.1, 0.45 - 0.4 * ((d - 22) / 6));
-}
-export function hLh(d: number): number {
-  if (d < 12) return 0.15;
-  if (d < 14) return 0.15 + 0.7 * ((d - 12) / 2);
-  if (d <= 15) return Math.max(0.15, 0.85 - 0.55 * (d - 14));
-  return 0.15;
-}
-export function hProgesterone(d: number): number {
-  if (d <= 14) return 0.08;
-  if (d <= 22) return 0.08 + 0.7 * ((d - 14) / 8);
-  return Math.max(0.08, 0.78 - 0.65 * ((d - 22) / 6));
-}
-export function hTestosterone(d: number): number {
-  if (d <= 8) return 0.18;
-  if (d <= 12) return 0.18 + 0.32 * ((d - 8) / 4);
-  if (d <= 15) return 0.5 + 0.15 * Math.sin(((d - 12) / 3) * Math.PI);
-  return Math.max(0.18, 0.5 - 0.32 * ((d - 15) / 13));
+// ---- Native hormone rhythm model (normalized 0..1), keyed to cycle length L ----
+// Each hormone is a smooth, CONTINUOUS function of the cycle day, parameterized by
+// the seeded cycle length and its ovulation day (L-14) — no fixed 28-day template,
+// so the landmarks (follicular rise, ovulatory surge, luteal peak) scale with N.
+// Absolute serum concentrations differ by orders of magnitude, so every hormone is
+// normalized to its OWN maximum: this is a relative-levels, educational chart.
+const gauss = (d: number, mu: number, sigma: number) =>
+  Math.exp(-((d - mu) ** 2) / (2 * sigma * sigma));
+// Asymmetric gaussian: a broad rise (sL) and a sharper fall (sR) around the peak.
+const agauss = (d: number, mu: number, sL: number, sR: number) =>
+  d <= mu ? gauss(d, mu, sL) : gauss(d, mu, sR);
+const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
+
+export type HormoneKey = "estrogen" | "progesterone" | "lh" | "testosterone";
+
+/** Raw (un-normalized) hormone levels for a (possibly fractional) cycle day. The
+ *  luteal span is a fixed ~14 (ov = L-14); the follicular span stretches with L. */
+function rawHormones(d: number, L: number, ov: number): Record<HormoneKey, number> {
+  const foll = Math.max(2, ov - 1); // follicular span (day 1 -> ovulation)
+  const lut = Math.max(2, L - ov);  // luteal span (~14)
+  const midLuteal = ov + lut / 2;
+  return {
+    // Rises through the follicular phase, peaks just before ovulation (broad rise,
+    // sharp post-peak fall = the ovulatory dip), then a smaller secondary luteal rise.
+    estrogen:
+      0.08 +
+      1.0 * agauss(d, ov - 1, foll / 2.4, 2.2) +
+      0.5 * gauss(d, midLuteal, lut / 3.2),
+    // Flat and low, with a sharp narrow surge at ovulation.
+    lh: 0.1 + 1.0 * gauss(d, ov, Math.max(0.9, lut / 12)),
+    // Near-zero in the follicular phase, rises after ovulation to a mid-luteal
+    // peak, then falls before menses.
+    progesterone:
+      0.04 + 0.96 * sigmoid((d - (ov + 2)) / 1.6) * gauss(d, midLuteal, lut / 2.7),
+    // Gentle: a moderate baseline with a slight rise around ovulation.
+    testosterone: 0.3 + 0.38 * gauss(d, ov, foll / 2.4),
+  };
 }
 
-export const HORMONES = [
-  { key: "estrogen", label: "Estrogen", color: "#C76B7A", fn: hEstrogen,
+/** Normalized (0..1) hormone model for a cycle of length L. `value(key, d)` accepts
+ *  fractional days so the current-day dots ride the curves smoothly while scrubbing;
+ *  the curves and the dots are both read from this one function. */
+export function hormoneModel(L: number) {
+  const ov = ovulationDay(L);
+  const keys: HormoneKey[] = ["estrogen", "progesterone", "lh", "testosterone"];
+  const max: Record<HormoneKey, number> = { estrogen: 1e-6, progesterone: 1e-6, lh: 1e-6, testosterone: 1e-6 };
+  for (let d = 1; d <= L; d++) {
+    const r = rawHormones(d, L, ov);
+    for (const k of keys) if (r[k] > max[k]) max[k] = r[k];
+  }
+  const value = (key: HormoneKey, d: number) =>
+    Math.max(0, Math.min(1, rawHormones(d, L, ov)[key] / max[key]));
+  return { ov, value };
+}
+
+export const HORMONES: { key: HormoneKey; label: string; color: string; note: string }[] = [
+  { key: "estrogen", label: "Estrogen", color: "#C76B7A",
     note: "Drives energy and mood; rises through the follicular phase, peaks at ovulation." },
-  { key: "progesterone", label: "Progesterone", color: "#8E5378", fn: hProgesterone,
+  { key: "progesterone", label: "Progesterone", color: "#8E5378",
     note: "The calming, grounding hormone of the luteal phase; can also bring bloating." },
-  { key: "lh", label: "LH", color: "#C9A24A", fn: hLh,
+  { key: "lh", label: "LH", color: "#C9A24A",
     note: "Surges sharply mid-cycle to trigger ovulation." },
-  { key: "testosterone", label: "Testosterone", color: "#2F7A7A", fn: hTestosterone,
+  { key: "testosterone", label: "Testosterone", color: "#2F7A7A",
     note: "Supports drive and libido; tends to run higher with PMOS." },
-] as const;
+];
