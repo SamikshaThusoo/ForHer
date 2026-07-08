@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { usePersona } from "@/context/PersonaContext";
@@ -44,6 +44,33 @@ export default function CyclePage() {
   const navDir = useRef(1);
   const cycle = localCycle ?? fh.cycleLog;
   const logged = useMemo(() => periodDaysSet(dayLog), [dayLog]); // period days feed the cycle math
+
+  // Keep cycleLog.lastPeriod / duration in sync with the calendar's most-recent
+  // period start. The calendar edits `dayLog`; every phase-derived surface (home,
+  // community, hormones, phase instructions) reads `cycleLog.lastPeriod`. Without
+  // this they'd stay pinned to the onboarding value, so editing a period here would
+  // silently disagree with the phase shown everywhere else. Runs on load (to
+  // reconcile any already-diverged state) and whenever period days change.
+  useEffect(() => {
+    const cyc = localCycle ?? fh.cycleLog;
+    if (!cyc || cyc.intent === "pregnant") return;
+    const set = periodDaysSet(dayLog);
+    if (set.size === 0) return;
+    const now = new Date();
+    const days = [...set].sort();
+    const starts = days.filter((s) => !set.has(localISO(addDays(fromISO(s), -1))));
+    const past = starts.filter((s) => dayNum(fromISO(s)) <= dayNum(now));
+    const start = past.length ? past[past.length - 1] : null;
+    if (!start) return; // no period on/before today → keep the existing anchor
+    let runLen = 0, d = fromISO(start);
+    while (set.has(localISO(d))) { runLen++; d = addDays(d, 1); }
+    const duration = Math.max(1, Math.min(runLen, 10));
+    if (cyc.lastPeriod !== start || cyc.duration !== duration) {
+      const updated: CycleLog = { ...cyc, lastPeriod: start, duration };
+      saveCycleLog(persona.id, updated);
+      setLocalCycle(updated);
+    }
+  }, [dayLog, fh.cycleLog, localCycle, persona.id]);
 
   const header = (
     <header className={styles.head}>
