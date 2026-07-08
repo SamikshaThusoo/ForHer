@@ -1,12 +1,12 @@
 "use client";
 import { motion } from "framer-motion";
-import { Camera, ScanBarcode, Mic, Search, type LucideIcon } from "lucide-react";
+import { Camera, PenLine, Mic, Search, type LucideIcon } from "lucide-react";
 import styles from "./ModeTabs.module.css";
 import type { LogMode } from "@/types/food";
 
 const MODES: { id: LogMode; label: string; icon: LucideIcon }[] = [
   { id: "photo",   label: "Photo",   icon: Camera },
-  { id: "barcode", label: "Barcode", icon: ScanBarcode },
+  { id: "write",   label: "Write",   icon: PenLine },
   { id: "voice",   label: "Voice",   icon: Mic },
   { id: "manual",  label: "Search",  icon: Search },
 ];

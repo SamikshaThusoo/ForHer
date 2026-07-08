@@ -1,6 +1,6 @@
 import type { Status } from "./persona";
 
-export type LogMode = "photo" | "barcode" | "voice" | "manual";
+export type LogMode = "photo" | "write" | "voice" | "manual";
 
 export interface FoodItem {
   id: string;

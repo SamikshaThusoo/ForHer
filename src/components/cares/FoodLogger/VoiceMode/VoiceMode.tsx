@@ -1,73 +1,128 @@
 "use client";
-import { useRef, useState } from "react";
-import { FOODS } from "@/data/foods";
-import { Mic, Square, Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Mic, Square, Info } from "lucide-react";
+import { MealField } from "../MealField/MealField";
+import type { MealType } from "@/lib/forher/foodlog";
 import styles from "./VoiceMode.module.css";
 
-const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+// Minimal typings for the browser Web Speech API (no library added). Only the
+// members we use are declared; the constructor lives on window under one of two names.
+type SpeechAlt = { transcript: string };
+type SpeechResult = ArrayLike<SpeechAlt> & { isFinal: boolean };
+interface SpeechEvent { resultIndex: number; results: ArrayLike<SpeechResult> }
+interface SpeechErrEvent { error: string }
+interface Recognition {
+  lang: string; interimResults: boolean; continuous: boolean; maxAlternatives: number;
+  onresult: ((e: SpeechEvent) => void) | null;
+  onerror: ((e: SpeechErrEvent) => void) | null;
+  onend: (() => void) | null;
+  start(): void; stop(): void; abort(): void;
+}
+type RecognitionCtor = new () => Recognition;
 
-/** Log a meal by voice — records audio via MediaRecorder. (In production the clip
- *  would be transcribed and matched; here it logs a representative item.) */
-export function VoiceMode({ onLog }: { onLog: (foodId: string) => void }) {
-  const [state, setState] = useState<"idle" | "recording" | "recorded">("idle");
-  const [seconds, setSeconds] = useState(0);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+function getRecognitionCtor(): RecognitionCtor | null {
+  if (typeof window === "undefined") return null;
+  const w = window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+}
+
+/** Log a meal by voice via the Web Speech API. Recognition is browser-provided and
+ *  imperfect, so the transcript lands in the shared editable field for the user to
+ *  correct before saving through the same Save button (method = voice). */
+export function VoiceMode({ meal }: { meal: MealType }) {
+  const [supported, setSupported] = useState(true);
+  const [listening, setListening] = useState(false);
+  const [text, setText] = useState("");        // committed transcript = the field value
+  const [interim, setInterim] = useState("");  // in-progress words while speaking
   const [err, setErr] = useState<string | null>(null);
-  const mediaRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<number | null>(null);
+  const recRef = useRef<Recognition | null>(null);
 
-  const start = async () => {
+  useEffect(() => {
+    setSupported(getRecognitionCtor() != null);
+    return () => { try { recRef.current?.abort(); } catch { /* ignore */ } };
+  }, []);
+
+  const start = () => {
+    const Ctor = getRecognitionCtor();
+    if (!Ctor) { setSupported(false); return; }
     setErr(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mr = new MediaRecorder(stream);
-      chunksRef.current = [];
-      mr.ondataavailable = (e) => { if (e.data.size) chunksRef.current.push(e.data); };
-      mr.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: mr.mimeType || "audio/webm" });
-        setAudioUrl(URL.createObjectURL(blob));
-        stream.getTracks().forEach((t) => t.stop());
-        setState("recorded");
-      };
-      mediaRef.current = mr;
-      mr.start();
-      setSeconds(0);
-      setState("recording");
-      timerRef.current = window.setInterval(() => setSeconds((s) => s + 1), 1000);
-    } catch {
-      setErr("Microphone unavailable — try Search or Photo instead.");
-    }
+    const rec = new Ctor();
+    rec.lang = typeof navigator !== "undefined" && navigator.language ? navigator.language : "en-US";
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e) => {
+      let fin = "", inter = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        const t = r[0]?.transcript ?? "";
+        if (r.isFinal) fin += t; else inter += t;
+      }
+      if (fin.trim()) setText((prev) => (prev ? prev + " " : "") + fin.trim());
+      setInterim(inter);
+    };
+    rec.onerror = (e) => {
+      setListening(false);
+      setInterim("");
+      if (e.error === "not-allowed" || e.error === "service-not-allowed")
+        setErr("Microphone permission is blocked — allow it in your browser, or type your meal below.");
+      else if (e.error === "no-speech")
+        setErr("Didn't catch that — tap the mic to try again, or type it below.");
+      else if (e.error === "audio-capture")
+        setErr("No microphone found — type your meal below.");
+      else if (e.error !== "aborted")
+        setErr("Voice input stopped — you can type your meal below.");
+    };
+    rec.onend = () => { setListening(false); setInterim(""); };
+    recRef.current = rec;
+    try { rec.start(); setListening(true); }
+    catch { setErr("Couldn't start voice input — type your meal below."); }
   };
-  const stop = () => {
-    mediaRef.current?.stop();
-    if (timerRef.current) window.clearInterval(timerRef.current);
-  };
-  const reset = () => { setAudioUrl(null); setSeconds(0); setState("idle"); };
+
+  const stop = () => { try { recRef.current?.stop(); } catch { /* ignore */ } };
+
+  // Unsupported browser → graceful fall back to the plain typed field.
+  if (!supported) {
+    return (
+      <MealField
+        meal={meal}
+        method="voice"
+        value={text}
+        onChange={setText}
+        placeholder="Type what you ate — e.g. two rotis, dal and a bowl of curd"
+        note={<p className={styles.note}><Info size={13} /> Voice input isn&apos;t available in this browser — type your meal instead.</p>}
+      />
+    );
+  }
+
+  const topSlot = (
+    <div className={styles.voiceTop}>
+      {!listening ? (
+        <button type="button" className={styles.mic} onClick={start} aria-label="Start voice input">
+          <Mic size={24} />
+        </button>
+      ) : (
+        <button type="button" className={`${styles.mic} ${styles.recording}`} onClick={stop} aria-label="Stop voice input">
+          <Square size={18} />
+        </button>
+      )}
+      <p className={styles.status} aria-live="polite">
+        {listening
+          ? (interim ? `“${interim}”` : "Listening… say what you ate")
+          : "Tap the mic and speak — you can edit before saving"}
+      </p>
+    </div>
+  );
 
   return (
-    <div className={styles.wrap}>
-      <p className={styles.hint}>Say what you ate — e.g. &ldquo;a bowl of dal and two rotis&rdquo;.</p>
-
-      {state === "idle" && (
-        <button type="button" className={styles.mic} onClick={start} aria-label="Start recording"><Mic size={26} /></button>
-      )}
-      {state === "recording" && (
-        <>
-          <button type="button" className={`${styles.mic} ${styles.recording}`} onClick={stop} aria-label="Stop recording"><Square size={20} /></button>
-          <span className={styles.timer}>Recording… {fmt(seconds)}</span>
-        </>
-      )}
-      {state === "recorded" && (
-        <div className={styles.recorded}>
-          {audioUrl && <audio controls src={audioUrl} className={styles.audio} />}
-          <div className={styles.row}>
-            <button type="button" className={styles.secondary} onClick={reset}>Re-record</button>
-            <button type="button" className={styles.primary} onClick={() => onLog(FOODS[0].id)}><Check size={15} /> Log meal</button>
-          </div>
-        </div>
-      )}
-      {err && <p className={styles.err}>{err}</p>}
-    </div>
+    <MealField
+      meal={meal}
+      method="voice"
+      value={text}
+      onChange={setText}
+      topSlot={topSlot}
+      placeholder="Your words will appear here — you can edit before saving"
+      note={err ? <p className={styles.err}>{err}</p> : null}
+    />
   );
 }
