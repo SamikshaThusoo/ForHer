@@ -11,12 +11,21 @@ import { consultOnDay, isRetestDay, type ConsultInfo } from "@/lib/forher/consul
 import { getRating, setRating } from "@/lib/forher/consultfeedback";
 import type { CyclePhase } from "@/types/journey";
 import { fmtTarget } from "@/lib/forher/taskmeta";
+import { avatarSvgUriFor } from "@/lib/avatar";
 import { FocusCarousel } from "../FocusCarousel/FocusCarousel";
 import {
   ArrowRight, Check, Footprints, TrendingUp, Droplet, MessagesSquare, Stethoscope, FlaskConical,
   CalendarHeart, Briefcase, Utensils, Wind, Salad, Brain, Sun, HeartPulse, Star, Download, FileText, X,
 } from "lucide-react";
 import styles from "@/app/home.module.css";
+
+// Phase accent for the community card (rose / gold / teal / plum), mirroring /community.
+const COMM_ACCENT: Record<CyclePhase, { main: string; soft: string }> = {
+  menstrual: { main: "#C76B7A", soft: "rgba(199,107,122,0.12)" },
+  follicular: { main: "#C9A24A", soft: "rgba(201,162,74,0.14)" },
+  ovulatory: { main: "#2F7A7A", soft: "rgba(47,122,122,0.12)" },
+  luteal: { main: "#8E5378", soft: "rgba(142,83,120,0.12)" },
+};
 
 const WORK_PROMPT: Record<CyclePhase, string> = {
   menstrual: "Keep the load light — save deep work for later.",
@@ -263,12 +272,24 @@ export function ForHerHub() {
   );
 
   // 10 · Community.
+  const comm = COMM_ACCENT[cyclePhase ?? "luteal"];
   cards.push(
-    <Link href="/community" className={`${styles.car} ${styles.carCommunity}`} key="community">
-      <span className={styles.carIcon}><MessagesSquare size={22} /></span>
+    <Link
+      href="/community"
+      className={`${styles.car} ${styles.carCommunity}`}
+      key="community"
+      style={{ background: `linear-gradient(150deg, ${comm.soft}, #fff 62%)` }}
+    >
+      <span className={styles.carIcon} style={{ background: comm.soft, color: comm.main }}><MessagesSquare size={22} /></span>
       <h3 className={styles.carTitle}>Women in your phase are sharing</h3>
       <p className={styles.carSub}>Tips and check-ins from women like you.</p>
-      <span className={styles.carCta}>Open community <ArrowRight size={14} /></span>
+      <div className={`${styles.carAvatars} fhReveal`}>
+        {[0, 1, 2].map((n) => (
+          <img key={n} className={styles.carAv} src={avatarSvgUriFor(`comm-${cyclePhase ?? "x"}-${n}`, "flat")} alt="" aria-hidden />
+        ))}
+        <span className={styles.carAvatarsLabel} style={{ color: comm.main }}>women like you</span>
+      </div>
+      <span className={styles.carCta} style={{ color: comm.main }}>Open community <ArrowRight size={14} /></span>
     </Link>,
   );
 
