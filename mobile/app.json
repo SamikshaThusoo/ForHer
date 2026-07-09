@@ -7,7 +7,9 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.forher.pmos",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -36,6 +38,15 @@
         {
           "microphonePermission": "Allow ForHer to use the microphone for voice meal logging.",
           "speechRecognitionPermission": "Allow ForHer to recognise speech for voice meal logging."
+        }
+      ],
+      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FBF3F5",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180
         }
       ]
     ],
