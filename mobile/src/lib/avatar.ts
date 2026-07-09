@@ -45,3 +45,22 @@ export function avatarSvgUriFor(
 export function colorfulNotionistFor(seed: string): string {
   return createAvatar(notionists, { seed, size: 128 }).toDataUri();
 }
+
+/** Raw SVG markup (not a data URI) for the same avatars — for react-native-svg's
+ *  SvgXml. Avoids toDataUri's base64 (`btoa`), which Hermes doesn't provide. */
+export function avatarSvgFor(
+  seed: string,
+  kind: "neutral" | "hero" | "soft" | "flat" = "neutral",
+): string {
+  switch (kind) {
+    case "hero":
+      return createAvatar(personas, { seed, size: 128, backgroundColor: ["E5E8EE"], skinColor: ["b16a5b"] }).toString();
+    case "soft":
+      return createAvatar(loreleiNeutral, { seed, size: 96 }).toString();
+    case "flat":
+      return createAvatar(micah, { seed, size: 96 }).toString();
+    case "neutral":
+    default:
+      return createAvatar(notionistsNeutral, { seed, size: 64 }).toString();
+  }
+}

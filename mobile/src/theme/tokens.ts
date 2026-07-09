@@ -26,10 +26,12 @@ export const phaseAccent: Record<CyclePhase, { main: string; deep: string; soft:
   luteal: { main: "#8E5378", deep: "#6E3C5C", soft: "rgba(142,83,120,0.10)", line: "rgba(142,83,120,0.30)" },
 };
 
-// DM Serif Display / DM Sans get loaded via expo-font; fall back to system until then.
+// DM Serif Display / DM Sans loaded via @expo-google-fonts in the root layout.
 export const fonts = {
-  serif: "DMSerifDisplay",
-  sans: "DMSans",
+  serif: "DMSerifDisplay_400Regular",
+  sans: "DMSans_400Regular",
+  sansMedium: "DMSans_500Medium",
+  sansBold: "DMSans_700Bold",
 };
 
 export const gradients = {
