@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable, TextInput, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Check, Lock, ChevronDown, Sprout, Search } from "lucide-react-native";
+import { Check, Lock, ChevronDown, Sprout, Search, Mic, Square } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { logMeal, logText, logPrescribed, onPlanMealsThisWeek, type MealType } from "@/lib/forher/foodlog";
 import { mealPlanUnlocked, prescribedFor } from "@/lib/forher/mealplan";
+import { useVoice } from "@/lib/useVoice";
 import { FOODS } from "@/data/foods";
 import { colors, fonts } from "@/theme/tokens";
 
@@ -25,6 +26,8 @@ export default function Food() {
   const [q, setQ] = useState("");
   const [showElse, setShowElse] = useState(false);
   const [weekCount, setWeekCount] = useState(0);
+  const [interim, setInterim] = useState("");
+  const voice = useVoice((fin) => setText((t) => (t.trim() ? t.trim() + " " : "") + fin), setInterim);
   useEffect(() => { setWeekCount(onPlanMealsThisWeek()); }, []);
 
   const done = () => (router.canGoBack() ? router.back() : router.replace("/"));
@@ -36,15 +39,24 @@ export default function Food() {
 
   const logger = (
     <View style={styles.loggerBody}>
-      <Text style={styles.fieldLabel}>What did you eat?</Text>
+      <View style={styles.fieldHead}>
+        <Text style={styles.fieldLabel}>What did you eat?</Text>
+        {voice.supported && (
+          <Pressable onPress={() => (voice.listening ? voice.stop() : voice.start())} style={[styles.mic, voice.listening && styles.micOn]}>
+            {voice.listening ? <Square size={14} color="#fff" /> : <Mic size={15} color={colors.plumBright} />}
+            <Text style={[styles.micText, voice.listening && styles.micTextOn]}>{voice.listening ? "Stop" : "Speak"}</Text>
+          </Pressable>
+        )}
+      </View>
       <TextInput
         style={styles.field}
         value={text}
         onChangeText={setText}
-        placeholder="Type what you ate — e.g. two rotis, dal and a bowl of curd"
+        placeholder="Type or speak what you ate — e.g. two rotis, dal and a bowl of curd"
         placeholderTextColor={colors.textMuted}
         multiline
       />
+      {voice.listening && <Text style={styles.interim}>{interim ? `“${interim}”` : "Listening… say what you ate"}</Text>}
       <Pressable onPress={saveText} disabled={!text.trim()} style={[styles.save, !text.trim() && styles.saveOff]}>
         <Text style={styles.saveText}>Save {meal}</Text>
       </Pressable>
@@ -133,7 +145,13 @@ const styles = StyleSheet.create({
   unlockText: { flex: 1, fontSize: 12.5, fontFamily: fonts.sansMedium, color: colors.textSoft },
 
   loggerBody: { paddingHorizontal: 18, marginTop: 8, gap: 10 },
+  fieldHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   fieldLabel: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.textSoft },
+  mic: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1, borderColor: "rgba(142,83,120,0.3)", borderRadius: 999, paddingVertical: 6, paddingHorizontal: 11, backgroundColor: "rgba(142,83,120,0.08)" },
+  micOn: { backgroundColor: colors.plumBright, borderColor: colors.plumBright },
+  micText: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.plumBright },
+  micTextOn: { color: "#fff" },
+  interim: { fontSize: 12.5, fontFamily: fonts.sans, fontStyle: "italic", color: colors.textSoft, marginTop: -2 },
   field: { minHeight: 84, borderWidth: 1, borderColor: colors.line, borderRadius: 14, padding: 12, fontSize: 14, fontFamily: fonts.sans, color: colors.text, backgroundColor: "#fff", textAlignVertical: "top" },
   save: { borderRadius: 14, paddingVertical: 14, alignItems: "center", backgroundColor: colors.plum },
   saveOff: { opacity: 0.5 },

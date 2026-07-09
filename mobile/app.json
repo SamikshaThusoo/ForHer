@@ -25,7 +25,19 @@
       "expo-router",
       "expo-status-bar",
       "expo-font",
-      "@react-native-community/datetimepicker"
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow ForHer to use the camera to scan food packets."
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow ForHer to use the microphone for voice meal logging.",
+          "speechRecognitionPermission": "Allow ForHer to recognise speech for voice meal logging."
+        }
+      ]
     ],
     "scheme": "forher"
   }
