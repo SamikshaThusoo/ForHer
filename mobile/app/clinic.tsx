@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, ScrollView, StyleSheet } from "react-nati
 import { Baby, Stethoscope, FlaskConical, Check, X, Calendar } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
 import { personaTrack, clinicPlanFor, careItemIncludes, careCircleFlags, type CareItem } from "@/lib/journey";
 import { useForHer, readCycleLog, saveCycleLog } from "@/lib/forher/state";
@@ -79,7 +80,7 @@ export default function Clinic() {
             <Text style={styles.intentTitle}>Trying to conceive?</Text>
             <Text style={styles.intentSub}>A long gap can also mean you&apos;re trying for a baby — telling us changes what we look for.</Text>
           </View>
-          <Pressable onPress={setTtc} style={styles.intentBtn}><Text style={styles.intentBtnText}>Yes, I am</Text></Pressable>
+          <PressableScale onPress={setTtc} style={styles.intentBtn}><Text style={styles.intentBtnText}>Yes, I am</Text></PressableScale>
         </View>
       )}
 
@@ -104,9 +105,9 @@ export default function Clinic() {
                     <Text style={styles.bookedText}>Booked · {bookings[item.id].slot}</Text>
                   </View>
                 ) : (
-                  <Pressable onPress={() => setBookingItem(item)} style={styles.bookBtn}>
+                  <PressableScale onPress={() => setBookingItem(item)} style={styles.bookBtn}>
                     <Calendar size={14} color="#fff" /><Text style={styles.bookBtnText}>Book</Text>
-                  </Pressable>
+                  </PressableScale>
                 )}
               </View>
             );

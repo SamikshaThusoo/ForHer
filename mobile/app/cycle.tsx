@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { CycleRing } from "@/components/forher/CycleRing";
 import { CycleOnboarding } from "@/components/forher/CycleOnboarding";
 import { DayLogSheet } from "@/components/forher/DayLogSheet";
@@ -155,9 +156,9 @@ export default function Cycle() {
         <View style={styles.scrubMeta}>
           <Text style={styles.scrubHint}>Drag to explore any day</Text>
           {selCd !== null && selCd !== todayCd && (
-            <Pressable onPress={() => setSelCd(null)} style={styles.backToday}>
+            <PressableScale onPress={() => setSelCd(null)} style={styles.backToday}>
               <RotateCcw size={12} color={colors.plumBright} /><Text style={styles.backTodayText}>Back to today</Text>
-            </Pressable>
+            </PressableScale>
           )}
         </View>
       </View>
@@ -175,9 +176,9 @@ export default function Cycle() {
       <Text style={styles.tapHint}>Tap any day to log flow &amp; symptoms. Future periods are predicted (outlined).</Text>
 
       <View style={styles.monthNav}>
-        <Pressable onPress={() => setMonthOffset((o) => Math.max(-12, o - 1))} style={styles.monthNavBtn}><ChevronLeft size={18} color={colors.plum} /></Pressable>
+        <PressableScale onPress={() => setMonthOffset((o) => Math.max(-12, o - 1))} style={styles.monthNavBtn}><ChevronLeft size={18} color={colors.plum} /></PressableScale>
         <Text style={styles.monthNavLabel}>{viewMonth.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</Text>
-        <Pressable onPress={() => setMonthOffset((o) => Math.min(12, o + 1))} style={styles.monthNavBtn}><ChevronRight size={18} color={colors.plum} /></Pressable>
+        <PressableScale onPress={() => setMonthOffset((o) => Math.min(12, o + 1))} style={styles.monthNavBtn}><ChevronRight size={18} color={colors.plum} /></PressableScale>
       </View>
 
       <Month month={viewMonth} anchor={anchor} anchorISO={anchorISO} L={L} ovCd={ovCd} logged={logged} predicted={predicted} dayLog={dayLog} today={today} selCd={selCd}
@@ -229,12 +230,12 @@ function Month({ month, anchor, anchorISO, L, ovCd, logged, predicted, dayLog, t
         const isSel = selISO === iso;
         const hasSymptoms = (dayLog[iso]?.symptoms?.length ?? 0) > 0;
         return (
-          <Pressable key={i} onPress={() => onTap(iso, cd)} style={styles.cell}>
+          <PressableScale key={i} onPress={() => onTap(iso, cd)} style={styles.cell}>
             <View style={[styles.day, isFertile && styles.dayFertile, isLogged && styles.dayLogged, isPred && styles.dayPred, isOv && styles.dayOv, isTodayCell && styles.dayToday, isSel && styles.daySel]}>
               <Text style={[styles.dayNum, (isLogged || isOv) && styles.dayNumOn]}>{d}</Text>
             </View>
             {hasSymptoms && <View style={styles.symptomDot} />}
-          </Pressable>
+          </PressableScale>
         );
       })}
     </View>

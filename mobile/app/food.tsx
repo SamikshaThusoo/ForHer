@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { Check, Lock, ChevronDown, Sprout, Search, Mic, Square } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { logMeal, logText, logPrescribed, onPlanMealsThisWeek, type MealType } from "@/lib/forher/foodlog";
@@ -42,10 +43,10 @@ export default function Food() {
       <View style={styles.fieldHead}>
         <Text style={styles.fieldLabel}>What did you eat?</Text>
         {voice.supported && (
-          <Pressable onPress={() => (voice.listening ? voice.stop() : voice.start())} style={[styles.mic, voice.listening && styles.micOn]}>
+          <PressableScale onPress={() => (voice.listening ? voice.stop() : voice.start())} style={[styles.mic, voice.listening && styles.micOn]}>
             {voice.listening ? <Square size={14} color="#fff" /> : <Mic size={15} color={colors.plumBright} />}
             <Text style={[styles.micText, voice.listening && styles.micTextOn]}>{voice.listening ? "Stop" : "Speak"}</Text>
-          </Pressable>
+          </PressableScale>
         )}
       </View>
       <TextInput
@@ -57,19 +58,19 @@ export default function Food() {
         multiline
       />
       {voice.listening && <Text style={styles.interim}>{interim ? `“${interim}”` : "Listening… say what you ate"}</Text>}
-      <Pressable onPress={saveText} disabled={!text.trim()} style={[styles.save, !text.trim() && styles.saveOff]}>
+      <PressableScale onPress={saveText} disabled={!text.trim()} style={[styles.save, !text.trim() && styles.saveOff]}>
         <Text style={styles.saveText}>Save {meal}</Text>
-      </Pressable>
+      </PressableScale>
 
       <View style={styles.searchWrap}>
         <Search size={15} color={colors.textMuted} />
         <TextInput style={styles.searchInput} value={q} onChangeText={setQ} placeholder="…or search a food" placeholderTextColor={colors.textMuted} />
       </View>
       {results.map((f) => (
-        <Pressable key={f.id} onPress={() => saveCatalog(f.id, f.name)} style={styles.result}>
+        <PressableScale key={f.id} onPress={() => saveCatalog(f.id, f.name)} style={styles.result}>
           <Text style={styles.resultEmoji}>{f.imageHint ?? "🍽"}</Text>
           <Text style={styles.resultName}>{f.name}</Text>
-        </Pressable>
+        </PressableScale>
       ))}
     </View>
   );
@@ -86,13 +87,13 @@ export default function Food() {
             <Text style={styles.eyebrow}>From your dietician&apos;s plan</Text>
             <Text style={styles.planTitle}>Options for {cap(meal)}</Text>
             {prescribedFor(meal).map((o) => (
-              <Pressable key={o.name} onPress={() => savePrescribed(o.name)} style={styles.optionCard}>
+              <PressableScale key={o.name} onPress={() => savePrescribed(o.name)} style={styles.optionCard}>
                 <View style={styles.optionMain}>
                   <Text style={styles.optionName}>{o.name}</Text>
                   <Text style={styles.optionNote}>{o.note}</Text>
                 </View>
                 <View style={styles.optionDot} />
-              </Pressable>
+              </PressableScale>
             ))}
             {weekCount > 0 && (
               <View style={styles.soft}>
@@ -102,10 +103,10 @@ export default function Food() {
             )}
           </View>
 
-          <Pressable onPress={() => setShowElse((s) => !s)} style={styles.elseToggle}>
+          <PressableScale onPress={() => setShowElse((s) => !s)} style={styles.elseToggle}>
             <Text style={styles.elseText}>I ate something else</Text>
             <ChevronDown size={16} color={colors.textSoft} style={{ transform: [{ rotate: showElse ? "180deg" : "0deg" }] }} />
-          </Pressable>
+          </PressableScale>
           {showElse && logger}
         </>
       ) : (

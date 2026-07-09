@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import { Sparkles, Stethoscope, Salad, Brain, Sun, Trophy, ClipboardCheck, Check, Lock, X, type LucideIcon } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, PLAN_LAST_DAY } from "@/lib/forher/state";
 import { personaTrack, getTouchpointsDue, getPhase } from "@/lib/journey";
@@ -109,7 +110,7 @@ export default function Plan() {
               {g.dividerBefore && (
                 <View style={styles.divider}><Text style={styles.divPill}>{PHASE_LABEL[g.phase]} · {PHASE_RANGE[g.phase]}</Text></View>
               )}
-              <Pressable onPress={() => setSel(g)} style={styles.row}>
+              <PressableScale onPress={() => setSel(g)} style={styles.row}>
                 <View style={styles.rail}>
                   <View style={[styles.line, g.i === 0 && styles.lineHidden]} />
                   <View style={[styles.node, isMilestone && styles.nodeMilestone, done && styles.nodeDone, current && styles.nodeCurrent, locked && styles.nodeLocked]}>
@@ -123,7 +124,7 @@ export default function Plan() {
                   <Text style={styles.rowDay}>Day {g.day}</Text>
                   <Text style={[styles.rowLabel, locked && styles.rowLabelLocked]}>{short}</Text>
                 </View>
-              </Pressable>
+              </PressableScale>
             </View>
           );
         })}

@@ -4,6 +4,7 @@ import Svg, { Path, Line, Circle, Defs, Stop, LinearGradient as SvgGradient } fr
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
@@ -141,10 +142,10 @@ export default function Hormones() {
             const on = sel === h.key;
             const dim = sel && sel !== h.key;
             return (
-              <Pressable key={h.key} onPress={() => setSel(on ? null : h.key)} style={[styles.legItem, on && styles.legOn, dim && styles.legDim]}>
+              <PressableScale key={h.key} onPress={() => setSel(on ? null : h.key)} style={[styles.legItem, on && styles.legOn, dim && styles.legDim]}>
                 <View style={[styles.legDot, { backgroundColor: hueOf(h.key) }]} />
                 <Text style={styles.legLabel}>{h.label}</Text>
-              </Pressable>
+              </PressableScale>
             );
           })}
         </View>

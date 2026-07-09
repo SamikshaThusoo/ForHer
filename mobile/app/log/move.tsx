@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Check } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { storage } from "@/lib/storage";
 import { colors, fonts } from "@/theme/tokens";
 
@@ -36,7 +37,7 @@ export default function MoveLog() {
           <View style={styles.doneMark}><Check size={26} color="#fff" strokeWidth={3} /></View>
           <Text style={styles.doneTitle}>Nice work</Text>
           <Text style={styles.doneSub}>Logged for today. Small, steady movement adds up with PMOS.</Text>
-          <Pressable onPress={home} style={styles.save}><Text style={styles.saveText}>Back home</Text></Pressable>
+          <PressableScale onPress={home} style={styles.save}><Text style={styles.saveText}>Back home</Text></PressableScale>
         </View>
       </Screen>
     );
@@ -53,7 +54,7 @@ export default function MoveLog() {
         <View style={styles.chips}>
           {STEPS.map((s) => {
             const on = steps === s;
-            return <Pressable key={s} onPress={() => setSteps(s)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{s.toLocaleString()}</Text></Pressable>;
+            return <PressableScale key={s} onPress={() => setSteps(s)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{s.toLocaleString()}</Text></PressableScale>;
           })}
         </View>
 
@@ -61,7 +62,7 @@ export default function MoveLog() {
         <View style={styles.chips}>
           {KINDS.map((k) => {
             const on = kind === k;
-            return <Pressable key={k} onPress={() => setKind(k)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{k}</Text></Pressable>;
+            return <PressableScale key={k} onPress={() => setKind(k)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{k}</Text></PressableScale>;
           })}
         </View>
 
@@ -71,15 +72,15 @@ export default function MoveLog() {
             <View style={styles.chips}>
               {MINUTES.map((m) => {
                 const on = mins === m;
-                return <Pressable key={m} onPress={() => setMins(m)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{m} min</Text></Pressable>;
+                return <PressableScale key={m} onPress={() => setMins(m)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{m} min</Text></PressableScale>;
               })}
             </View>
           </>
         )}
 
-        <Pressable onPress={save} disabled={steps === null && !kind} style={[styles.save, steps === null && !kind && styles.saveOff]}>
+        <PressableScale onPress={save} disabled={steps === null && !kind} style={[styles.save, steps === null && !kind && styles.saveOff]}>
           <Text style={styles.saveText}>Log movement</Text>
-        </Pressable>
+        </PressableScale>
       </View>
     </Screen>
   );

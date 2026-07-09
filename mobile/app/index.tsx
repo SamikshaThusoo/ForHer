@@ -1,5 +1,6 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { PressableScale } from "@/components/ui/PressableScale";
 import {
   CalendarHeart, Activity, MessagesSquare, Utensils, Route, Stethoscope, TrendingUp, BookOpen,
   type LucideIcon,
@@ -40,9 +41,9 @@ export default function Home() {
         {allPersonas.map((p) => {
           const on = p.id === persona.id;
           return (
-            <Pressable key={p.id} onPress={() => setPersonaId(p.id)} style={[styles.persona, on && styles.personaOn]}>
+            <PressableScale key={p.id} onPress={() => setPersonaId(p.id)} style={[styles.persona, on && styles.personaOn]}>
               <Text style={[styles.personaText, on && styles.personaTextOn]}>{p.shortName}</Text>
-            </Pressable>
+            </PressableScale>
           );
         })}
       </ScrollView>
@@ -57,13 +58,13 @@ export default function Home() {
 
       <View style={styles.grid}>
         {NAV.map((n) => (
-          <Pressable key={n.href} onPress={() => router.push(n.href as never)} style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
+          <PressableScale key={n.href} onPress={() => router.push(n.href as never)} style={styles.card}>
             <View style={[styles.cardIcon, { backgroundColor: accent.soft }]}>
               <n.Icon size={22} color={accent.deep} />
             </View>
             <Text style={styles.cardTitle}>{n.label}</Text>
             <Text style={styles.cardSub}>{n.sub}</Text>
-          </Pressable>
+          </PressableScale>
         ))}
       </View>
     </Screen>

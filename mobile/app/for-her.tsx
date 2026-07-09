@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Info, ArrowRight, Check, Minus, Stethoscope, FlaskConical } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
 import type { AssessmentAnswers, DomainSignals, RiskOutcome, CareTrack } from "@/types/journey";
 import { getDomainSignals, getRiskOutcome, clinicPlanFor, type CareItem } from "@/lib/journey";
@@ -74,18 +75,18 @@ export default function ForHer() {
               <Text style={styles.domain}>{item.domain}</Text>
               <Text style={styles.qtext}>{item.q}</Text>
               <View style={styles.pills}>
-                <Pressable onPress={() => setAnswers((p) => ({ ...p, [item.key]: true }))} style={[styles.pill, answers[item.key] && styles.pillYes]}>
+                <PressableScale onPress={() => setAnswers((p) => ({ ...p, [item.key]: true }))} style={[styles.pill, answers[item.key] && styles.pillYes]}>
                   <Text style={[styles.pillText, answers[item.key] && styles.pillTextOn]}>{item.yes}</Text>
-                </Pressable>
-                <Pressable onPress={() => setAnswers((p) => ({ ...p, [item.key]: false }))} style={[styles.pill, !answers[item.key] && styles.pillNo]}>
+                </PressableScale>
+                <PressableScale onPress={() => setAnswers((p) => ({ ...p, [item.key]: false }))} style={[styles.pill, !answers[item.key] && styles.pillNo]}>
                   <Text style={[styles.pillText, !answers[item.key] && styles.pillTextOn]}>{item.no}</Text>
-                </Pressable>
+                </PressableScale>
               </View>
             </View>
           ))}
-          <Pressable onPress={() => setStep("result")} style={styles.cta}>
+          <PressableScale onPress={() => setStep("result")} style={styles.cta}>
             <Text style={styles.ctaText}>See my result</Text><ArrowRight size={16} color="#fff" />
-          </Pressable>
+          </PressableScale>
         </View>
       )}
 
@@ -116,9 +117,9 @@ export default function ForHer() {
               <Text style={styles.caveatText}><Text style={styles.bold}>Confidence: indicative. </Text>Without lab values we&apos;ve screened on your answers alone.</Text>
             </View>
           )}
-          <Pressable onPress={() => { if (outcome === "none") { hasConditions ? goClinic() : enroll(); } else setStep("recommend"); }} style={styles.cta}>
+          <PressableScale onPress={() => { if (outcome === "none") { hasConditions ? goClinic() : enroll(); } else setStep("recommend"); }} style={styles.cta}>
             <Text style={styles.ctaText}>{outcome === "none" ? "See what's next" : "See my care plan"}</Text><ArrowRight size={16} color="#fff" />
-          </Pressable>
+          </PressableScale>
         </View>
       )}
 
@@ -129,14 +130,14 @@ export default function ForHer() {
           <Text style={styles.eyebrow}>A few ways we&apos;ll support you</Text>
           <Text style={styles.title}>Your care, in one place</Text>
           <Text style={styles.lead}>Book a visit, meet your team, keep your profile current — anytime, from the Clinic tab.</Text>
-          <Pressable onPress={() => setConsented((c) => !c)} style={styles.consent}>
+          <PressableScale onPress={() => setConsented((c) => !c)} style={styles.consent}>
             <View style={[styles.checkbox, consented && styles.checkboxOn]}>{consented && <Check size={13} color="#fff" strokeWidth={3} />}</View>
             <Text style={styles.consentText}>I understand this is lifestyle support — not a diagnosis or prescription.</Text>
-          </Pressable>
-          <Pressable onPress={enroll} disabled={!consented} style={[styles.cta, !consented && styles.ctaOff]}>
+          </PressableScale>
+          <PressableScale onPress={enroll} disabled={!consented} style={[styles.cta, !consented && styles.ctaOff]}>
             <Text style={styles.ctaText}>Start my plan</Text><ArrowRight size={16} color="#fff" />
-          </Pressable>
-          <Pressable onPress={goClinic} style={styles.skip}><Text style={styles.skipText}>Not now — just book a check-in</Text></Pressable>
+          </PressableScale>
+          <PressableScale onPress={goClinic} style={styles.skip}><Text style={styles.skipText}>Not now — just book a check-in</Text></PressableScale>
         </View>
       )}
     </Screen>
@@ -164,7 +165,7 @@ function RecommendStep({ tier, flags, onContinue }: { tier: CareTrack; flags: { 
       <Text style={styles.lead}>Based on your screen — you can book these once you start your plan.</Text>
       {tests.length > 0 && <><Text style={styles.recSection}>Recommended tests</Text>{tests.map((t) => <Row key={t.id} item={t} />)}</>}
       {consults.length > 0 && <><Text style={styles.recSection}>Doctor appointments</Text>{consults.map((c) => <Row key={c.id} item={c} />)}</>}
-      <Pressable onPress={onContinue} style={styles.cta}><Text style={styles.ctaText}>Continue</Text><ArrowRight size={16} color="#fff" /></Pressable>
+      <PressableScale onPress={onContinue} style={styles.cta}><Text style={styles.ctaText}>Continue</Text><ArrowRight size={16} color="#fff" /></PressableScale>
       <Text style={styles.disclaimer}>This is a screening tool, not a diagnosis. Please consult a qualified clinician for medical decisions.</Text>
     </View>
   );

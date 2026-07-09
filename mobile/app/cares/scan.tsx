@@ -4,6 +4,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { ScanLine, Camera } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
 import { PACKET_SCANS } from "@/data/packetScans";
 import { verdictFor } from "@/lib/personalize";
@@ -51,7 +52,7 @@ export default function Scan() {
           <View style={styles.permBox}>
             <Camera size={36} color={colors.plumBright} />
             <Text style={styles.permText}>Camera access is needed to scan packets.</Text>
-            <Pressable onPress={requestPermission} style={styles.permBtn}><Text style={styles.permBtnText}>Enable camera</Text></Pressable>
+            <PressableScale onPress={requestPermission} style={styles.permBtn}><Text style={styles.permBtnText}>Enable camera</Text></PressableScale>
           </View>
         )}
 
@@ -62,9 +63,9 @@ export default function Scan() {
       </View>
 
       {granted && (
-        <Pressable onPress={capture} disabled={scanning} style={[styles.captureBtn, scanning && styles.captureOff]}>
+        <PressableScale onPress={capture} disabled={scanning} style={[styles.captureBtn, scanning && styles.captureOff]}>
           <ScanLine size={18} color="#fff" /><Text style={styles.captureText}>{scanned ? "Scan another" : "Scan packet"}</Text>
-        </Pressable>
+        </PressableScale>
       )}
 
       {scanned && verdict && v && (

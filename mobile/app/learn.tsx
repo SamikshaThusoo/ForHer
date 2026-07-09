@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { colors, fonts } from "@/theme/tokens";
 
 // PCOS/PMOS micro-learning, grounded in the 2023 International Evidence-based
@@ -29,14 +30,14 @@ export default function Learn() {
         {CARDS.map((c, i) => {
           const isOpen = open === i;
           return (
-            <Pressable key={c.title} onPress={() => setOpen(isOpen ? null : i)} style={[styles.card, isOpen && styles.cardOpen]}>
+            <PressableScale key={c.title} onPress={() => setOpen(isOpen ? null : i)} style={[styles.card, isOpen && styles.cardOpen]}>
               <Text style={styles.tag}>{c.tag}</Text>
               <View style={styles.titleRow}>
                 <Text style={styles.cardTitle}>{c.title}</Text>
                 <Text style={styles.chev}>{isOpen ? "–" : "+"}</Text>
               </View>
               {isOpen && <Text style={styles.body}>{c.body}</Text>}
-            </Pressable>
+            </PressableScale>
           );
         })}
       </View>

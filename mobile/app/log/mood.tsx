@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Check } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { storage } from "@/lib/storage";
 import { colors, fonts } from "@/theme/tokens";
 
@@ -41,7 +42,7 @@ export default function MoodLog() {
         <View style={styles.chips}>
           {FEELINGS.map((f) => {
             const on = feelings.has(f);
-            return <Pressable key={f} onPress={() => toggle(f)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{f}</Text></Pressable>;
+            return <PressableScale key={f} onPress={() => toggle(f)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{f}</Text></PressableScale>;
           })}
         </View>
 
@@ -49,12 +50,12 @@ export default function MoodLog() {
         <View style={styles.chips}>
           {CYCLE.map((c) => {
             const on = cycle === c;
-            return <Pressable key={c} onPress={() => setCycle(c)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{c}</Text></Pressable>;
+            return <PressableScale key={c} onPress={() => setCycle(c)} style={[styles.chip, on && styles.chipOn]}><Text style={[styles.chipText, on && styles.chipTextOn]}>{c}</Text></PressableScale>;
           })}
         </View>
 
         <TextInput style={styles.note} value={note} onChangeText={setNote} placeholder="Anything else worth noting? (optional)" placeholderTextColor={colors.textMuted} multiline />
-        <Pressable onPress={save} style={styles.save}><Text style={styles.saveText}>Save today&apos;s check-in</Text></Pressable>
+        <PressableScale onPress={save} style={styles.save}><Text style={styles.saveText}>Save today&apos;s check-in</Text></PressableScale>
       </View>
 
       <Modal visible={saved} transparent animationType="fade" onRequestClose={home}>

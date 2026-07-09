@@ -3,6 +3,7 @@ import { View, Text, TextInput, Pressable, ScrollView, KeyboardAvoidingView, Pla
 import { Send } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
 import { ASK_SEEDS } from "@/data/askResponses";
 import { colors, fonts } from "@/theme/tokens";
@@ -53,9 +54,9 @@ export default function Ask() {
           {messages.length <= 1 && (
             <View style={styles.suggests}>
               {ASK_SEEDS.slice(0, 3).map((s) => (
-                <Pressable key={s.prompt} onPress={() => send(s.prompt)} style={styles.suggest}>
+                <PressableScale key={s.prompt} onPress={() => send(s.prompt)} style={styles.suggest}>
                   <Text style={styles.suggestText}>{s.prompt}</Text>
-                </Pressable>
+                </PressableScale>
               ))}
             </View>
           )}
@@ -63,9 +64,9 @@ export default function Ask() {
 
         <View style={styles.composer}>
           <TextInput style={styles.input} value={input} onChangeText={setInput} placeholder="Ask about your meals, plan or labs…" placeholderTextColor={colors.textMuted} onSubmitEditing={() => send(input)} returnKeyType="send" />
-          <Pressable onPress={() => send(input)} style={[styles.sendBtn, !input.trim() && styles.sendOff]}>
+          <PressableScale onPress={() => send(input)} style={[styles.sendBtn, !input.trim() && styles.sendOff]}>
             <Send size={18} color="#fff" />
-          </Pressable>
+          </PressableScale>
         </View>
       </KeyboardAvoidingView>
     </Screen>

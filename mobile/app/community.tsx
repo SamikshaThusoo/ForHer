@@ -3,6 +3,7 @@ import { View, Text, Pressable, TextInput, StyleSheet, type ViewStyle } from "re
 import { Bookmark, Heart, Check, Sprout } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { PressableScale } from "@/components/ui/PressableScale";
 import { Avatar } from "@/components/ui/Avatar";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
@@ -86,11 +87,11 @@ function ReactionPill({ base, on, onToggle, kind }: { base: number; on: boolean;
   const count = base + (on ? 1 : 0);
   const Icon = kind === "save" ? Bookmark : Heart;
   return (
-    <Pressable onPress={onToggle} style={[styles.react, on && styles.reactOn]} accessibilityRole="button">
+    <PressableScale onPress={onToggle} style={[styles.react, on && styles.reactOn]} accessibilityRole="button">
       <Icon size={14} color={on ? "#fff" : colors.plumBright} fill={on ? "#fff" : "none"} strokeWidth={2} />
       <Text style={[styles.reactCount, on && styles.reactTextOn]}>{count.toLocaleString()}</Text>
       {kind === "save" && <Text style={[styles.reactLabel, on && styles.reactTextOn]}>{on ? "saved" : "women saved this"}</Text>}
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -176,9 +177,9 @@ export default function Community() {
           {FEELINGS.map((f) => {
             const on = picked.has(f);
             return (
-              <Pressable key={f} onPress={() => toggle(f)} style={[styles.chip, { borderColor: a.line }, on && { backgroundColor: a.main, borderColor: a.main }]}>
+              <PressableScale key={f} onPress={() => toggle(f)} style={[styles.chip, { borderColor: a.line }, on && { backgroundColor: a.main, borderColor: a.main }]}>
                 <Text style={[styles.chipText, on && styles.chipTextOn]}>{f}</Text>
-              </Pressable>
+              </PressableScale>
             );
           })}
         </View>
@@ -190,9 +191,9 @@ export default function Community() {
           placeholderTextColor={colors.textMuted}
           multiline
         />
-        <Pressable onPress={share} disabled={!canShare} style={[styles.share, { backgroundColor: a.main }, !canShare && styles.shareOff]}>
+        <PressableScale onPress={share} disabled={!canShare} style={[styles.share, { backgroundColor: a.main }, !canShare && styles.shareOff]}>
           <Text style={styles.shareText}>Share with your phase community</Text>
-        </Pressable>
+        </PressableScale>
         {shared && (
           <View style={[styles.thanks, { borderColor: a.line }]}>
             <View style={[styles.thanksIcon, { backgroundColor: a.main }]}><Check size={16} color="#fff" strokeWidth={3} /></View>
