@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
@@ -13,7 +15,7 @@ import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
 import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, ovulationDay, PHASE_LABEL, PHASE_COLOR } from "@/lib/forher/cycleview";
 import { readDayLog, writeDayLog, periodDaysSet, isEmptyEntry, type DayLog, type DayEntry } from "@/lib/forher/daylog";
 import type { CyclePhase } from "@/types/journey";
-import { colors, fonts } from "@/theme/tokens";
+import { colors, fonts, gradients } from "@/theme/tokens";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -30,6 +32,7 @@ const INSIGHT: Record<CyclePhase, string> = {
 };
 
 export default function Cycle() {
+  const router = useRouter();
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const today = new Date();
@@ -205,6 +208,13 @@ export default function Cycle() {
         <View style={styles.legItem}><View style={styles.legSymptom} /><Text style={styles.legLabel}>Symptoms</Text></View>
       </View>
 
+      <PressableScale onPress={() => router.push("/hormones")} style={styles.nextBtnWrap}>
+        <LinearGradient colors={gradients.plum} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.nextBtn}>
+          <Text style={styles.nextBtnText}>Next · your hormone rhythm</Text>
+          <ArrowRight size={16} color="#fff" />
+        </LinearGradient>
+      </PressableScale>
+
       <DayLogSheet
         dateISO={sheetISO}
         entry={sheetISO ? (dayLog[sheetISO] ?? {}) : {}}
@@ -336,4 +346,8 @@ const styles = StyleSheet.create({
   legFertile: { width: 12, height: 12, borderRadius: 6, backgroundColor: "rgba(79,157,105,0.45)" },
   legSymptom: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.plumBright },
   legLabel: { fontSize: 11, fontFamily: fonts.sansMedium, color: colors.textSoft },
+
+  nextBtnWrap: { marginHorizontal: 18, marginTop: 16, marginBottom: 6, borderRadius: 14, overflow: "hidden" },
+  nextBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingVertical: 13 },
+  nextBtnText: { color: "#fff", fontSize: 14, fontFamily: fonts.sansBold },
 });

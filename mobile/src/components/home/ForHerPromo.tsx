@@ -5,7 +5,7 @@ import { Sparkles, ArrowRight, ScanLine, Stethoscope, HeartPulse } from "lucide-
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { entryFraming, personaTrack } from "@/lib/journey";
-import { activeNudge } from "@/lib/forher/nudge";
+import { activeNudge, activeConditions } from "@/lib/forher/nudge";
 import { readDayLog } from "@/lib/forher/daylog";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { ForHerHub } from "./ForHerHub";
@@ -55,17 +55,25 @@ export function ForHerPromo() {
   }
 
   const isStanding = track === "medium" || track === "high";
-  const nudge = isStanding ? null : activeNudge({
-    tier: track, persona, cycleLog: fh.cycleLog, dayLog: readDayLog(persona.id),
+  const sig = {
+    persona, cycleLog: fh.cycleLog, dayLog: readDayLog(persona.id),
     cycleLength: cycleLengthFor(persona, fh.cycleLog?.cycleLength), today: new Date(),
-  });
-  const content = isStanding
-    ? { title: "Your care circle & next visit", cta: "Open", href: "/clinic" as const }
-    : nudge ? { title: nudge.title, cta: nudge.cta, href: nudge.href } : null;
+  };
+  // A firing clinical signal (missed / irregular / symptom) surfaces on the card for
+  // every tier — matching what the clinic page shows. Only when there's none do we
+  // fall back to the standing care-circle strip (care-plan) or a soft nudge (companion).
+  const condition = activeConditions(sig)[0] ?? null;
+  const nudge = isStanding ? null : activeNudge({ tier: track, ...sig });
+  const content = condition
+    ? { title: condition.title, cta: condition.cta, href: condition.href }
+    : isStanding
+      ? { title: "Your care circle & next visit", cta: "Open", href: "/clinic" as const }
+      : nudge ? { title: nudge.title, cta: nudge.cta, href: nudge.href } : null;
+  const showCondition = !!condition;
 
   const clinicCard = content ? (
     <Pressable style={styles.clinicEntry} onPress={() => router.push(content.href as never)}>
-      <View style={styles.clinicIcon}>{isStanding ? <Stethoscope size={18} color="#B5532F" /> : <HeartPulse size={18} color="#B5532F" />}</View>
+      <View style={styles.clinicIcon}>{showCondition || !isStanding ? <HeartPulse size={18} color="#B5532F" /> : <Stethoscope size={18} color="#B5532F" />}</View>
       <View style={styles.clinicText}>
         <Text style={styles.clinicEyebrow}>Clinic ForHer</Text>
         <Text style={styles.clinicTitle} numberOfLines={1}>{content.title}</Text>
