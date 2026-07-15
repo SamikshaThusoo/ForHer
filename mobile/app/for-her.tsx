@@ -1,20 +1,20 @@
 import { useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { Info, ArrowRight, Check, Minus, Stethoscope, FlaskConical } from "lucide-react-native";
+import { Info, ArrowRight, Check, Minus } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
 import { usePersona } from "@/context/PersonaContext";
-import type { AssessmentAnswers, DomainSignals, RiskOutcome, CareTrack } from "@/types/journey";
-import { getDomainSignals, getRiskOutcome, clinicPlanFor, type CareItem } from "@/lib/journey";
+import type { AssessmentAnswers, DomainSignals, RiskOutcome } from "@/types/journey";
+import { getDomainSignals, getRiskOutcome } from "@/lib/journey";
 import { markAssessed, readCycleLog } from "@/lib/forher/state";
 import { activeConditions } from "@/lib/forher/nudge";
 import { readDayLog } from "@/lib/forher/daylog";
 import { cycleLengthFor } from "@/lib/forher/cycleview";
 import { colors, fonts } from "@/theme/tokens";
 
-type Step = "questions" | "result" | "recommend" | "hub";
+type Step = "questions" | "result" | "hub";
 const BLANK: AssessmentAnswers = { irregularPeriods: false, acneSkin: false, hairChanges: false, weightDifficulty: false, familyHistory: false };
 const QUESTIONS: { key: keyof AssessmentAnswers; domain: string; q: string; yes: string; no: string }[] = [
   { key: "irregularPeriods", domain: "Your cycle", q: "How predictable is your period?", yes: "All over the place", no: "Fairly regular" },
@@ -42,7 +42,6 @@ export default function ForHer() {
   const signals = useMemo(() => getDomainSignals(answers, pmos?.ahcMarkers), [answers, pmos]);
   const outcome = useMemo(() => getRiskOutcome(answers, pmos?.ahcMarkers), [answers, pmos]);
   const confidence: "high" | "low" = !pmos?.hasAhc ? "low" : signals.confidence;
-  const flags = { acneOrHirsutism: signals.androgenic, ttc: !!pmos?.ttc, highMetabolic: outcome === "high" };
 
   const cycleLog = readCycleLog(persona.id);
   const hasConditions = activeConditions({
@@ -84,7 +83,7 @@ export default function ForHer() {
               </View>
             </View>
           ))}
-          <PressableScale onPress={() => setStep("result")} style={styles.cta}>
+          <PressableScale onPress={() => setStep("result")} style={[styles.cta, styles.ctaSubmit]}>
             <Text style={styles.ctaText}>See my result</Text><ArrowRight size={16} color="#fff" />
           </PressableScale>
         </View>
@@ -117,13 +116,11 @@ export default function ForHer() {
               <Text style={styles.caveatText}><Text style={styles.bold}>Confidence: indicative. </Text>Without lab values we&apos;ve screened on your answers alone.</Text>
             </View>
           )}
-          <PressableScale onPress={() => { if (outcome === "none") { hasConditions ? goClinic() : enroll(); } else setStep("recommend"); }} style={styles.cta}>
+          <PressableScale onPress={() => { if (outcome === "none") { hasConditions ? goClinic() : enroll(); } else setStep("hub"); }} style={styles.cta}>
             <Text style={styles.ctaText}>{outcome === "none" ? "See what's next" : "See my care plan"}</Text><ArrowRight size={16} color="#fff" />
           </PressableScale>
         </View>
       )}
-
-      {step === "recommend" && <RecommendStep tier={outcome} flags={flags} onContinue={() => setStep("hub")} />}
 
       {step === "hub" && (
         <View style={styles.wrap}>
@@ -141,33 +138,6 @@ export default function ForHer() {
         </View>
       )}
     </Screen>
-  );
-}
-
-function RecommendStep({ tier, flags, onContinue }: { tier: CareTrack; flags: { acneOrHirsutism: boolean; ttc: boolean; highMetabolic: boolean }; onContinue: () => void }) {
-  const plan = clinicPlanFor(tier, flags);
-  const items = [plan.primary, ...plan.secondary].filter(Boolean) as CareItem[];
-  const tests = items.filter((i) => i.kind === "test");
-  const consults = items.filter((i) => i.kind === "consult");
-  const Row = ({ item }: { item: CareItem }) => {
-    const Icon = item.kind === "test" ? FlaskConical : Stethoscope;
-    return (
-      <View style={styles.recRow}>
-        <View style={styles.recIcon}><Icon size={17} color={colors.plumBright} /></View>
-        <View style={styles.recBody}><Text style={styles.recLabel}>{item.label}</Text><Text style={styles.recReason}>{item.reason}</Text></View>
-      </View>
-    );
-  };
-  return (
-    <View style={styles.wrap}>
-      <Text style={styles.eyebrow}>What we recommend</Text>
-      <Text style={styles.title}>Here&apos;s what would help</Text>
-      <Text style={styles.lead}>Based on your screen — you can book these once you start your plan.</Text>
-      {tests.length > 0 && <><Text style={styles.recSection}>Recommended tests</Text>{tests.map((t) => <Row key={t.id} item={t} />)}</>}
-      {consults.length > 0 && <><Text style={styles.recSection}>Doctor appointments</Text>{consults.map((c) => <Row key={c.id} item={c} />)}</>}
-      <PressableScale onPress={onContinue} style={styles.cta}><Text style={styles.ctaText}>Continue</Text><ArrowRight size={16} color="#fff" /></PressableScale>
-      <Text style={styles.disclaimer}>This is a screening tool, not a diagnosis. Please consult a qualified clinician for medical decisions.</Text>
-    </View>
   );
 }
 
@@ -190,6 +160,7 @@ const styles = StyleSheet.create({
   pillTextOn: { color: "#fff" },
 
   cta: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: colors.plum, borderRadius: 14, paddingVertical: 14, marginTop: 20 },
+  ctaSubmit: { marginTop: 34, marginBottom: 8 },
   ctaOff: { opacity: 0.5 },
   ctaText: { color: "#fff", fontSize: 14.5, fontFamily: fonts.sansBold },
 
