@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { View, Text, Pressable, TextInput, Modal, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 import { Check } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
 import { storage } from "@/lib/storage";
-import { colors, fonts } from "@/theme/tokens";
+import { colors, fonts, gradients } from "@/theme/tokens";
 
 const FEELINGS = ["Energetic", "Calm", "Motivated", "Tired", "Crampy", "Bloated", "Moody", "Anxious"];
 const CYCLE = ["Period today", "Spotting", "No bleeding", "Not sure"];
@@ -55,7 +56,11 @@ export default function MoodLog() {
         </View>
 
         <TextInput style={styles.note} value={note} onChangeText={setNote} placeholder="Anything else worth noting? (optional)" placeholderTextColor={colors.textMuted} multiline />
-        <PressableScale onPress={save} style={styles.save}><Text style={styles.saveText}>Save today&apos;s check-in</Text></PressableScale>
+        <PressableScale onPress={save} style={styles.saveWrap}>
+          <LinearGradient colors={gradients.plum} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.save}>
+            <Text style={styles.saveText}>Save today&apos;s check-in</Text>
+          </LinearGradient>
+        </PressableScale>
       </View>
 
       <Modal visible={saved} transparent animationType="fade" onRequestClose={home}>
@@ -85,7 +90,8 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 12, fontFamily: fonts.sansMedium, color: colors.plum },
   chipTextOn: { color: "#fff" },
   note: { minHeight: 60, borderWidth: 1, borderColor: colors.line, borderRadius: 12, padding: 11, fontSize: 13, fontFamily: fonts.sans, color: colors.text, backgroundColor: "#fff", marginTop: 18, textAlignVertical: "top" },
-  save: { backgroundColor: colors.plum, borderRadius: 13, paddingVertical: 14, alignItems: "center", marginTop: 16 },
+  saveWrap: { marginTop: 16, borderRadius: 999, overflow: "hidden", shadowColor: "#5B2A4A", shadowOpacity: 0.22, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
+  save: { paddingVertical: 14, alignItems: "center" },
   saveText: { color: "#fff", fontSize: 14, fontFamily: fonts.sansBold },
   modalBg: { flex: 1, backgroundColor: "rgba(62,27,51,0.4)", alignItems: "center", justifyContent: "center", padding: 30 },
   modal: { width: "100%", maxWidth: 320, backgroundColor: "#fff", borderRadius: 20, padding: 24, alignItems: "center" },

@@ -48,19 +48,30 @@ export function colorfulNotionistFor(seed: string): string {
 
 /** Raw SVG markup (not a data URI) for the same avatars — for react-native-svg's
  *  SvgXml. Avoids toDataUri's base64 (`btoa`), which Hermes doesn't provide. */
+// react-native-svg's SvgXml parser chokes on two things DiceBear emits: the
+// <metadata> block (custom RDF namespaces) and the full-viewbox "viewboxMask"
+// (a no-op luminance mask). Either can blank the whole avatar. Strip both — the
+// art is already clipped to a circle by the container — so avatars render on native.
+function cleanSvg(svg: string): string {
+  return svg
+    .replace(/<metadata[\s\S]*?<\/metadata>/g, "")
+    .replace(/<mask id="viewboxMask">[\s\S]*?<\/mask>/g, "")
+    .replace(/\s*mask="url\(#viewboxMask\)"/g, "");
+}
+
 export function avatarSvgFor(
   seed: string,
   kind: "neutral" | "hero" | "soft" | "flat" = "neutral",
 ): string {
   switch (kind) {
     case "hero":
-      return createAvatar(personas, { seed, size: 128, backgroundColor: ["E5E8EE"], skinColor: ["b16a5b"] }).toString();
+      return cleanSvg(createAvatar(personas, { seed, size: 128, backgroundColor: ["E5E8EE"], skinColor: ["b16a5b"] }).toString());
     case "soft":
-      return createAvatar(loreleiNeutral, { seed, size: 96 }).toString();
+      return cleanSvg(createAvatar(loreleiNeutral, { seed, size: 96 }).toString());
     case "flat":
-      return createAvatar(micah, { seed, size: 96 }).toString();
+      return cleanSvg(createAvatar(micah, { seed, size: 96 }).toString());
     case "neutral":
     default:
-      return createAvatar(notionistsNeutral, { seed, size: 64 }).toString();
+      return cleanSvg(createAvatar(notionistsNeutral, { seed, size: 64 }).toString());
   }
 }

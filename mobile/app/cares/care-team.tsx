@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
-import { ShieldCheck, Stethoscope, HeartHandshake, FlaskConical } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { ShieldCheck, Stethoscope, HeartHandshake, TestTube, ChevronRight } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { usePersona } from "@/context/PersonaContext";
-import { colors, fonts } from "@/theme/tokens";
+import { colors, fonts, gradients } from "@/theme/tokens";
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
 
@@ -19,13 +20,22 @@ export default function CareTeam() {
         <Text style={styles.sub}>Tele-doctor, weekly coach, and your next retest.</Text>
       </View>
 
-      <View style={styles.retest}>
-        <View style={styles.retestIcon}><FlaskConical size={20} color="#fff" /></View>
-        <View style={styles.retestBody}>
-          <Text style={styles.retestLabel}>Next retest</Text>
-          <Text style={styles.retestVal}>in {daysToMidRetest} days</Text>
+      <LinearGradient colors={gradients.plum} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.retest}>
+        <View style={styles.retestLeft}>
+          <View style={styles.retestLabelRow}>
+            <TestTube size={12} strokeWidth={2} color="rgba(255,255,255,0.95)" />
+            <Text style={styles.retestLabel}>Mid-program retest</Text>
+          </View>
+          <Text style={styles.retestDetail}>HbA1c · BP · lipid panel</Text>
         </View>
-      </View>
+        <View style={styles.retestRight}>
+          <View style={styles.retestDaysGroup}>
+            <Text style={styles.retestDays}>{daysToMidRetest}</Text>
+            <Text style={styles.retestUnit}>days</Text>
+          </View>
+          <ChevronRight size={18} strokeWidth={2} color="rgba(255,255,255,0.85)" />
+        </View>
+      </LinearGradient>
 
       {nextDoctorConsult && (
         <View style={styles.card}>
@@ -64,11 +74,18 @@ const styles = StyleSheet.create({
   hero: { paddingHorizontal: 18, paddingTop: 4, paddingBottom: 10 },
   title: { fontSize: 24, fontFamily: fonts.serif, color: colors.plumDeep },
   sub: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 4 },
-  retest: { flexDirection: "row", alignItems: "center", gap: 12, marginHorizontal: 18, backgroundColor: colors.plum, borderRadius: 16, padding: 15 },
-  retestIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,255,255,0.2)" },
-  retestBody: { flex: 1 },
-  retestLabel: { fontSize: 11, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: "rgba(255,255,255,0.8)" },
-  retestVal: { fontSize: 18, fontFamily: fonts.serif, color: "#fff", marginTop: 2 },
+  retest: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginHorizontal: 18, borderRadius: 18, padding: 18,
+    shadowColor: "#5B2A4A", shadowOpacity: 0.4, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 4,
+  },
+  retestLeft: { flex: 1 },
+  retestLabelRow: { flexDirection: "row", alignItems: "center", gap: 7 },
+  retestLabel: { fontSize: 11, fontFamily: fonts.sansMedium, letterSpacing: 0.7, textTransform: "uppercase", color: "rgba(255,255,255,0.95)" },
+  retestDetail: { fontSize: 16, fontFamily: fonts.sansBold, color: "#fff", marginTop: 6 },
+  retestRight: { flexDirection: "row", alignItems: "center", gap: 8 },
+  retestDaysGroup: { flexDirection: "row", alignItems: "baseline", gap: 5 },
+  retestDays: { fontSize: 46, fontFamily: fonts.sansBold, color: "#fff", lineHeight: 48 },
+  retestUnit: { fontSize: 12, fontFamily: fonts.sansMedium, color: "rgba(255,255,255,0.85)" },
   card: { flexDirection: "row", alignItems: "center", gap: 12, marginHorizontal: 18, marginTop: 10, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 15, padding: 14 },
   cardIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(142,83,120,0.1)" },
   cardBody: { flex: 1 },

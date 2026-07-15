@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { View, Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { ScanLine, Camera } from "lucide-react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, useReducedMotion } from "react-native-reanimated";
+import { ScanLine } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
@@ -11,11 +13,24 @@ import { verdictFor } from "@/lib/personalize";
 import { colors, fonts } from "@/theme/tokens";
 
 const VERDICT: Record<string, { label: string; color: string }> = {
-  great: { label: "Great for you", color: "#4F9D69" },
-  ok: { label: "OK in moderation", color: "#2F7A7A" },
-  watch: { label: "Watch this one", color: "#C9772A" },
-  avoid: { label: "Best avoided", color: "#C76B7A" },
+  great: { label: "Great for you", color: "#2EAE6B" },
+  ok: { label: "OK in moderation", color: "#F2A024" },
+  watch: { label: "Watch this one", color: "#F67F1B" },
+  avoid: { label: "Best avoided", color: "#E24B4A" },
 };
+
+/** Scanning beam that sweeps top↔bottom while scanning. */
+function Beam({ active }: { active: boolean }) {
+  const reduce = useReducedMotion();
+  const t = useSharedValue(0);
+  useEffect(() => {
+    if (active && !reduce) t.value = withRepeat(withTiming(1, { duration: 2400 }), -1, true);
+    else t.value = 0;
+  }, [active, reduce, t]);
+  const anim = useAnimatedStyle(() => ({ top: `${18 + t.value * 60}%` }));
+  if (!active) return null;
+  return <Animated.View pointerEvents="none" style={[styles.beam, anim]} />;
+}
 
 export default function Scan() {
   const { persona } = usePersona();
@@ -25,7 +40,8 @@ export default function Scan() {
 
   // No on-device vision model in the prototype: a capture simulates a match to a
   // seeded packet, then anchors the verdict to the persona's labs (verdictFor).
-  const capture = () => {
+  const scan = () => {
+    if (permission && !permission.granted) requestPermission();
     setScanning(true); setScanned(null);
     setTimeout(() => {
       setScanned(PACKET_SCANS[Math.floor(Math.random() * PACKET_SCANS.length)]);
@@ -42,44 +58,43 @@ export default function Scan() {
       <Header title="For Her · Scan" />
       <View style={styles.hero}>
         <Text style={styles.title}>Scan a packet</Text>
-        <Text style={styles.sub}>Point at a label — verdict anchored to your labs.</Text>
+        <Text style={styles.sub}>Verdict in 1 second, anchored to your labs.</Text>
       </View>
 
       <View style={styles.viewport}>
-        {granted ? (
-          <CameraView style={StyleSheet.absoluteFill} facing="back" />
-        ) : (
-          <View style={styles.permBox}>
-            <Camera size={36} color={colors.plumBright} />
-            <Text style={styles.permText}>Camera access is needed to scan packets.</Text>
-            <PressableScale onPress={requestPermission} style={styles.permBtn}><Text style={styles.permBtnText}>Enable camera</Text></PressableScale>
-          </View>
-        )}
+        <LinearGradient colors={["#2A2A2A", "#1A1A1A"]} style={StyleSheet.absoluteFill} />
+        {granted && <CameraView style={StyleSheet.absoluteFill} facing="back" />}
 
-        {granted && <View style={styles.frame} pointerEvents="none" />}
-        {granted && scanning && (
-          <View style={styles.overlay} pointerEvents="none"><ActivityIndicator color="#fff" /><Text style={styles.overlayText}>Scanning…</Text></View>
-        )}
+        <View style={[styles.corner, styles.tl]} pointerEvents="none" />
+        <View style={[styles.corner, styles.tr]} pointerEvents="none" />
+        <View style={[styles.corner, styles.bl]} pointerEvents="none" />
+        <View style={[styles.corner, styles.br]} pointerEvents="none" />
+        <Beam active={scanning} />
+
+        <View style={styles.shutterStack}>
+          <ScanLine size={18} strokeWidth={1.8} color="rgba(255,255,255,0.75)" />
+          <PressableScale onPress={scan} disabled={scanning} style={styles.shutter}>
+            <Text style={styles.shutterText}>{scanned ? "Scan another" : scanning ? "Scanning…" : "Tap to scan a packet"}</Text>
+          </PressableScale>
+        </View>
       </View>
-
-      {granted && (
-        <PressableScale onPress={capture} disabled={scanning} style={[styles.captureBtn, scanning && styles.captureOff]}>
-          <ScanLine size={18} color="#fff" /><Text style={styles.captureText}>{scanned ? "Scan another" : "Scan packet"}</Text>
-        </PressableScale>
-      )}
 
       {scanned && verdict && v && (
         <View style={styles.verdict}>
-          <Text style={styles.packetName}>{scanned.imageHint ?? "📦"}  {scanned.brand} · {scanned.name}</Text>
-          <View style={[styles.badge, { backgroundColor: `${v.color}1f` }]}><Text style={[styles.badgeText, { color: v.color }]}>{v.label}</Text></View>
-          <Text style={styles.reason}>{verdict.oneLineReason}</Text>
-          {scanned.altSuggestion && (
-            <View style={styles.swap}>
-              <Text style={styles.swapLabel}>Try instead</Text>
-              <Text style={styles.swapName}>{scanned.altSuggestion.brand} · {scanned.altSuggestion.name}</Text>
-              <Text style={styles.swapWhy}>{scanned.altSuggestion.whyBetter}</Text>
-            </View>
-          )}
+          <View style={[styles.toneBand, { backgroundColor: v.color }]}>
+            <Text style={styles.toneLabel}>{v.label.toUpperCase()}</Text>
+          </View>
+          <View style={styles.verdictBody}>
+            <Text style={styles.packetName}>{scanned.imageHint ?? "📦"}  {scanned.brand} · {scanned.name}</Text>
+            <Text style={styles.reason}>{verdict.oneLineReason}</Text>
+            {scanned.altSuggestion && (
+              <View style={styles.swap}>
+                <Text style={styles.swapLabel}>Try instead</Text>
+                <Text style={styles.swapName}>{scanned.altSuggestion.brand} · {scanned.altSuggestion.name}</Text>
+                <Text style={styles.swapWhy}>{scanned.altSuggestion.whyBetter}</Text>
+              </View>
+            )}
+          </View>
         </View>
       )}
     </Screen>
@@ -90,24 +105,26 @@ const styles = StyleSheet.create({
   hero: { paddingHorizontal: 18, paddingTop: 4, paddingBottom: 10 },
   title: { fontSize: 24, fontFamily: fonts.serif, color: colors.plumDeep },
   sub: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 4 },
-  viewport: { marginHorizontal: 18, height: 260, borderRadius: 20, overflow: "hidden", backgroundColor: "#2A1826", alignItems: "center", justifyContent: "center" },
-  permBox: { alignItems: "center", gap: 12, padding: 24 },
-  permText: { fontSize: 13, fontFamily: fonts.sansMedium, color: "#EAD9E2", textAlign: "center" },
-  permBtn: { backgroundColor: colors.plum, borderRadius: 12, paddingVertical: 11, paddingHorizontal: 20 },
-  permBtnText: { color: "#fff", fontSize: 13, fontFamily: fonts.sansBold },
-  frame: { position: "absolute", top: 50, left: 40, right: 40, bottom: 50, borderWidth: 2, borderColor: "rgba(255,255,255,0.7)", borderRadius: 16 },
-  overlay: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: "rgba(42,24,38,0.4)" },
-  overlayText: { color: "#fff", fontSize: 13, fontFamily: fonts.sansMedium },
-  captureBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginHorizontal: 18, marginTop: 12, backgroundColor: colors.plum, borderRadius: 14, paddingVertical: 14 },
-  captureOff: { opacity: 0.6 },
-  captureText: { color: "#fff", fontSize: 14, fontFamily: fonts.sansBold },
-  verdict: { marginHorizontal: 18, marginTop: 14, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 16, padding: 15 },
-  packetName: { fontSize: 13.5, fontFamily: fonts.sansBold, color: colors.plumDeep, marginBottom: 8 },
-  badge: { alignSelf: "flex-start", borderRadius: 999, paddingVertical: 5, paddingHorizontal: 12 },
-  badgeText: { fontSize: 12, fontFamily: fonts.sansBold },
-  reason: { fontSize: 13.5, fontFamily: fonts.sans, color: colors.plumDeep, marginTop: 10, lineHeight: 20 },
-  swap: { marginTop: 12, backgroundColor: "rgba(79,157,105,0.08)", borderRadius: 12, padding: 12 },
-  swapLabel: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: "#3E7A54" },
+
+  viewport: { marginHorizontal: 18, aspectRatio: 3 / 4, maxHeight: 380, borderRadius: 28, overflow: "hidden", borderWidth: 1, borderColor: "rgba(255,255,255,0.06)", backgroundColor: "#1A1A1A" },
+  corner: { position: "absolute", width: 34, height: 34, borderColor: "#fff" },
+  tl: { top: "14%", left: "9%", borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 14 },
+  tr: { top: "14%", right: "9%", borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 14 },
+  bl: { bottom: "22%", left: "9%", borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: 14 },
+  br: { bottom: "22%", right: "9%", borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: 14 },
+  beam: { position: "absolute", left: "10%", right: "10%", height: 2, backgroundColor: "#34D399", shadowColor: "#34D399", shadowOpacity: 0.65, shadowRadius: 10 },
+  shutterStack: { position: "absolute", left: 0, right: 0, bottom: 20, alignItems: "center", gap: 8 },
+  shutter: { backgroundColor: "#fff", borderRadius: 999, paddingVertical: 11, paddingHorizontal: 22 },
+  shutterText: { color: "#161616", fontSize: 13, fontFamily: fonts.sansBold },
+
+  verdict: { marginHorizontal: 18, marginTop: 14, backgroundColor: "#fff", borderRadius: 16, overflow: "hidden", shadowColor: "#5B2A4A", shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
+  toneBand: { height: 34, flexDirection: "row", alignItems: "center", paddingHorizontal: 16 },
+  toneLabel: { fontSize: 11, fontFamily: fonts.sansBold, letterSpacing: 0.6, color: "#fff" },
+  verdictBody: { padding: 15 },
+  packetName: { fontSize: 13.5, fontFamily: fonts.sansBold, color: colors.plumDeep },
+  reason: { fontSize: 13.5, fontFamily: fonts.sans, color: colors.plumDeep, marginTop: 8, lineHeight: 20 },
+  swap: { marginTop: 12, backgroundColor: colors.plumSoft, borderRadius: 12, padding: 12 },
+  swapLabel: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.plumBright },
   swapName: { fontSize: 13.5, fontFamily: fonts.sansBold, color: colors.plumDeep, marginTop: 3 },
   swapWhy: { fontSize: 12, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 2, lineHeight: 17 },
 });

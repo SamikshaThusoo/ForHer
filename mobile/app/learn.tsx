@@ -54,13 +54,19 @@ const styles = StyleSheet.create({
   lead: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 7, lineHeight: 18 },
 
   cards: { paddingHorizontal: 18, gap: 10, marginTop: 6 },
-  card: { backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 15, padding: 14 },
-  cardOpen: { borderColor: "rgba(142,83,120,0.35)" },
-  tag: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase", color: colors.plumBright },
-  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4 },
-  cardTitle: { flex: 1, fontSize: 16, fontFamily: fonts.serif, color: colors.plumDeep },
-  chev: { fontSize: 20, fontFamily: fonts.sans, color: colors.plumBright, marginLeft: 10 },
-  body: { fontSize: 13, fontFamily: fonts.sans, color: "#4A3A44", lineHeight: 20, marginTop: 10 },
+  card: {
+    backgroundColor: "#fff", borderWidth: 1, borderColor: "rgba(91,42,74,0.1)", borderRadius: 16, padding: 15, paddingVertical: 14,
+    shadowColor: "#5B2A4A", shadowOpacity: 0.05, shadowRadius: 12, shadowOffset: { width: 0, height: 3 }, elevation: 1,
+  },
+  cardOpen: { shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
+  tag: {
+    alignSelf: "flex-start", overflow: "hidden", fontSize: 9.5, fontFamily: fonts.sansBold, letterSpacing: 0.5,
+    textTransform: "uppercase", color: colors.plumBright, backgroundColor: "rgba(142,83,120,0.1)", borderRadius: 999, paddingVertical: 3, paddingHorizontal: 9,
+  },
+  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 9 },
+  cardTitle: { flex: 1, fontSize: 16.5, fontFamily: fonts.serif, color: colors.plumDeep },
+  chev: { fontSize: 18, fontFamily: fonts.sansBold, color: colors.plumBright, marginLeft: 10 },
+  body: { fontSize: 12.5, fontFamily: fonts.sans, color: "#4A3A44", lineHeight: 20, marginTop: 9 },
 
   disclaimer: { fontSize: 9.5, fontFamily: fonts.sans, fontStyle: "italic", color: colors.textMuted, textAlign: "center", marginHorizontal: 22, marginTop: 20, lineHeight: 14 },
 });

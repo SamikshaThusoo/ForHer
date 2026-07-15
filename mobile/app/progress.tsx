@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 import { CheckCircle2, CalendarHeart, Stethoscope, Moon, Activity, Trophy, Lock, FlaskConical, Droplet, ClipboardEdit } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
@@ -71,6 +72,7 @@ function Row({ Icon, children }: { Icon: typeof Moon; children: React.ReactNode 
 }
 
 function DailyView() {
+  const router = useRouter();
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const day = fh.day;
@@ -107,7 +109,7 @@ function DailyView() {
         <Text style={styles.dLabel}>What you did today</Text>
         {tasksDone > 0 ? completed.map((t) => (
           <View key={t.id} style={styles.dRow}><CheckCircle2 size={14} color="#4F9D69" /><Text style={styles.dRowText}>{t.title}</Text></View>
-        )) : <Text style={styles.dMuted}>No tasks ticked yet.</Text>}
+        )) : <Text style={styles.dMuted}>No tasks ticked yet — <Text style={styles.link} onPress={() => router.push("/")}>pick one</Text>.</Text>}
         <Row Icon={Moon}>{mood ? (mood.length ? `Mood: ${mood.slice(0, 3).join(", ").toLowerCase()}` : "Mood logged") : "Mood not logged"}</Row>
         <Row Icon={Activity}>{symptomsToday.length ? `Symptoms: ${symptomsToday.length} logged` : "No symptoms logged today"}</Row>
       </View>
@@ -176,9 +178,12 @@ function MilestoneView() {
                   <View style={styles.cpBlock}>
                     <Text style={styles.cpLabel}>Clinical markers</Text>
                     {markers.map((m) => (
-                      <Text key={m.key} style={styles.dRowText}>
-                        {m.label}: <Text style={styles.cpVal}>{m.value.toFixed(m.decimals)}{m.unit}</Text> · {m.state}
-                      </Text>
+                      <View key={m.key} style={styles.markerRow}>
+                        <Text style={styles.dRowText}>{m.label}: <Text style={styles.cpVal}>{m.value.toFixed(m.decimals)}{m.unit}</Text></Text>
+                        <View style={[styles.cpState, m.state === "measured" && styles.cpMeasured]}>
+                          <Text style={[styles.cpStateText, m.state === "measured" && styles.cpMeasuredText]}>{m.state}</Text>
+                        </View>
+                      </View>
                     ))}
                   </View>
                 )}
@@ -189,6 +194,13 @@ function MilestoneView() {
                   <Row Icon={Droplet}>{logs.periods} period{logs.periods === 1 ? "" : "s"} · {logs.symptomDays} symptom-day{logs.symptomDays === 1 ? "" : "s"} logged</Row>
                   <Row Icon={ClipboardEdit}>Health profile: {bmi ? `BMI ${bmi}` : "not updated"}</Row>
                 </View>
+
+                {cp.day === 90 && (
+                  <View style={styles.cpBlock}>
+                    <Text style={styles.cpLabel}>Day-90 re-test</Text>
+                    <Row Icon={FlaskConical}>Full panel — HbA1c, HOMA-IR, lipids, hormones</Row>
+                  </View>
+                )}
               </>
             ) : (
               <Text style={styles.cpPreview}>Reached at Day {cp.day}. Your markers, appointments and activity for this phase appear here.</Text>
@@ -241,5 +253,11 @@ const styles = StyleSheet.create({
   cpBlock: { gap: 5 },
   cpLabel: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.textMuted },
   cpVal: { fontFamily: fonts.sansBold, color: colors.plumDeep },
+  markerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
+  cpState: { backgroundColor: "rgba(91,42,74,0.07)", borderRadius: 999, paddingVertical: 2, paddingHorizontal: 8 },
+  cpStateText: { fontSize: 10, fontFamily: fonts.sansBold, color: colors.textMuted },
+  cpMeasured: { backgroundColor: "rgba(79,157,105,0.12)" },
+  cpMeasuredText: { color: "#4F9D69" },
   cpPreview: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, fontStyle: "italic", lineHeight: 18 },
+  link: { fontFamily: fonts.sansBold, color: colors.plumBright, textDecorationLine: "underline" },
 });

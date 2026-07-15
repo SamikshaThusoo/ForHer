@@ -1,12 +1,23 @@
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 import { Check } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
 import { storage } from "@/lib/storage";
-import { colors, fonts } from "@/theme/tokens";
+import { colors, fonts, gradients } from "@/theme/tokens";
+
+function SaveButton({ label, onPress, disabled, style }: { label: string; onPress: () => void; disabled?: boolean; style?: object }) {
+  return (
+    <PressableScale onPress={onPress} disabled={disabled} style={[styles.saveWrap, disabled && styles.saveOff, style]}>
+      <LinearGradient colors={gradients.plum} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.save}>
+        <Text style={styles.saveText}>{label}</Text>
+      </LinearGradient>
+    </PressableScale>
+  );
+}
 
 const KINDS = ["Walk", "Yoga", "Strength", "Cardio", "Dance", "Cycling"];
 const MINUTES = [10, 20, 30, 45];
@@ -37,7 +48,7 @@ export default function MoveLog() {
           <View style={styles.doneMark}><Check size={26} color="#fff" strokeWidth={3} /></View>
           <Text style={styles.doneTitle}>Nice work</Text>
           <Text style={styles.doneSub}>Logged for today. Small, steady movement adds up with PMOS.</Text>
-          <PressableScale onPress={home} style={styles.save}><Text style={styles.saveText}>Back home</Text></PressableScale>
+          <SaveButton label="Back home" onPress={home} style={{ marginTop: 20, alignSelf: "stretch" }} />
         </View>
       </Screen>
     );
@@ -78,9 +89,7 @@ export default function MoveLog() {
           </>
         )}
 
-        <PressableScale onPress={save} disabled={steps === null && !kind} style={[styles.save, steps === null && !kind && styles.saveOff]}>
-          <Text style={styles.saveText}>Log movement</Text>
-        </PressableScale>
+        <SaveButton label="Log movement" onPress={save} disabled={steps === null && !kind} />
       </View>
     </Screen>
   );
@@ -97,7 +106,8 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: colors.plum, borderColor: colors.plum },
   chipText: { fontSize: 12, fontFamily: fonts.sansMedium, color: colors.plum },
   chipTextOn: { color: "#fff" },
-  save: { backgroundColor: colors.plum, borderRadius: 13, paddingVertical: 14, alignItems: "center", marginTop: 20 },
+  saveWrap: { marginTop: 22, borderRadius: 999, overflow: "hidden", shadowColor: "#5B2A4A", shadowOpacity: 0.22, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
+  save: { paddingVertical: 14, alignItems: "center" },
   saveOff: { opacity: 0.5 },
   saveText: { color: "#fff", fontSize: 14, fontFamily: fonts.sansBold },
   doneWrap: { alignItems: "center", padding: 30, paddingTop: 50 },

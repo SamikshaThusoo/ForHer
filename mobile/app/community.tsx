@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { View, Text, Pressable, TextInput, StyleSheet, type ViewStyle } from "react-native";
-import { Bookmark, Heart, Check, Sprout } from "lucide-react-native";
+import { View, Text, TextInput, StyleSheet, type ViewStyle } from "react-native";
+import { useRouter } from "expo-router";
+import { Bookmark, Heart, Check } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
@@ -73,6 +74,15 @@ const KIND_LABEL: Record<Tip["kind"], string> = {
   Diet: "From the kitchen",
 };
 
+/** Emphasise the numeric token in the pacing sentence (e.g. "~7,800"). */
+function withStat(text: string, color: string) {
+  return text.split(/([\d,]+(?:\.\d+)?)/).map((part, i) =>
+    /^[\d,]+(?:\.\d+)?$/.test(part)
+      ? <Text key={i} style={{ fontFamily: fonts.sansBold, color }}>{part}</Text>
+      : <Text key={i}>{part}</Text>,
+  );
+}
+
 const REACT_KEY = "forher.community.reactions.v1";
 const readReactions = (): Record<string, boolean> => {
   try { const o = JSON.parse(storage.getItem(REACT_KEY) || "{}"); return o && typeof o === "object" ? o : {}; } catch { return {}; }
@@ -96,6 +106,7 @@ function ReactionPill({ base, on, onToggle, kind }: { base: number; on: boolean;
 }
 
 export default function Community() {
+  const router = useRouter();
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const today = new Date();
@@ -153,7 +164,11 @@ export default function Community() {
           {logged ? "Women in your " : "Women "}
           <Text style={[styles.h1em, { color: a.deep }]}>{logged ? `${phaseWord} phase` : "like you"}</Text>
         </Text>
-        <Text style={styles.sub}>Recommendations and check-ins from women tracking the same phase as you.</Text>
+        {logged ? (
+          <Text style={styles.sub}>Recommendations and check-ins from women tracking the same phase as you.</Text>
+        ) : (
+          <Text style={styles.sub}>Recommendations and check-ins. <Text style={[styles.sub, styles.inlineLink]} onPress={() => router.push("/cycle")}>Log your cycle</Text> to see your phase community.</Text>
+        )}
       </View>
 
       {carePlan && (
@@ -166,7 +181,7 @@ export default function Community() {
             </View>
             <Text style={[styles.pacingTag, accentText]}>Women in your {phaseWord} phase</Text>
           </View>
-          <Text style={styles.pacingText}>{PACING[phase]}</Text>
+          <Text style={styles.pacingText}>{withStat(PACING[phase], a.deep)}</Text>
         </View>
       )}
 
@@ -280,6 +295,7 @@ const styles = StyleSheet.create({
   h1: { fontSize: 25, fontFamily: fonts.serif, color: colors.plumDeep, lineHeight: 30 },
   h1em: { fontFamily: fonts.serif, fontStyle: "italic" },
   sub: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 7, lineHeight: 18 },
+  inlineLink: { fontFamily: fonts.sansBold, color: colors.plumBright, textDecorationLine: "underline" },
   em: { fontStyle: "italic" },
 
   pacing: { marginHorizontal: 18, marginBottom: 6, borderWidth: 1, borderRadius: 18, padding: 14 },

@@ -47,6 +47,15 @@ export default function Hormones() {
   const [sel, setSel] = useState<string | null>(null);
   const ovCd = ovulationDay(L);
 
+  const lp = fh.cycleLog?.lastPeriod;
+  const fmtD = (d: Date) => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  let datesLine: string | null = null;
+  if (lp) {
+    const daysToOv = ((ovCd - todayCd) % L + L) % L;
+    const daysToPeriod = todayCd === 1 ? 0 : L - todayCd + 1;
+    datesLine = `Next period ~ ${fmtD(new Date(today.getTime() + daysToPeriod * 86400000))} · Ovulation ~ ${fmtD(new Date(today.getTime() + daysToOv * 86400000))}`;
+  }
+
   const model = hormoneModel(L);
   const val = (key: HormoneKey, d: number) => model.value(key, d);
   const x = (d: number) => PAD + ((d - 1) / (L - 1)) * (W - 2 * PAD);
@@ -154,6 +163,7 @@ export default function Hormones() {
       <View style={styles.phaseBox}>
         <Text style={styles.phaseTag}>{PHASE_LABEL[phase]} phase{isToday ? ", right now" : ""}</Text>
         <Text style={styles.phaseProse}>{PHASE_PROSE[phase]}</Text>
+        {datesLine && <Text style={styles.phaseDates}>{datesLine}</Text>}
       </View>
 
       <View style={styles.recs}>
@@ -255,6 +265,7 @@ const styles = StyleSheet.create({
   phaseBox: { marginHorizontal: 18, marginTop: 14, backgroundColor: "rgba(142,83,120,0.07)", borderWidth: 1, borderColor: "rgba(142,83,120,0.18)", borderRadius: 15, padding: 13 },
   phaseTag: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase", color: colors.plumBright },
   phaseProse: { fontSize: 12.5, fontFamily: fonts.sans, color: "#4A3A44", marginTop: 6, lineHeight: 19 },
+  phaseDates: { fontSize: 11.5, fontFamily: fonts.sansBold, color: "#C9772A", marginTop: 8 },
 
   recs: { marginHorizontal: 18, marginTop: 14, gap: 9 },
   recRow: { flexDirection: "row", gap: 10, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 13, padding: 11 },

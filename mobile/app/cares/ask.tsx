@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { View, Text, TextInput, Pressable, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
-import { Send } from "lucide-react-native";
+import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { Send, Sparkles } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
@@ -9,6 +9,13 @@ import { ASK_SEEDS } from "@/data/askResponses";
 import { colors, fonts } from "@/theme/tokens";
 
 interface Msg { role: "user" | "habit"; text: string; citation?: string }
+
+const SUGGESTIONS = [
+  "Can I have biryani tonight?",
+  "Why am I tired after lunch?",
+  "What's a good snack at 4pm?",
+  "Can I stop my BP medication?",
+];
 
 export default function Ask() {
   const { persona } = usePersona();
@@ -43,27 +50,37 @@ export default function Ask() {
         </View>
 
         <ScrollView ref={scroller} style={styles.fill} contentContainerStyle={styles.thread} showsVerticalScrollIndicator={false}>
-          {messages.map((m, i) => (
-            <View key={i} style={[styles.bubbleWrap, m.role === "user" ? styles.userWrap : styles.habitWrap]}>
-              <View style={[styles.bubble, m.role === "user" ? styles.userBubble : styles.habitBubble]}>
-                <Text style={[styles.bubbleText, m.role === "user" && styles.userText]}>{m.text}</Text>
-                {m.citation && <Text style={[styles.citation, m.role === "user" && styles.userCite]}>{m.citation}</Text>}
+          {messages.map((m, i) =>
+            m.role === "user" ? (
+              <View key={i} style={[styles.bubbleWrap, styles.userWrap]}>
+                <View style={[styles.bubble, styles.userBubble]}>
+                  <Text style={[styles.bubbleText, styles.userText]}>{m.text}</Text>
+                  {m.citation && <Text style={[styles.citation, styles.userCite]}>{m.citation}</Text>}
+                </View>
               </View>
-            </View>
-          ))}
-          {messages.length <= 1 && (
-            <View style={styles.suggests}>
-              {ASK_SEEDS.slice(0, 3).map((s) => (
-                <PressableScale key={s.prompt} onPress={() => send(s.prompt)} style={styles.suggest}>
-                  <Text style={styles.suggestText}>{s.prompt}</Text>
-                </PressableScale>
-              ))}
-            </View>
+            ) : (
+              <View key={i} style={styles.habitRow}>
+                <View style={styles.avatar}><Sparkles size={14} strokeWidth={1.9} color={colors.plumBright} /></View>
+                <View style={[styles.bubble, styles.habitBubble]}>
+                  <Text style={styles.brandLabel}>Habit</Text>
+                  <Text style={styles.bubbleText}>{m.text}</Text>
+                  {m.citation && <Text style={styles.citation}>{m.citation}</Text>}
+                </View>
+              </View>
+            ),
           )}
         </ScrollView>
 
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.suggestScroll} contentContainerStyle={styles.suggests} keyboardShouldPersistTaps="handled">
+          {SUGGESTIONS.map((s) => (
+            <PressableScale key={s} onPress={() => send(s)} style={styles.suggest}>
+              <Text style={styles.suggestText}>{s}</Text>
+            </PressableScale>
+          ))}
+        </ScrollView>
+
         <View style={styles.composer}>
-          <TextInput style={styles.input} value={input} onChangeText={setInput} placeholder="Ask about your meals, plan or labs…" placeholderTextColor={colors.textMuted} onSubmitEditing={() => send(input)} returnKeyType="send" />
+          <TextInput style={styles.input} value={input} onChangeText={setInput} placeholder="Ask anything about food, your labs, your plan…" placeholderTextColor={colors.textMuted} onSubmitEditing={() => send(input)} returnKeyType="send" />
           <PressableScale onPress={() => send(input)} style={[styles.sendBtn, !input.trim() && styles.sendOff]}>
             <Send size={18} color="#fff" />
           </PressableScale>
@@ -78,19 +95,22 @@ const styles = StyleSheet.create({
   hero: { paddingHorizontal: 18, paddingTop: 2, paddingBottom: 6 },
   title: { fontSize: 24, fontFamily: fonts.serif, color: colors.plumDeep },
   sub: { fontSize: 12, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 4 },
-  thread: { paddingHorizontal: 16, paddingBottom: 16, gap: 10 },
+  thread: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
   bubbleWrap: { maxWidth: "86%" },
   userWrap: { alignSelf: "flex-end" },
-  habitWrap: { alignSelf: "flex-start" },
-  bubble: { borderRadius: 16, padding: 12 },
-  habitBubble: { backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderTopLeftRadius: 4 },
-  userBubble: { backgroundColor: colors.plum, borderTopRightRadius: 4 },
-  bubbleText: { fontSize: 13.5, fontFamily: fonts.sans, color: colors.plumDeep, lineHeight: 20 },
+  habitRow: { flexDirection: "row", alignItems: "flex-start", gap: 9, maxWidth: "92%", alignSelf: "flex-start" },
+  avatar: { width: 26, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(142,83,120,0.1)", marginTop: 2 },
+  bubble: { borderRadius: 16, padding: 12, paddingHorizontal: 14 },
+  habitBubble: { flex: 1, backgroundColor: "#fff", borderTopLeftRadius: 6, shadowColor: "#5B2A4A", shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 1 },
+  brandLabel: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase", color: colors.plumBright, marginBottom: 4 },
+  userBubble: { backgroundColor: colors.plum, borderBottomRightRadius: 6 },
+  bubbleText: { fontSize: 14, fontFamily: fonts.sans, color: colors.plumDeep, lineHeight: 20 },
   userText: { color: "#fff" },
-  citation: { fontSize: 10.5, fontFamily: fonts.sansMedium, color: colors.plumBright, marginTop: 6 },
-  userCite: { color: "rgba(255,255,255,0.75)" },
-  suggests: { gap: 8, marginTop: 4 },
-  suggest: { alignSelf: "flex-start", backgroundColor: "rgba(142,83,120,0.08)", borderWidth: 1, borderColor: "rgba(142,83,120,0.25)", borderRadius: 999, paddingVertical: 8, paddingHorizontal: 13 },
+  citation: { fontSize: 10, fontFamily: fonts.sans, fontStyle: "italic", color: colors.textSoft, marginTop: 7 },
+  userCite: { color: "rgba(255,255,255,0.78)", fontStyle: "italic" },
+  suggestScroll: { flexGrow: 0, flexShrink: 0 },
+  suggests: { gap: 8, paddingHorizontal: 14, paddingBottom: 8, alignItems: "center" },
+  suggest: { backgroundColor: "rgba(142,83,120,0.08)", borderWidth: 1, borderColor: "rgba(142,83,120,0.25)", borderRadius: 999, paddingVertical: 8, paddingHorizontal: 13 },
   suggestText: { fontSize: 12.5, fontFamily: fonts.sansMedium, color: colors.plumBright },
   composer: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: "rgba(255,255,255,0.6)" },
   input: { flex: 1, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 999, paddingHorizontal: 15, paddingVertical: 10, fontSize: 13.5, fontFamily: fonts.sans, color: colors.text },

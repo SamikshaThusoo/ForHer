@@ -7,6 +7,7 @@ import { PressableScale } from "@/components/ui/PressableScale";
 import { CycleRing } from "@/components/forher/CycleRing";
 import { CycleOnboarding } from "@/components/forher/CycleOnboarding";
 import { DayLogSheet } from "@/components/forher/DayLogSheet";
+import { Florette, BloodDrop } from "@/components/forher/CycleArt";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, saveCycleLog, type CycleLog } from "@/lib/forher/state";
 import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, ovulationDay, PHASE_LABEL, PHASE_COLOR } from "@/lib/forher/cycleview";
@@ -164,8 +165,20 @@ export default function Cycle() {
       </View>
 
       <View style={styles.chips}>
-        <View style={styles.chip}><Text style={styles.chipLabel}>Next period</Text><Text style={styles.chipVal}>{fmt(nextStart)} · {rel(periodIn)}</Text></View>
-        <View style={styles.chip}><Text style={styles.chipLabel}>Ovulation</Text><Text style={styles.chipVal}>{fmt(ovDate)} · {rel(daysToOv)}</Text></View>
+        <View style={styles.chip}>
+          <View style={styles.chipIcon}><BloodDrop size={19} /></View>
+          <View style={styles.chipText}>
+            <Text style={styles.chipLabel}>Next period</Text>
+            <Text style={styles.chipVal}>{fmt(nextStart)} · {rel(periodIn)}</Text>
+          </View>
+        </View>
+        <View style={styles.chip}>
+          <View style={styles.chipIcon}><Florette size={19} color="#4F9D69" /></View>
+          <View style={styles.chipText}>
+            <Text style={styles.chipLabel}>Ovulation</Text>
+            <Text style={styles.chipVal}>{fmt(ovDate)} · {rel(daysToOv)}</Text>
+          </View>
+        </View>
       </View>
 
       <View style={[styles.insight, { backgroundColor: `${insightColor}14`, borderColor: `${insightColor}33` }]}>
@@ -185,10 +198,11 @@ export default function Cycle() {
         onTap={(iso, cd) => { setSelCd(cd); setSheetISO(iso); }} />
 
       <View style={styles.legend}>
-        <LegendItem color={PHASE_COLOR.menstrual} label="Period" />
-        <LegendItem color={PHASE_COLOR.menstrual} label="Predicted" outline />
-        <LegendItem color="#4F9D69" label="Fertile" faint />
-        <LegendItem color="#4F9D69" label="Ovulation" />
+        <View style={styles.legItem}><BloodDrop size={15} /><Text style={styles.legLabel}>Period</Text></View>
+        <View style={styles.legItem}><BloodDrop size={14} fill={false} /><Text style={styles.legLabel}>Predicted</Text></View>
+        <View style={styles.legItem}><View style={styles.legFertile} /><Text style={styles.legLabel}>Fertile</Text></View>
+        <View style={styles.legItem}><Florette size={15} color="#2F6B45" /><Text style={styles.legLabel}>Ovulation</Text></View>
+        <View style={styles.legItem}><View style={styles.legSymptom} /><Text style={styles.legLabel}>Symptoms</Text></View>
       </View>
 
       <DayLogSheet
@@ -231,10 +245,13 @@ function Month({ month, anchor, anchorISO, L, ovCd, logged, predicted, dayLog, t
         const hasSymptoms = (dayLog[iso]?.symptoms?.length ?? 0) > 0;
         return (
           <PressableScale key={i} onPress={() => onTap(iso, cd)} style={styles.cell}>
-            <View style={[styles.day, isFertile && styles.dayFertile, isLogged && styles.dayLogged, isPred && styles.dayPred, isOv && styles.dayOv, isTodayCell && styles.dayToday, isSel && styles.daySel]}>
-              <Text style={[styles.dayNum, (isLogged || isOv) && styles.dayNumOn]}>{d}</Text>
+            <View style={[styles.day, isFertile && styles.dayFertile, isLogged && styles.dayLogged, isOv && styles.dayOv, isTodayCell && styles.dayToday, isSel && styles.daySel]}>
+              <Text style={[styles.dayNum, isLogged && styles.dayNumLogged, isPred && styles.dayNumPred, isFertile && styles.dayNumFertile, isOv && styles.dayNumOv]}>{d}</Text>
+              <View style={styles.dayArt}>
+                {isLogged ? <BloodDrop size={12} /> : isPred ? <BloodDrop size={11} fill={false} /> : isOv ? <Florette size={13} color="#2F6B45" bright /> : null}
+              </View>
+              {hasSymptoms && <View style={styles.symptomDot} />}
             </View>
-            {hasSymptoms && <View style={styles.symptomDot} />}
           </PressableScale>
         );
       })}
@@ -252,15 +269,6 @@ function Scrubber({ value, max, onChange }: { value: number; max: number; onChan
       onResponderGrant={(e) => update(e.nativeEvent.locationX)} onResponderMove={(e) => update(e.nativeEvent.locationX)}>
       <View style={styles.trackBar} />
       <View pointerEvents="none" style={[styles.thumb, { left: left - 11 }]} />
-    </View>
-  );
-}
-
-function LegendItem({ color, label, outline, faint }: { color: string; label: string; outline?: boolean; faint?: boolean }) {
-  return (
-    <View style={styles.legItem}>
-      <View style={[styles.legDot, { backgroundColor: faint ? `${color}44` : outline ? "transparent" : color, borderWidth: outline ? 1.5 : 0, borderColor: color }]} />
-      <Text style={styles.legLabel}>{label}</Text>
     </View>
   );
 }
@@ -286,9 +294,15 @@ const styles = StyleSheet.create({
   backTodayText: { fontSize: 11, fontFamily: fonts.sansBold, color: colors.plumBright },
 
   chips: { flexDirection: "row", gap: 10, marginHorizontal: 18, marginTop: 14 },
-  chip: { flex: 1, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 14, padding: 12 },
-  chipLabel: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.textMuted },
-  chipVal: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.plumDeep, marginTop: 4 },
+  chip: {
+    flex: 1, flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#fff",
+    borderWidth: 1, borderColor: "rgba(91,42,74,0.1)", borderRadius: 15, paddingVertical: 11, paddingHorizontal: 12,
+    shadowColor: "#5B2A4A", shadowOpacity: 0.05, shadowRadius: 12, shadowOffset: { width: 0, height: 3 }, elevation: 1,
+  },
+  chipIcon: { width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(142,83,120,0.08)" },
+  chipText: { flex: 1, gap: 2 },
+  chipLabel: { fontSize: 9.5, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.textMuted },
+  chipVal: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.plumDeep, lineHeight: 15 },
 
   insight: { marginHorizontal: 18, marginTop: 14, borderWidth: 1, borderRadius: 15, padding: 13 },
   insightTag: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase" },
@@ -303,19 +317,23 @@ const styles = StyleSheet.create({
   grid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 14, marginTop: 10 },
   wd: { width: `${100 / 7}%`, textAlign: "center", fontSize: 10, fontFamily: fonts.sansBold, color: colors.textMuted, marginBottom: 6 },
   cell: { width: `${100 / 7}%`, aspectRatio: 1, alignItems: "center", justifyContent: "center" },
-  day: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "transparent" },
-  dayNum: { fontSize: 13, fontFamily: fonts.sansMedium, color: colors.plumDeep },
-  dayNumOn: { color: "#fff" },
-  dayLogged: { backgroundColor: PHASE_COLOR.menstrual },
-  dayPred: { borderColor: PHASE_COLOR.menstrual, borderStyle: "dashed" },
-  dayFertile: { backgroundColor: "rgba(79,157,105,0.14)" },
-  dayOv: { backgroundColor: "#4F9D69" },
-  dayToday: { borderColor: colors.plum },
-  daySel: { borderColor: colors.plumBright, borderWidth: 2 },
-  symptomDot: { position: "absolute", bottom: 4, width: 4, height: 4, borderRadius: 2, backgroundColor: colors.orange },
+  day: { width: 42, height: 42, borderRadius: 10, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: "transparent" },
+  dayNum: { fontSize: 12.5, fontFamily: fonts.sansMedium, color: colors.plumDeep, lineHeight: 14 },
+  dayNumLogged: { color: "#A23C53", fontFamily: fonts.sansBold },
+  dayNumPred: { color: "#C76B7A", fontFamily: fonts.sansBold },
+  dayNumFertile: { color: "#2F6B45", fontFamily: fonts.sansBold },
+  dayNumOv: { color: "#235539", fontFamily: fonts.sansBold },
+  dayArt: { height: 12, alignItems: "center", justifyContent: "center" },
+  dayLogged: { backgroundColor: "rgba(199,107,122,0.18)" },
+  dayFertile: { backgroundColor: "rgba(79,157,105,0.18)" },
+  dayOv: { backgroundColor: "rgba(79,157,105,0.3)" },
+  dayToday: { borderColor: "#3E1B33" },
+  daySel: { borderColor: colors.plumBright, borderWidth: 2.5, transform: [{ scale: 1.07 }] },
+  symptomDot: { position: "absolute", top: 3, right: 3, width: 5, height: 5, borderRadius: 2.5, backgroundColor: colors.plumBright },
 
   legend: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 16, paddingHorizontal: 18 },
   legItem: { flexDirection: "row", alignItems: "center", gap: 6 },
-  legDot: { width: 12, height: 12, borderRadius: 6 },
+  legFertile: { width: 12, height: 12, borderRadius: 6, backgroundColor: "rgba(79,157,105,0.45)" },
+  legSymptom: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.plumBright },
   legLabel: { fontSize: 11, fontFamily: fonts.sansMedium, color: colors.textSoft },
 });

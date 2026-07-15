@@ -1,13 +1,16 @@
 import { View, Text, StyleSheet } from "react-native";
-import Svg, { Circle, Path, G } from "react-native-svg";
+import Svg, { Circle, Path } from "react-native-svg";
 import { phaseForCycleDay, ovulationDay, PHASE_COLOR, PHASE_LABEL } from "@/lib/forher/cycleview";
 import type { CyclePhase } from "@/types/journey";
+import { Florette, BloodDrop } from "./CycleArt";
 import { fonts } from "@/theme/tokens";
 
 const VB = 300, C = 150, R = 116, TRACK = 13, ACTIVE = 19, GAP_DEG = 3, TAU = Math.PI / 180;
+const SIZE = 260, K = SIZE / VB; // px-per-viewbox-unit for overlays
 const FLOR = "#4F9D69";
 
 const polar = (r: number, deg: number) => ({ x: C + r * Math.cos(deg * TAU), y: C + r * Math.sin(deg * TAU) });
+const px = (v: number) => v * K;
 
 function arcPath(r: number, a0: number, a1: number) {
   const s = polar(r, a0), e = polar(r, a1);
@@ -23,22 +26,13 @@ function statusLine(day: number, L: number, ovCd: number, duration: number) {
   return toNext === 0 ? "Period due today" : `Next period in ${toNext} day${toNext === 1 ? "" : "s"}`;
 }
 
-function Flower({ cx, cy, size, color }: { cx: number; cy: number; size: number; color: string }) {
-  const petals = [0, 72, 144, 216, 288];
-  const pr = size * 0.3, off = size * 0.34;
-  return (
-    <G>
-      {petals.map((a) => {
-        const rad = (a - 90) * TAU;
-        return <Circle key={a} cx={cx + off * Math.cos(rad)} cy={cy + off * Math.sin(rad)} r={pr} fill={color} />;
-      })}
-      <Circle cx={cx} cy={cy} r={pr * 0.85} fill="#F2C14E" />
-    </G>
-  );
+/** Absolutely-positioned art overlay at a ring coordinate (viewbox space). */
+function Deco({ x, y, children }: { x: number; y: number; children: React.ReactNode }) {
+  return <View pointerEvents="none" style={[styles.deco, { left: px(x), top: px(y) }]}>{children}</View>;
 }
 
-/** The cycle ring — a 4-phase arc ring with the florette at ovulation, period drops
- *  on the menstrual arc, and a marker at the selected day. Pure visual; reads the model. */
+/** The cycle ring — a 4-phase arc ring with blood drops on the period arc, the
+ *  florette at ovulation, and a live marker at the selected day. Reads the model only. */
 export function CycleRing({ L, cycleDay, todayCd, duration, onPhaseTap }: {
   L: number; cycleDay: number; todayCd: number; duration: number; onPhaseTap?: (day: number) => void;
 }) {
@@ -57,13 +51,15 @@ export function CycleRing({ L, cycleDay, todayCd, duration, onPhaseTap }: {
 
   const marker = polar(R, dayToAngle(cycleDay));
   const ovPos = polar(R, dayToAngle(ovCd));
+  const todayPos = polar(R, dayToAngle(todayCd));
   const drops = Array.from({ length: Math.min(duration, 7) }, (_, i) => polar(R, dayToAngle(i + 1) + 180 / L));
   const markerColor = PHASE_COLOR[phase];
   const isOv = cycleDay === ovCd;
+  const isToday = cycleDay === todayCd;
 
   return (
     <View style={styles.wrap}>
-      <Svg viewBox={`0 0 ${VB} ${VB}`} width={260} height={260}>
+      <Svg viewBox={`0 0 ${VB} ${VB}`} width={SIZE} height={SIZE}>
         <Circle cx={C} cy={C} r={R} fill="none" stroke="rgba(91,42,74,0.08)" strokeWidth={TRACK} />
         {segs.map((s) => {
           const active = s.phase === phase;
@@ -74,12 +70,20 @@ export function CycleRing({ L, cycleDay, todayCd, duration, onPhaseTap }: {
               onPress={onPhaseTap ? () => onPhaseTap(s.a) : undefined} />
           );
         })}
-        {drops.map((p, i) => <Circle key={i} cx={p.x} cy={p.y} r={2.8} fill="#fff" opacity={0.9} />)}
-        <Flower cx={ovPos.x} cy={ovPos.y} size={13} color={FLOR} />
-        {isOv
-          ? <Flower cx={marker.x} cy={marker.y} size={16} color={FLOR} />
-          : <Circle cx={marker.x} cy={marker.y} r={9} fill={markerColor} stroke="#fff" strokeWidth={3} />}
       </Svg>
+
+      {/* period drops along the menstrual arc */}
+      {drops.map((p, i) => <Deco key={i} x={p.x} y={p.y}><BloodDrop size={12} /></Deco>)}
+      {/* florette at the ovulation point */}
+      <Deco x={ovPos.x} y={ovPos.y}><Florette size={22} color={FLOR} bright /></Deco>
+      {/* faint today tick when scrubbed away */}
+      {!isToday && <View pointerEvents="none" style={[styles.todayTick, { left: px(todayPos.x), top: px(todayPos.y) }]} />}
+      {/* live marker — florette on ovulation day, else a phase-coloured dot */}
+      <View pointerEvents="none" style={[styles.deco, { left: px(marker.x), top: px(marker.y) }]}>
+        {isOv
+          ? <Florette size={28} color={FLOR} bright />
+          : <View style={[styles.marker, { backgroundColor: markerColor, shadowColor: markerColor }]} />}
+      </View>
 
       <View style={styles.center} pointerEvents="none">
         <Text style={styles.bigDay}>{cycleDay}</Text>
@@ -94,8 +98,11 @@ export function CycleRing({ L, cycleDay, todayCd, duration, onPhaseTap }: {
 }
 
 const styles = StyleSheet.create({
-  wrap: { width: 260, height: 260, alignSelf: "center", justifyContent: "center", alignItems: "center" },
-  center: { position: "absolute", width: 260, height: 260, alignItems: "center", justifyContent: "center" },
+  wrap: { width: SIZE, height: SIZE, alignSelf: "center", justifyContent: "center", alignItems: "center" },
+  center: { position: "absolute", width: SIZE, height: SIZE, alignItems: "center", justifyContent: "center" },
+  deco: { position: "absolute", transform: [{ translateX: "-50%" }, { translateY: "-50%" }] },
+  todayTick: { position: "absolute", width: 8, height: 8, borderRadius: 4, backgroundColor: "rgba(91,42,74,0.25)", transform: [{ translateX: "-50%" }, { translateY: "-50%" }] },
+  marker: { width: 18, height: 18, borderRadius: 9, borderWidth: 3, borderColor: "#fff", shadowOpacity: 0.4, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 3 },
   bigDay: { fontSize: 44, fontFamily: fonts.serif, color: "#3E1B33", lineHeight: 48 },
   ofL: { fontSize: 12, fontFamily: fonts.sans, color: "#9A8A92", marginTop: -2 },
   pill: { marginTop: 8, borderRadius: 999, paddingVertical: 3, paddingHorizontal: 11 },
