@@ -1,5 +1,6 @@
 import { storage } from "@/lib/storage";
 import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
 
 // All For Her UI state lives in storage, namespaced per persona so switching
 // personas keeps their progress separate. Keys: forher.<id>.{assessed,day,done,schedule}.
@@ -61,13 +62,19 @@ export function useForHer(personaId: string) {
   const [done, setDone] = useState<Record<number, string[]>>({});
   const [cycleLog, setCycleLog] = useState<CycleLog | null>(null);
 
-  useEffect(() => {
+  // Re-read persisted state from storage. Runs on mount/persona change AND whenever
+  // the screen regains focus — so e.g. scrubbing the plan day then returning home
+  // refreshes the day-driven cards (consult, meals, retest) instead of showing stale.
+  const hydrate = useCallback(() => {
     setAssessed(read(kAssessed(personaId), false));
     setDayState(read(kDay(personaId), 1));
     setDone(read(kDone(personaId), {}));
     setCycleLog(read<CycleLog | null>(kCycle(personaId), null));
     setHydrated(true);
   }, [personaId]);
+
+  useEffect(() => { hydrate(); }, [hydrate]);
+  useFocusEffect(useCallback(() => { hydrate(); }, [hydrate]));
 
   const setDay = useCallback((d: number) => {
     const clamped = Math.max(1, Math.min(PLAN_LAST_DAY, Math.round(d)));

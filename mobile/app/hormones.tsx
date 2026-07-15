@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 import Svg, { Path, Line, Circle, Defs, Stop, LinearGradient as SvgGradient } from "react-native-svg";
 import { LinearGradient } from "expo-linear-gradient";
+import { ArrowRight } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
@@ -12,7 +14,7 @@ import {
   cycleLengthFor, cycleDayFromLog, phaseForCycleDay, ovulationDay, hormoneModel,
   PHASE_LABEL, PHASE_PROSE, HORMONES, type HormoneKey,
 } from "@/lib/forher/cycleview";
-import { colors, fonts } from "@/theme/tokens";
+import { colors, fonts, gradients } from "@/theme/tokens";
 import type { CyclePhase } from "@/types/journey";
 
 const W = 320, H = 116, PAD = 6;
@@ -33,6 +35,7 @@ const PHASE_RECS: Record<CyclePhase, { body: string; work: string; tip: string }
 };
 
 export default function Hormones() {
+  const router = useRouter();
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   const today = new Date();
@@ -202,6 +205,13 @@ export default function Hormones() {
       )}
 
       <Text style={styles.disclaimer}>An educational model of how hormones move — not your measured levels.</Text>
+
+      <PressableScale onPress={() => router.replace("/")} style={styles.doneWrap}>
+        <LinearGradient colors={gradients.plum} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.done}>
+          <Text style={styles.doneText}>Done</Text>
+          <ArrowRight size={16} color="#fff" />
+        </LinearGradient>
+      </PressableScale>
     </Screen>
   );
 }
@@ -286,4 +296,7 @@ const styles = StyleSheet.create({
   pmosStrong: { fontFamily: fonts.sansBold, color: "#236B6B" },
 
   disclaimer: { fontSize: 9.5, fontFamily: fonts.sans, fontStyle: "italic", color: colors.textMuted, textAlign: "center", marginHorizontal: 20, marginTop: 16 },
+  doneWrap: { marginHorizontal: 18, marginTop: 16, marginBottom: 6, borderRadius: 14, overflow: "hidden" },
+  done: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingVertical: 14 },
+  doneText: { color: "#fff", fontSize: 14.5, fontFamily: fonts.sansBold },
 });
