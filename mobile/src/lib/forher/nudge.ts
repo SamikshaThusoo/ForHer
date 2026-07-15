@@ -14,6 +14,10 @@ const HREF = "/clinic";
 const CTA = "Book a check-in";
 const DAY_MS = 86400000;
 
+// Clinical weightage — the tiebreak when two signals are equally recent.
+const WEIGHT: Record<NudgeType, number> = { "missed-period": 3, irregular: 2, symptom: 1, wellness: 0 };
+const isoOf = (d: Date) => { const p = (n: number) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
+
 const CONCERNING = ["acne", "hair_loss", "pelvic_pain", "bladder_incontinence"];
 const SYMPTOM_LABEL: Record<string, string> = {
   acne: "acne", hair_loss: "hair loss", pelvic_pain: "pelvic pain", bladder_incontinence: "bladder issues",
@@ -92,12 +96,15 @@ function isIrregularHistory(starts: string[]): boolean {
 }
 
 function irregularNudge(persona: Persona, dayLog: DayLog, today: Date): Nudge | null {
-  // Prefer her own logged periods; fall back to (and combine with) the seed history.
-  // Only recent starts count, so an old logged run doesn't flag irregular forever.
-  const combined = [...(persona.pmos?.cycleHistory ?? []), ...periodStarts(dayLog)].filter((iso) =>
-    withinDays(iso, today, 365),
-  );
-  const irregular = isIrregularHistory(combined) || shouldResurfaceAssessment(persona, 0);
+  // Once she's logged her own periods, judge irregularity from HER data alone. The
+  // seeded cycleHistory (and the seed-only shouldResurfaceAssessment fallback) is just
+  // demo priming for a persona who hasn't logged anything yet — mixing a fresh log with
+  // a months-old seed would otherwise create a giant fake gap and flag irregular forever.
+  const loggedStarts = periodStarts(dayLog).filter((iso) => withinDays(iso, today, 365));
+  const irregular = loggedStarts.length > 0
+    ? isIrregularHistory(loggedStarts)
+    : isIrregularHistory((persona.pmos?.cycleHistory ?? []).filter((iso) => withinDays(iso, today, 365)))
+      || shouldResurfaceAssessment(persona, 0);
   if (!irregular) return null;
   return {
     type: "irregular",
@@ -182,6 +189,27 @@ export function isConditionNudge(nudge: Nudge | null): boolean {
 
 /** Every firing clinical signal (missed / irregular / symptom), regardless of tier —
  *  the home card shows only the top one; the clinic page shows them all. */
+/** The date of the most recent evidence behind a signal — drives time-relevance.
+ *  A missed period is a live/ongoing concern (today); irregular is anchored to her
+ *  most recent period start (or the seed if she hasn't logged); a symptom to the
+ *  latest day she logged a concerning one. */
+function recencyOf(type: NudgeType, persona: Persona, dayLog: DayLog, today: Date): string {
+  if (type === "missed-period") return isoOf(today);
+  if (type === "symptom") {
+    let latest = "";
+    for (const [iso, entry] of Object.entries(dayLog)) {
+      if (withinDays(iso, today, 90) && (entry.symptoms ?? []).some((s) => CONCERNING.includes(s)) && iso > latest) latest = iso;
+    }
+    return latest;
+  }
+  if (type === "irregular") {
+    const logged = periodStarts(dayLog).filter((iso) => withinDays(iso, today, 365));
+    const src = logged.length > 0 ? logged : (persona.pmos?.cycleHistory ?? []).filter((iso) => withinDays(iso, today, 365));
+    return src.length ? [...src].sort()[src.length - 1] : "";
+  }
+  return "";
+}
+
 export function activeConditions(args: {
   persona: Persona;
   cycleLog: CycleLog | null;
@@ -190,9 +218,17 @@ export function activeConditions(args: {
   today: Date;
 }): Nudge[] {
   const { persona, cycleLog, dayLog, cycleLength, today } = args;
-  return [
+  // Order by time-relevance (most recent evidence first), then by clinical weight —
+  // so a freshly-logged symptom outranks a months-old seeded irregular, but when two
+  // signals are equally recent the heavier one (missed > irregular > symptom) wins.
+  return ([
     missedPeriodNudge(cycleLog, dayLog, cycleLength, today),
     irregularNudge(persona, dayLog, today),
     symptomNudge(dayLog, today),
-  ].filter(Boolean) as Nudge[];
+  ].filter(Boolean) as Nudge[]).sort((a, b) => {
+    const ra = recencyOf(a.type, persona, dayLog, today);
+    const rb = recencyOf(b.type, persona, dayLog, today);
+    if (ra !== rb) return ra < rb ? 1 : -1; // most recent first
+    return WEIGHT[b.type] - WEIGHT[a.type]; // weightage tiebreak
+  });
 }

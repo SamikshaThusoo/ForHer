@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight } from "lucide-react-n
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
+import { Slider } from "@/components/ui/Slider";
 import { CycleRing } from "@/components/forher/CycleRing";
 import { CycleOnboarding } from "@/components/forher/CycleOnboarding";
 import { DayLogSheet } from "@/components/forher/DayLogSheet";
@@ -156,7 +157,7 @@ export default function Cycle() {
       <CycleRing L={L} cycleDay={cycleDay} todayCd={todayCd} duration={duration} onPhaseTap={setSelCd} />
 
       <View style={styles.scrubWrap}>
-        <Scrubber value={cycleDay} max={L} onChange={setSelCd} />
+        <Slider value={cycleDay} max={L} onChange={setSelCd} />
         <View style={styles.scrubMeta}>
           <Text style={styles.scrubHint}>Drag to explore any day</Text>
           {selCd !== null && selCd !== todayCd && (
@@ -265,20 +266,6 @@ function Month({ month, anchor, anchorISO, L, ovCd, logged, predicted, dayLog, t
           </PressableScale>
         );
       })}
-    </View>
-  );
-}
-
-function Scrubber({ value, max, onChange }: { value: number; max: number; onChange: (d: number) => void }) {
-  const [w, setW] = useState(0);
-  const update = (x: number) => { if (w > 0) onChange(Math.round(1 + Math.max(0, Math.min(1, x / w)) * (max - 1))); };
-  const left = w > 0 ? ((value - 1) / (max - 1)) * w : 0;
-  return (
-    <View style={styles.trackHit} onLayout={(e) => setW(e.nativeEvent.layout.width)}
-      onStartShouldSetResponder={() => true} onMoveShouldSetResponder={() => true}
-      onResponderGrant={(e) => update(e.nativeEvent.locationX)} onResponderMove={(e) => update(e.nativeEvent.locationX)}>
-      <View style={styles.trackBar} />
-      <View pointerEvents="none" style={[styles.thumb, { left: left - 11 }]} />
     </View>
   );
 }

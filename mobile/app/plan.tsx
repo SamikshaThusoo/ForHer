@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, StyleSheet } from "react-native";
 import { X } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
+import { Slider } from "@/components/ui/Slider";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer, PLAN_LAST_DAY } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
@@ -46,7 +47,7 @@ export default function Plan() {
 
       <View style={styles.scrub}>
         <Text style={styles.dayNum}>Day {fh.day}<Text style={styles.dayTot}> / {PLAN_LAST_DAY}</Text></Text>
-        <DayScrubber value={fh.day} max={PLAN_LAST_DAY} onChange={fh.setDay} />
+        <Slider value={fh.day} max={PLAN_LAST_DAY} onChange={fh.setDay} />
       </View>
 
       <View style={styles.roadWrap}>
@@ -74,19 +75,6 @@ export default function Plan() {
   );
 }
 
-function DayScrubber({ value, max, onChange }: { value: number; max: number; onChange: (d: number) => void }) {
-  const [w, setW] = useState(0);
-  const update = (x: number) => { if (w > 0) onChange(Math.round(1 + Math.max(0, Math.min(1, x / w)) * (max - 1))); };
-  const left = w > 0 ? ((value - 1) / (max - 1)) * w : 0;
-  return (
-    <View style={styles.trackHit} onLayout={(e) => setW(e.nativeEvent.layout.width)}
-      onStartShouldSetResponder={() => true} onMoveShouldSetResponder={() => true}
-      onResponderGrant={(e) => update(e.nativeEvent.locationX)} onResponderMove={(e) => update(e.nativeEvent.locationX)}>
-      <View style={styles.trackBar} />
-      <View pointerEvents="none" style={[styles.thumb, { left: left - 11 }]} />
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   hero: { paddingHorizontal: 18, paddingTop: 4, paddingBottom: 8 },

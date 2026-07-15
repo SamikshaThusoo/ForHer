@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal, ScrollView, TextInput, StyleSheet } from 
 import { useRouter } from "expo-router";
 import {
   Baby, Stethoscope, FlaskConical, Check, X, Video, CalendarCheck, ClipboardEdit, RefreshCw,
-  type LucideIcon,
+  ChevronDown, AlertCircle, type LucideIcon,
 } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
@@ -29,6 +29,13 @@ const TIER_COPY: Record<string, string> = {
 
 type SheetView = "visit" | "bookings" | "profile" | null;
 
+// Compact chips for the collapsed "what we've noticed" summary line.
+const FLAG_LABEL: Record<string, string> = {
+  irregular: "irregular cycles",
+  "missed-period": "a missed period",
+  symptom: "logged symptoms",
+};
+
 export default function Clinic() {
   const router = useRouter();
   const { persona } = usePersona();
@@ -41,6 +48,8 @@ export default function Clinic() {
   const [profile, setProfile] = useState<HealthProfile>(() => readHealthProfile(persona.id));
   const [view, setView] = useState<SheetView>(null);
   const [sheetItem, setSheetItem] = useState<CareItem | null>(null);
+  const [showNoticed, setShowNoticed] = useState(false);
+  const [showTests, setShowTests] = useState(false);
 
   const conditions = activeConditions({
     persona, cycleLog, dayLog: readDayLog(persona.id),
@@ -114,11 +123,10 @@ export default function Clinic() {
   };
 
   const primaryHero = (item: CareItem, extra: CareItem[]) => {
-    const includes = careItemIncludes(item.id);
     const HeroIcon = item.kind === "test" ? FlaskConical : Stethoscope;
     return (
       <View style={styles.heroCard}>
-        <Text style={styles.heroEyebrow}>Recommended now</Text>
+        <Text style={styles.heroEyebrow}>Recommended for you</Text>
         <View style={styles.heroMain}>
           <View style={styles.heroIcon}><HeroIcon size={22} color="#B5532F" /></View>
           <View style={styles.heroBody}>
@@ -126,20 +134,17 @@ export default function Clinic() {
             <Text style={styles.heroWhy}>{item.reason}</Text>
           </View>
         </View>
-        {includes.length > 0 && (
-          <View style={styles.heroIncludes}>
-            {includes.map((p) => (
-              <View key={p} style={styles.heroInclude}><Check size={13} color="#4F9D69" strokeWidth={2.5} /><Text style={styles.heroIncludeText}>{p}</Text></View>
-            ))}
-          </View>
-        )}
+        {/* One clear primary action. The "what's included" detail lives in the booking sheet. */}
         {isBooked(bookings, item.id)
           ? <View style={styles.heroBooked}><Check size={16} color="#4F9D69" /><Text style={styles.heroBookedText}>Booked</Text></View>
           : <PressableScale onPress={() => setSheetItem(item)} style={styles.heroBook}><Text style={styles.heroBookText}>Book now</Text></PressableScale>}
         {extra.length > 0 && (
           <View style={styles.heroTests}>
-            <Text style={styles.heroTestsLabel}>Recommended tests</Text>
-            {extra.map((t) => <MiniRow key={t.id} item={t} />)}
+            <PressableScale onPress={() => setShowTests((s) => !s)} style={styles.testsToggle}>
+              <Text style={styles.heroTestsLabel}>{showTests ? "Recommended tests" : `See ${extra.length} recommended test${extra.length > 1 ? "s" : ""}`}</Text>
+              <ChevronDown size={15} color={colors.plumBright} style={{ transform: [{ rotate: showTests ? "180deg" : "0deg" }] }} />
+            </PressableScale>
+            {showTests && extra.map((t) => <MiniRow key={t.id} item={t} />)}
           </View>
         )}
       </View>
@@ -163,8 +168,14 @@ export default function Clinic() {
 
       {hasConditions && (
         <View style={styles.noticed}>
-          <Text style={styles.noticedLabel}>What we&apos;ve noticed</Text>
-          {conditions.map((c) => (
+          <PressableScale onPress={() => setShowNoticed((s) => !s)} style={styles.noticedHead}>
+            <AlertCircle size={15} color="#A34E5E" />
+            <Text style={styles.noticedSummary} numberOfLines={1}>
+              Flagged: {conditions.map((c) => FLAG_LABEL[c.type] ?? c.type).join(", ")}
+            </Text>
+            <ChevronDown size={16} color="#A34E5E" style={{ transform: [{ rotate: showNoticed ? "180deg" : "0deg" }] }} />
+          </PressableScale>
+          {showNoticed && conditions.map((c) => (
             <View key={c.type} style={styles.noticedItem}>
               <Text style={styles.noticedTitle}>{c.title}</Text>
               <Text style={styles.noticedBody}>{c.body}</Text>
@@ -330,9 +341,10 @@ const styles = StyleSheet.create({
   h1: { fontSize: 26, fontFamily: fonts.serif, color: colors.plumDeep, marginTop: 4 },
   lede: { fontSize: 13, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 7, lineHeight: 19 },
 
-  noticed: { marginHorizontal: 18, marginTop: 8, backgroundColor: "rgba(199,107,122,0.06)", borderWidth: 1, borderColor: "rgba(199,107,122,0.2)", borderRadius: 15, padding: 14 },
-  noticedLabel: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase", color: "#A34E5E", marginBottom: 8 },
-  noticedItem: { marginBottom: 8 },
+  noticed: { marginHorizontal: 18, marginTop: 10, backgroundColor: "rgba(199,107,122,0.06)", borderWidth: 1, borderColor: "rgba(199,107,122,0.2)", borderRadius: 15, paddingVertical: 12, paddingHorizontal: 14 },
+  noticedHead: { flexDirection: "row", alignItems: "center", gap: 8 },
+  noticedSummary: { flex: 1, fontSize: 12.5, fontFamily: fonts.sansBold, color: "#A34E5E" },
+  noticedItem: { marginTop: 10 },
   noticedTitle: { fontSize: 13.5, fontFamily: fonts.sansBold, color: colors.plumDeep },
   noticedBody: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 2, lineHeight: 18 },
 
@@ -352,15 +364,15 @@ const styles = StyleSheet.create({
   heroBody: { flex: 1 },
   heroTitle: { fontSize: 18, fontFamily: fonts.serif, color: colors.plumDeep },
   heroWhy: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 3, lineHeight: 17 },
-  heroIncludes: { gap: 5, marginBottom: 14 },
-  heroInclude: { flexDirection: "row", alignItems: "flex-start", gap: 7 },
+  heroInclude: { flexDirection: "row", alignItems: "flex-start", gap: 7, marginBottom: 6 },
   heroIncludeText: { flex: 1, fontSize: 12, fontFamily: fonts.sans, color: colors.plum, lineHeight: 16 },
   heroBook: { backgroundColor: colors.plum, borderRadius: 13, paddingVertical: 12, alignItems: "center" },
   heroBookText: { color: "#fff", fontSize: 14, fontFamily: fonts.sansBold },
   heroBooked: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 12, backgroundColor: "rgba(79,157,105,0.1)", borderRadius: 13 },
   heroBookedText: { fontSize: 13.5, fontFamily: fonts.sansBold, color: "#4F9D69" },
   heroTests: { marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: "rgba(181,83,47,0.14)" },
-  heroTestsLabel: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.plumBright, marginBottom: 8, marginTop: 12 },
+  testsToggle: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingBottom: 4 },
+  heroTestsLabel: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.plumBright },
   lifestyle: { fontSize: 13.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 8, lineHeight: 20 },
 
   tiles: { flexDirection: "row", gap: 10 },

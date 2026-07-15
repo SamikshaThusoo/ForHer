@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
+import { Slider } from "@/components/ui/Slider";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
@@ -145,8 +146,12 @@ export default function Hormones() {
           <Text style={styles.axisLabel}>Day {L}</Text>
         </View>
 
-        {/* Scrubber: phase-map track + draggable thumb */}
-        <Scrubber value={day} max={L} onChange={setDayState} colors={trackColors} locations={trackLocations} thumb={hueOf(dominant.key)} />
+        {/* Scrubber: phase-map gradient track + draggable thumb */}
+        <View style={styles.trackWrap}>
+          <Slider value={day} max={L} onChange={setDayState} thumbColor={hueOf(dominant.key)}
+            track={<LinearGradient colors={trackColors as unknown as [string, string, ...string[]]} locations={trackLocations as unknown as [number, number, ...number[]]}
+              start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.trackBar} />} />
+        </View>
         <Text style={styles.scrubHint}>Drag to explore any day in your cycle</Text>
 
         <View style={styles.legend}>
@@ -213,35 +218,6 @@ export default function Hormones() {
         </LinearGradient>
       </PressableScale>
     </Screen>
-  );
-}
-
-function Scrubber({ value, max, onChange, colors: cols, locations, thumb }: {
-  value: number; max: number; onChange: (d: number) => void;
-  colors: readonly string[]; locations: number[]; thumb: string;
-}) {
-  const [w, setW] = useState(0);
-  const update = (x: number) => {
-    if (w <= 0) return;
-    const frac = Math.max(0, Math.min(1, x / w));
-    onChange(Math.round(1 + frac * (max - 1)));
-  };
-  const left = w > 0 ? ((value - 1) / (max - 1)) * w : 0;
-  return (
-    <View style={styles.trackWrap}>
-      <View
-        style={styles.trackHit}
-        onLayout={(e) => setW(e.nativeEvent.layout.width)}
-        onStartShouldSetResponder={() => true}
-        onMoveShouldSetResponder={() => true}
-        onResponderGrant={(e) => update(e.nativeEvent.locationX)}
-        onResponderMove={(e) => update(e.nativeEvent.locationX)}
-      >
-        <LinearGradient colors={cols as unknown as [string, string, ...string[]]} locations={locations as unknown as [number, number, ...number[]]}
-          start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.trackBar} />
-        <View pointerEvents="none" style={[styles.thumb, { left: left - 11, borderColor: "#fff", backgroundColor: thumb }]} />
-      </View>
-    </View>
   );
 }
 
