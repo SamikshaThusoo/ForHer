@@ -52,6 +52,8 @@ export default function Progress() {
     );
   }
 
+  const router = useRouter();
+
   return (
     <Screen>
       <Header title="For Her · Progress" />
@@ -59,6 +61,15 @@ export default function Progress() {
         <Text style={styles.h1}>Your <Text style={styles.h1em}>progress</Text></Text>
         <Text style={styles.sub}>Today is the cursor; the 90 days is the frame.</Text>
       </View>
+
+      {/* Journey Map entry */}
+      <Pressable onPress={() => router.push("/maze" as never)} style={styles.mazeEntry}>
+        <View style={styles.mazeEntryLeft}>
+          <Text style={styles.mazeEntryTitle}>Journey Map</Text>
+          <Text style={styles.mazeEntrySubin}>See your 90-day path · pan to explore</Text>
+        </View>
+        <ArrowRight size={16} color={colors.plumBright} />
+      </Pressable>
 
       <View style={styles.tabs}>
         {(["daily", "milestone"] as const).map((t) => (
@@ -346,6 +357,11 @@ const styles = StyleSheet.create({
   habitCheckDone: { backgroundColor: "#4F9D69" },
   habitLabel: { flex: 1, fontSize: 12.5, fontFamily: fonts.sansMedium, color: colors.plumDeep },
   habitLabelDone: { color: "#4F9D69", textDecorationLine: "line-through" },
+
+  mazeEntry: { flexDirection: "row", alignItems: "center", marginHorizontal: 18, marginBottom: 10, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 15, padding: 14 },
+  mazeEntryLeft: { flex: 1 },
+  mazeEntryTitle: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.plumDeep },
+  mazeEntrySubin: { fontSize: 11.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 2 },
 
   catchCard: { backgroundColor: "rgba(142,83,120,0.05)", borderWidth: 1, borderColor: "rgba(142,83,120,0.15)", borderRadius: 15, padding: 14, gap: 5 },
   catchTitle: { fontSize: 10.5, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.plumBright, marginBottom: 4 },
