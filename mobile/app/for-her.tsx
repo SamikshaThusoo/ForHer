@@ -49,7 +49,7 @@ export default function ForHer() {
     cycleLength: cycleLengthFor(persona, cycleLog?.cycleLength), today: new Date(),
   }).length > 0;
 
-  const enroll = () => { markAssessed(persona.id); router.replace("/"); };
+  const enroll = () => { markAssessed(persona.id); router.replace("/reminders"); };
   const goClinic = () => { markAssessed(persona.id); router.push("/clinic" as never); };
 
   if (!pmos?.eligible) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { CheckCircle2, CalendarHeart, Stethoscope, Moon, Activity, Trophy, Lock, FlaskConical, Droplet, ClipboardEdit } from "lucide-react-native";
+import { CheckCircle2, CalendarHeart, Stethoscope, Moon, Activity, Trophy, Lock, FlaskConical, Droplet, ClipboardEdit, Utensils, Laugh, GlassWater, Cookie, ArrowRight, Circle } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { usePersona } from "@/context/PersonaContext";
@@ -9,10 +9,21 @@ import { useForHer } from "@/lib/forher/state";
 import { personaTrack, resolveDailyPlan, getPlanTouchpoints, getPhase, PHASE_BOUNDS } from "@/lib/journey";
 import { cycleLengthFor, cycleDayFromLog, phaseForCycleDay, PHASE_LABEL } from "@/lib/forher/cycleview";
 import { readDayLog } from "@/lib/forher/daylog";
+import { todaysMeals } from "@/lib/forher/foodlog";
 import { readHealthProfile, bmiFrom } from "@/lib/forher/healthprofile";
 import { nextVisit, phaseActivity, logsInPhase, checkpointMarkers } from "@/lib/forher/progressview";
 import { storage } from "@/lib/storage";
 import { colors, fonts } from "@/theme/tokens";
+
+const HABITS_KEY = (date: string) => `forher.habits.${date}`;
+const readHabits = (): Record<string, boolean> => {
+  try { return JSON.parse(storage.getItem(HABITS_KEY(new Date().toISOString().slice(0, 10))) || "{}"); } catch { return {}; }
+};
+const saveHabit = (id: string, val: boolean) => {
+  const d = new Date().toISOString().slice(0, 10);
+  const h = readHabits(); h[id] = val;
+  storage.setItem(HABITS_KEY(d), JSON.stringify(h));
+};
 
 const PHASE_NAME: Record<string, string> = { foundation: "Foundation", build: "Build", milestone: "Milestone" };
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -71,6 +82,22 @@ function Row({ Icon, children }: { Icon: typeof Moon; children: React.ReactNode 
   );
 }
 
+function HabitRow({ id, label, Icon, done, onToggle, onOpen }: {
+  id: string; label: string; Icon: typeof GlassWater; done: boolean;
+  onToggle?: () => void; onOpen?: () => void;
+}) {
+  return (
+    <Pressable onPress={onToggle ?? onOpen} style={styles.habitRow}>
+      <View style={[styles.habitCheck, done && styles.habitCheckDone]}>
+        {done ? <CheckCircle2 size={16} color="#fff" /> : <Circle size={16} color={colors.textMuted} />}
+      </View>
+      <Icon size={14} color={done ? "#4F9D69" : colors.plumBright} />
+      <Text style={[styles.habitLabel, done && styles.habitLabelDone]}>{label}</Text>
+      {onOpen && !done && <ArrowRight size={13} color={colors.textMuted} style={{ marginLeft: "auto" }} />}
+    </Pressable>
+  );
+}
+
 function DailyView() {
   const router = useRouter();
   const { persona } = usePersona();
@@ -95,6 +122,16 @@ function DailyView() {
   const upcoming = nextVisit(getPlanTouchpoints(persona), day);
   const inDays = upcoming ? upcoming.day - day : null;
 
+  const [habits, setHabits] = useState<Record<string, boolean>>(readHabits);
+  const toggleHabit = (id: string) => {
+    const next = !habits[id];
+    saveHabit(id, next);
+    setHabits((h) => ({ ...h, [id]: next }));
+  };
+
+  const foodLogged = Object.keys(todaysMeals()).length > 0;
+  const moodLogged = mood !== null;
+
   return (
     <View style={styles.body}>
       <Text style={styles.sectionHead}>Today&apos;s recap</Text>
@@ -106,6 +143,14 @@ function DailyView() {
       {isStart && <Text style={styles.startLine}>Day 1 — your streak starts today. One task counts.</Text>}
 
       <View style={styles.dCard}>
+        <Text style={styles.dLabel}>Daily habits</Text>
+        <HabitRow id="water" label="Drink 8 glasses of water" Icon={GlassWater} done={!!habits.water} onToggle={() => toggleHabit("water")} />
+        <HabitRow id="nosnack" label="No snacking between meals" Icon={Cookie} done={!!habits.nosnack} onToggle={() => toggleHabit("nosnack")} />
+        <HabitRow id="food" label="Log today's meals" Icon={Utensils} done={foodLogged} onOpen={() => router.push("/food")} />
+        <HabitRow id="mood" label="Check in your mood" Icon={Laugh} done={moodLogged} onOpen={() => router.push("/log/mood")} />
+      </View>
+
+      <View style={styles.dCard}>
         <Text style={styles.dLabel}>What you did today</Text>
         {tasksDone > 0 ? completed.map((t) => (
           <View key={t.id} style={styles.dRow}><CheckCircle2 size={14} color="#4F9D69" /><Text style={styles.dRowText}>{t.title}</Text></View>
@@ -113,6 +158,41 @@ function DailyView() {
         <Row Icon={Moon}>{mood ? (mood.length ? `Mood: ${mood.slice(0, 3).join(", ").toLowerCase()}` : "Mood logged") : "Mood not logged"}</Row>
         <Row Icon={Activity}>{symptomsToday.length ? `Symptoms: ${symptomsToday.length} logged` : "No symptoms logged today"}</Row>
       </View>
+
+      {/* End-of-day catch-up: surface cards not yet touched */}
+      {(!foodLogged || !moodLogged || !habits.water || !habits.nosnack) && (
+        <View style={styles.catchCard}>
+          <Text style={styles.catchTitle}>Still to do today</Text>
+          {!foodLogged && (
+            <Pressable style={styles.catchRow} onPress={() => router.push("/food")}>
+              <Utensils size={14} color={colors.plumBright} />
+              <Text style={styles.catchText}>Log your meals</Text>
+              <ArrowRight size={13} color={colors.textMuted} style={{ marginLeft: "auto" }} />
+            </Pressable>
+          )}
+          {!moodLogged && (
+            <Pressable style={styles.catchRow} onPress={() => router.push("/log/mood")}>
+              <Laugh size={14} color={colors.plumBright} />
+              <Text style={styles.catchText}>Mood check-in</Text>
+              <ArrowRight size={13} color={colors.textMuted} style={{ marginLeft: "auto" }} />
+            </Pressable>
+          )}
+          {!habits.water && (
+            <Pressable style={styles.catchRow} onPress={() => toggleHabit("water")}>
+              <GlassWater size={14} color={colors.plumBright} />
+              <Text style={styles.catchText}>Mark water intake done</Text>
+              <ArrowRight size={13} color={colors.textMuted} style={{ marginLeft: "auto" }} />
+            </Pressable>
+          )}
+          {!habits.nosnack && (
+            <Pressable style={styles.catchRow} onPress={() => toggleHabit("nosnack")}>
+              <Cookie size={14} color={colors.plumBright} />
+              <Text style={styles.catchText}>Mark no-snack done</Text>
+              <ArrowRight size={13} color={colors.textMuted} style={{ marginLeft: "auto" }} />
+            </Pressable>
+          )}
+        </View>
+      )}
 
       <View style={styles.dCard}>
         <Text style={styles.dLabel}>Where you are</Text>
@@ -260,4 +340,15 @@ const styles = StyleSheet.create({
   cpMeasuredText: { color: "#4F9D69" },
   cpPreview: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, fontStyle: "italic", lineHeight: 18 },
   link: { fontFamily: fonts.sansBold, color: colors.plumBright, textDecorationLine: "underline" },
+
+  habitRow: { flexDirection: "row", alignItems: "center", gap: 9, paddingVertical: 5 },
+  habitCheck: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(142,83,120,0.07)" },
+  habitCheckDone: { backgroundColor: "#4F9D69" },
+  habitLabel: { flex: 1, fontSize: 12.5, fontFamily: fonts.sansMedium, color: colors.plumDeep },
+  habitLabelDone: { color: "#4F9D69", textDecorationLine: "line-through" },
+
+  catchCard: { backgroundColor: "rgba(142,83,120,0.05)", borderWidth: 1, borderColor: "rgba(142,83,120,0.15)", borderRadius: 15, padding: 14, gap: 5 },
+  catchTitle: { fontSize: 10.5, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.plumBright, marginBottom: 4 },
+  catchRow: { flexDirection: "row", alignItems: "center", gap: 9, paddingVertical: 7, borderTopWidth: 1, borderTopColor: "rgba(142,83,120,0.08)" },
+  catchText: { flex: 1, fontSize: 12.5, fontFamily: fonts.sans, color: colors.plumDeep },
 });

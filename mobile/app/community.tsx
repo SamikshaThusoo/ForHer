@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, StyleSheet, type ViewStyle } from "react-native";
 import { useRouter } from "expo-router";
-import { Bookmark, Heart, Check } from "lucide-react-native";
+import { Bookmark, Heart, Check, Flame } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
@@ -15,6 +15,85 @@ import { colors, fonts, phaseAccent } from "@/theme/tokens";
 import type { CyclePhase } from "@/types/journey";
 
 const FEELINGS = ["Energetic", "Calm", "Motivated", "Tired", "Crampy", "Bloated", "Moody", "Anxious"];
+
+const TRENDING_TOPICS = [
+  {
+    tag: "Pre-menopausal",
+    title: "Navigating the transition",
+    desc: "Irregular cycles, hot flashes, sleep changes — how women are managing the approach to menopause.",
+    posts: [
+      { name: "Sunita", text: "My cycles are 22 days one month, 45 the next. Finally talked to my doctor. Turns out perimenopause can start in your 40s." },
+      { name: "Rekha", text: "The night sweats woke me every hour for weeks. Magnesium glycinate at bedtime changed everything." },
+      { name: "Meera", text: "Mood swings I never had before. Knowing it's hormonal makes it easier to manage — less self-blame." },
+    ],
+  },
+  {
+    tag: "Period pain",
+    title: "Making period pain manageable",
+    desc: "What's worked for cramping — from diet tweaks to heat therapy to knowing when to see a doctor.",
+    posts: [
+      { name: "Anjali", text: "Cutting refined sugar the week before completely changed my cramp severity. Worth trying for one cycle." },
+      { name: "Priya", text: "I used to push through pain at work. Getting a diagnosis (mild endo) and actual treatment was the answer." },
+      { name: "Divya", text: "Hot water bag + a ginger-turmeric chai. I know it sounds old-fashioned but it genuinely helps." },
+    ],
+  },
+  {
+    tag: "Endometriosis",
+    title: "Living with endometriosis",
+    desc: "Women sharing what a diagnosis changed, and how they manage flare-ups day to day.",
+    posts: [
+      { name: "Kiran", text: "7 years before I got diagnosed. If your pain is being dismissed, keep pushing for a second opinion." },
+      { name: "Nisha", text: "Low-inflammatory diet isn't a cure, but it made flare-ups noticeably less frequent for me." },
+      { name: "Shalini", text: "Tracking symptoms in an app helped me show my doctor a pattern. Took one appointment to finally get scanned." },
+    ],
+  },
+  {
+    tag: "Hormonal acne",
+    title: "Skin that changes with your cycle",
+    desc: "Understanding jaw-line breakouts, oily phases and what actually helps.",
+    posts: [
+      { name: "Tara", text: "Breakouts only in the week before my period — turns out that's textbook progesterone acne. Now I adjust my routine." },
+      { name: "Rhea", text: "Spearmint tea every morning for 3 months and my chin acne reduced by half. Small but real." },
+      { name: "Pallavi", text: "Finally saw a dermatologist who looked at my cycle history. A targeted retinoid made the biggest difference." },
+    ],
+  },
+  {
+    tag: "PMOS / PCOS",
+    title: "Managing PMOS day to day",
+    desc: "Practical habits for blood sugar, mood and irregular cycles — from women already on this path.",
+    posts: [
+      { name: "Ananya", text: "Eating protein first at every meal — sounds small, but it broke my afternoon energy crash pattern." },
+      { name: "Sanya", text: "Resistance training twice a week improved my insulin sensitivity more than any supplement I tried." },
+      { name: "Kavya", text: "Getting diagnosed late (at 29) was frustrating. But now I understand my body way better." },
+    ],
+  },
+  {
+    tag: "Fertility",
+    title: "Understanding your fertility window",
+    desc: "Tracking ovulation, what cycle tracking reveals, and conversations about TTC.",
+    posts: [
+      { name: "Nandini", text: "BBT tracking for 3 months showed me I was ovulating much later than typical apps assumed. Cycle tracking is personal." },
+      { name: "Gayatri", text: "We spent a year 'trying' before realising we were timing it wrong. Understanding the window changed everything." },
+      { name: "Leena", text: "PMOS made predicting ovulation hard. Ovulation strips + cycle tracking together gave me a clearer picture." },
+    ],
+  },
+  {
+    tag: "Stress & cycle",
+    title: "When stress shifts your cycle",
+    desc: "Late periods, missed cycles and heavier bleeding — how stress shows up in your hormones.",
+    posts: [
+      { name: "Aditi", text: "I skipped a period entirely during my exam month. My gynaecologist said cortisol suppresses ovulation. Made sense." },
+      { name: "Simran", text: "Breathwork for 10 minutes before bed — my luteal phase symptoms were visibly less severe the next cycle." },
+      { name: "Rina", text: "A job change made my cycles 40+ days for three months. Stress is real, hormones listen." },
+    ],
+  },
+];
+
+/** Returns today's trending topic — rotates every day. */
+function todaysTopic() {
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+  return TRENDING_TOPICS[dayOfYear % TRENDING_TOPICS.length];
+}
 
 type Tip = { kind: "Peer" | "Pacing" | "Diet"; text: string; saved: number };
 type Post = { name: string; text: string; likes: number };
@@ -154,6 +233,8 @@ export default function Community() {
   const canShare = picked.size > 0 || note.trim().length > 0;
 
   const accentText = { color: a.deep } as ViewStyle;
+  const topic = todaysTopic();
+  const [topicOpen, setTopicOpen] = useState(true);
 
   return (
     <Screen>
@@ -170,6 +251,32 @@ export default function Community() {
           <Text style={styles.sub}>Recommendations and check-ins. <Text style={[styles.sub, styles.inlineLink]} onPress={() => router.push("/cycle")}>Log your cycle</Text> to see your phase community.</Text>
         )}
       </View>
+
+      {/* Trending topic — rotates daily */}
+      <PressableScale onPress={() => setTopicOpen((o) => !o)} style={styles.trendCard}>
+        <View style={styles.trendHead}>
+          <View style={styles.trendFlame}><Flame size={14} color="#C9622A" /></View>
+          <View style={styles.trendMeta}>
+            <Text style={styles.trendTag}>Trending today · {topic.tag}</Text>
+            <Text style={styles.trendTitle}>{topic.title}</Text>
+          </View>
+        </View>
+        <Text style={styles.trendDesc}>{topic.desc}</Text>
+        {topicOpen && (
+          <View style={styles.trendPosts}>
+            {topic.posts.map((p, i) => (
+              <View key={i} style={styles.trendPost}>
+                <Avatar seed={`trend-${topic.tag}-${i}`} size={30} />
+                <View style={styles.trendPostBody}>
+                  <Text style={styles.trendPostName}>{p.name}</Text>
+                  <Text style={styles.trendPostText}>{p.text}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+        <Text style={styles.trendToggle}>{topicOpen ? "Show less ▲" : "Read discussion ▼"}</Text>
+      </PressableScale>
 
       {carePlan && (
         <View style={[styles.pacing, { backgroundColor: a.soft, borderColor: a.line }]}>
@@ -343,4 +450,18 @@ const styles = StyleSheet.create({
   yourText: { fontSize: 12.5, fontFamily: fonts.sans, fontStyle: "italic", color: "#4A3A44", marginTop: 6, lineHeight: 18 },
 
   disclaimer: { fontSize: 9.5, fontFamily: fonts.sans, fontStyle: "italic", color: colors.textMuted, textAlign: "center", marginHorizontal: 22, marginTop: 20, lineHeight: 14 },
+
+  trendCard: { marginHorizontal: 18, marginBottom: 14, backgroundColor: "#FFF8F4", borderWidth: 1, borderColor: "rgba(201,98,42,0.2)", borderRadius: 18, padding: 14, gap: 8 },
+  trendHead: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  trendFlame: { width: 30, height: 30, borderRadius: 10, backgroundColor: "rgba(201,98,42,0.12)", alignItems: "center", justifyContent: "center" },
+  trendMeta: { flex: 1 },
+  trendTag: { fontSize: 9.5, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase", color: "#C9622A" },
+  trendTitle: { fontSize: 14.5, fontFamily: fonts.sansBold, color: "#3E2010", marginTop: 2 },
+  trendDesc: { fontSize: 12, fontFamily: fonts.sans, color: "#5A3820", lineHeight: 17 },
+  trendPosts: { gap: 10, marginTop: 4 },
+  trendPost: { flexDirection: "row", alignItems: "flex-start", gap: 9, backgroundColor: "#fff", borderRadius: 13, padding: 10, borderWidth: 1, borderColor: "rgba(201,98,42,0.1)" },
+  trendPostBody: { flex: 1 },
+  trendPostName: { fontSize: 11.5, fontFamily: fonts.sansBold, color: "#3E2010" },
+  trendPostText: { fontSize: 12, fontFamily: fonts.sans, color: "#5A3820", marginTop: 3, lineHeight: 17 },
+  trendToggle: { fontSize: 11, fontFamily: fonts.sansBold, color: "#C9622A", textAlign: "center", marginTop: 2 },
 });

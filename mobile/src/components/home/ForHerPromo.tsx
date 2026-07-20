@@ -91,7 +91,7 @@ export function ForHerPromo() {
             <Text style={styles.hubBrand}>For Her <Text style={styles.hubTag}>Companion</Text></Text>
             <Text style={styles.hubPlanMuted}>Tracking & insights</Text>
           </View>
-          <Pressable style={styles.hubScan} onPress={() => router.push("/cares/scan")}><ScanLine size={18} color="#2F7A7A" /><Text style={styles.hubScanText}>Scan</Text></Pressable>
+          <Pressable style={styles.hubScan} onPress={() => router.push("/meal-plan" as never)}><ScanLine size={18} color="#2F7A7A" /><Text style={styles.hubScanText}>Meal Plan</Text></Pressable>
         </View>
         {clinicCard}
         <ForHerCompanionHub />
@@ -107,7 +107,7 @@ export function ForHerPromo() {
           <Text style={styles.hubBrand}>For Her <Text style={styles.hubTag}>PMOS</Text></Text>
           <Pressable onPress={() => router.push("/plan")}><Text style={styles.hubPlan}>Day {Math.min(fh.day, 90)} of 90 · See plan ›</Text></Pressable>
         </View>
-        <Pressable style={styles.hubScan} onPress={() => router.push("/cares/scan")}><ScanLine size={18} color="#2F7A7A" /><Text style={styles.hubScanText}>Scan</Text></Pressable>
+        <Pressable style={styles.hubScan} onPress={() => router.push("/meal-plan" as never)}><ScanLine size={18} color="#2F7A7A" /><Text style={styles.hubScanText}>Meal Plan</Text></Pressable>
       </View>
       {clinicCard}
       <ForHerHub />

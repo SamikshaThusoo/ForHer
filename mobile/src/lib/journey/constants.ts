@@ -47,6 +47,7 @@ export const TOUCHPOINT_SCHEDULE: {
   tracks: CareTrack[];
   ifAndrogenic?: boolean;
 }[] = [
+  { day: 2,  kind: "consult",  services: ["nutritionist"],    label: "Dietician onboarding call",      tracks: ["low", "medium", "high"] },
   { day: 5,  kind: "baseline", services: ["doctor"],          label: "Doctor baseline consult",        tracks: ["low", "medium", "high"] },
   { day: 7,  kind: "consult",  services: ["nutritionist"],    label: "Nutritionist intake",            tracks: ["medium", "high"] },
   { day: 21, kind: "consult",  services: ["psychologist"],    label: "Psychologist check-in",          tracks: ["high"] },
