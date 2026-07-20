@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { SvgXml } from "react-native-svg";
 import {
   ArrowRight, Check, Footprints, TrendingUp, MessagesSquare, Stethoscope, FlaskConical,
-  CalendarHeart, Briefcase, Utensils, Wind, Salad, Brain, Sun, HeartPulse, Star, Download, FileText, X, Droplet,
+  CalendarHeart, Briefcase, Utensils, Wind, Salad, Brain, Sun, HeartPulse, Star, Download, FileText, X, Droplet, Flame,
   type LucideIcon,
 } from "lucide-react-native";
 import { usePersona } from "@/context/PersonaContext";
@@ -28,6 +28,12 @@ const COMM_ACCENT: Record<CyclePhase, { main: string; soft: string }> = {
   ovulatory: { main: "#2F7A7A", soft: "rgba(47,122,122,0.12)" },
   luteal: { main: "#8E5378", soft: "rgba(142,83,120,0.12)" },
 };
+const TOPIC_TAGS = ["Pre-menopausal","Period pain","Endometriosis","Hormonal acne","PMOS / PCOS","Fertility","Stress & cycle"];
+function todaysTopic() {
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+  return TOPIC_TAGS[dayOfYear % TOPIC_TAGS.length];
+}
+
 const WORK_PROMPT: Record<CyclePhase, string> = {
   menstrual: "Keep the load light — save deep work for later.",
   follicular: "A great week to start big projects.",
@@ -260,11 +266,15 @@ export function ForHerHub() {
 
   // 10 · Community.
   const comm = COMM_ACCENT[cyclePhase ?? "luteal"];
+  const trendingTag = todaysTopic();
   cards.push(
     <CardShell variant="plain" customBg="#FFFFFF" onPress={() => router.push("/community")} key="community">
       <CardIcon Icon={MessagesSquare} bg={comm.soft} color={comm.main} />
       <Text style={carStyles.title}>Women in your phase are sharing</Text>
-      <Text style={carStyles.sub}>Tips and check-ins from women like you.</Text>
+      <View style={styles.trendPill}>
+        <Flame size={11} color="#C9622A" />
+        <Text style={styles.trendPillText}>Trending · {trendingTag}</Text>
+      </View>
       <View style={styles.avatars}>
         {[0, 1, 2].map((n) => <CommAvatar key={n} seed={`comm-${cyclePhase ?? "x"}-${n}`} />)}
         <Text style={[styles.avatarsLabel, { color: comm.main }]}>women like you</Text>
@@ -315,6 +325,9 @@ const styles = StyleSheet.create({
   cardBtn: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", backgroundColor: "#B5532F", borderRadius: 999, paddingVertical: 10, paddingHorizontal: 16 },
   cardBtnText: { color: "#fff", fontSize: 12.5, fontFamily: fonts.sansBold },
   stars: { flexDirection: "row", gap: 7, marginTop: 14 },
+  trendPill: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", backgroundColor: "rgba(201,98,42,0.10)", borderRadius: 999, paddingVertical: 4, paddingHorizontal: 9, marginTop: 6 },
+  trendPillText: { fontSize: 10.5, fontFamily: fonts.sansBold, color: "#C9622A" },
+
   avatars: { flexDirection: "row", alignItems: "center", marginTop: 12, marginBottom: 4 },
   avRing: { width: 27, height: 27, borderRadius: 14, borderWidth: 2, borderColor: "#fff", backgroundColor: "#fff", marginLeft: -8, overflow: "hidden" },
   avatarsLabel: { marginLeft: 10, fontSize: 11, fontFamily: fonts.sansBold },
