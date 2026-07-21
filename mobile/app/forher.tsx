@@ -1,14 +1,6 @@
-import { Screen } from "@/components/ui/Screen";
-import { Header } from "@/components/ui/Header";
-import { ForHerPromo } from "@/components/home/ForHerPromo";
+import { Redirect } from "expo-router";
 
-// The For Her dashboard — the full hub (carousel, meal plan, clinic entry) that
-// used to live inline on the Habit home, now behind the home-page banner.
+// The For Her hub lives inline on the Habit home — nothing links here anymore.
 export default function ForHerDashboard() {
-  return (
-    <Screen>
-      <Header title="For Her" />
-      <ForHerPromo />
-    </Screen>
-  );
+  return <Redirect href="/" />;
 }
