@@ -10,6 +10,9 @@ import { LifeSyncBanner } from "@/components/home/LifeSyncBanner";
 import { WellnessSolutions } from "@/components/home/WellnessSolutions";
 import { StepsCard } from "@/components/home/StepsCard";
 import { ForHerPromo } from "@/components/home/ForHerPromo";
+import { HraCard } from "@/components/home/HraCard";
+import { TrackHealth } from "@/components/home/TrackHealth";
+import { DiscoverEvents } from "@/components/home/DiscoverEvents";
 import { BottomNav } from "@/components/home/BottomNav";
 import * as Updates from "expo-updates";
 import { hh } from "@/theme/habit";
@@ -86,6 +89,9 @@ export default function Home() {
         <WellnessSolutions />
         <StepsCard />
         <ForHerPromo />
+        <HraCard />
+        <TrackHealth />
+        <DiscoverEvents />
       </ScrollView>
 
       <BottomNav hidden={navHidden} />
