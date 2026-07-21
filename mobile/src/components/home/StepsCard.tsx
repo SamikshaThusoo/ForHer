@@ -1,8 +1,12 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
 import { RefreshCw, Target, Zap } from "lucide-react-native";
 import { PressableScale } from "@/components/ui/PressableScale";
 import { hh } from "@/theme/habit";
 import { fonts } from "@/theme/tokens";
+
+// Explicit pixel sizing — see LifeSyncBanner; intrinsic-size rendering zoomed the art.
+const CARD_W = Dimensions.get("window").width - 28;
+const IMG_H = Math.round(CARD_W * (355 / 1113));
 
 /** Daily-steps tracker card — sync row, park scene with progress medallions,
  *  and the yellow "Start a Challenge" pill. Art lifted from the real app. */
@@ -53,7 +57,7 @@ const styles = StyleSheet.create({
   },
   goalNum: { fontSize: 14, fontFamily: fonts.sansBold, color: hh.text, lineHeight: 16 },
   goalLabel: { fontSize: 9.5, fontFamily: fonts.sans, color: hh.textMuted },
-  img: { width: "100%", aspectRatio: 1113 / 355 },
+  img: { width: CARD_W, height: IMG_H },
   btn: {
     marginHorizontal: 12, marginTop: 12, borderRadius: 999, backgroundColor: "#F9D75E",
     paddingVertical: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7,

@@ -6,25 +6,22 @@ import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { entryFraming } from "@/lib/journey";
 import { PressableScale } from "@/components/ui/PressableScale";
+import { ForHerEntryCard } from "./ForHerEntryCard";
 import { fonts } from "@/theme/tokens";
 
-/** For Her promo banner — sits where the real app runs its engagement banner.
- *  Unassessed → the 2-minute check; otherwise → the For Her dashboard. */
+/** For Her in the engagement-banner slot. Pre-assessment personas get the full
+ *  persona-framed entry card (flagged AHC markers etc.) exactly as before;
+ *  assessed personas get a compact banner into the /forher dashboard. */
 export function ForHerBanner() {
   const router = useRouter();
   const { persona } = usePersona();
   const fh = useForHer(persona.id);
   if (!entryFraming(persona)) return null;
 
-  const assessed = fh.hydrated && fh.assessed;
-  const title = assessed
-    ? `Day ${Math.min(fh.day, 90)} of your 90-day plan`
-    : "A quick check for your hormonal health";
-  const cta = assessed ? "Open For Her" : "Take the check";
-  const href = assessed ? "/forher" : "/for-her";
+  if (!fh.hydrated || !fh.assessed) return <ForHerEntryCard />;
 
   return (
-    <PressableScale onPress={() => router.push(href as never)}>
+    <PressableScale onPress={() => router.push("/forher" as never)}>
       <LinearGradient
         colors={["#5B2A4A", "#7A3A62", "#B5687E"]}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
@@ -35,9 +32,9 @@ export function ForHerBanner() {
             <Text style={styles.brand}>For Her</Text>
             <View style={styles.tag}><Text style={styles.tagText}>PMOS</Text></View>
           </View>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title}>Day {Math.min(fh.day, 90)} of your 90-day plan</Text>
           <View style={styles.cta}>
-            <Text style={styles.ctaText}>{cta}</Text>
+            <Text style={styles.ctaText}>Open For Her</Text>
             <ArrowRight size={13} color="#5B2A4A" />
           </View>
         </View>

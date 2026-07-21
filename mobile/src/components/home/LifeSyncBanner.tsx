@@ -1,5 +1,10 @@
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, Dimensions } from "react-native";
 import { PressableScale } from "@/components/ui/PressableScale";
+
+// Explicit pixel sizing — percentage width + aspectRatio let the raw 1113px-wide
+// asset render at intrinsic size on device, cropping to a zoomed-in corner.
+const CARD_W = Dimensions.get("window").width - 28;
+const CARD_H = Math.round(CARD_W * (390 / 1113));
 
 /** LifeSync+ lifestyle-care hero banner — real app art, 5-dot carousel indicator. */
 export function LifeSyncBanner() {
@@ -29,7 +34,7 @@ const styles = StyleSheet.create({
     shadowColor: "#1B2A3D", shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 2,
     backgroundColor: "#EAF4FB",
   },
-  img: { width: "100%", aspectRatio: 1113 / 390 },
+  img: { width: CARD_W, height: CARD_H },
   dots: { flexDirection: "row", gap: 6, justifyContent: "center", paddingTop: 10 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#CBD3DE" },
   dotOn: { backgroundColor: "#3A4A61" },
