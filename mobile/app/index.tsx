@@ -5,18 +5,18 @@ import { usePersona } from "@/context/PersonaContext";
 import { resetForHer } from "@/lib/forher/state";
 import { TopBar } from "@/components/home/TopBar";
 import { Greeting } from "@/components/home/Greeting";
-import { PromoCard } from "@/components/home/PromoCard";
-import { QuickActions } from "@/components/home/QuickActions";
+import { LifeSyncBanner } from "@/components/home/LifeSyncBanner";
 import { WellnessSolutions } from "@/components/home/WellnessSolutions";
-import { ForHerPromo } from "@/components/home/ForHerPromo";
-import { LeaderboardCard } from "@/components/home/LeaderboardCard";
+import { StepsCard } from "@/components/home/StepsCard";
+import { ForHerBanner } from "@/components/home/ForHerBanner";
 import { BottomNav } from "@/components/home/BottomNav";
 import * as Updates from "expo-updates";
 import { hh } from "@/theme/habit";
 import { fonts } from "@/theme/tokens";
 
-// The Habit Health home — the entry point. For Her is showcased where the activity
-// tracker used to sit (ForHerPromo). Faithful RN port of the web src/app/page.tsx.
+// The Habit Health home — replica of the real app's home (LifeSync+ hero, wellness
+// range, step tracker). For Her rides the engagement-banner slot (ForHerBanner)
+// and opens the full dashboard at /forher.
 export default function Home() {
   const { persona, allPersonas, setPersonaId } = usePersona();
 
@@ -63,11 +63,10 @@ export default function Home() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body}>
         <TopBar />
         <Greeting />
-        <PromoCard />
-        <QuickActions />
+        <LifeSyncBanner />
         <WellnessSolutions />
-        <ForHerPromo />
-        <LeaderboardCard />
+        <StepsCard />
+        <ForHerBanner />
       </ScrollView>
 
       <BottomNav />

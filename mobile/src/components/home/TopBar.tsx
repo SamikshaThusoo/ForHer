@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Bell, Wallet, ShoppingCart } from "lucide-react-native";
+import { Bell, FileText, ShoppingCart } from "lucide-react-native";
 import { HabitHealthLogo } from "./HabitHealthLogo";
 import { hh } from "@/theme/habit";
 import { fonts } from "@/theme/tokens";
@@ -12,7 +12,7 @@ export function TopBar() {
       <View style={styles.right}>
         <View style={styles.hc}><Text style={styles.hcText}>HC</Text></View>
         <Bell size={20} strokeWidth={1.75} color={hh.text} />
-        <Wallet size={20} strokeWidth={1.75} color={hh.text} />
+        <FileText size={20} strokeWidth={1.75} color={hh.text} />
         <ShoppingCart size={20} strokeWidth={1.75} color={hh.text} />
       </View>
     </View>
