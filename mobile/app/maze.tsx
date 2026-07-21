@@ -84,12 +84,6 @@ function scoreWindow(done: Record<number, string[]>, from: number, to: number, p
   return "miss";
 }
 
-const NODE_COLOR: Record<Score, string> = {
-  good: "#4F9D69",
-  warn: "#C9A24A",
-  miss: "#C76B4A",
-  future: "rgba(142,83,120,0.22)",
-};
 const NODE_STROKE: Record<Score, string> = {
   good: "#2E7A50",
   warn: "#A07830",
@@ -119,6 +113,7 @@ export default function MazeScreen() {
   );
 
   const userPos = posForDay(day);
+  const fullRouteD = solutionSliceD(0, 90);
   const donePathD = solutionSliceD(0, day);
   const aheadPathD = solutionSliceD(day, 90);
 
@@ -154,7 +149,7 @@ export default function MazeScreen() {
       <Header title="Journey Maze" />
 
       <View style={styles.hint}>
-        <Text style={styles.hintText}>Pan to explore · follow the dotted trail · Day {day} of 90</Text>
+        <Text style={styles.hintText}>Pan to explore · follow the pale road & golden beads · Day {day} of 90</Text>
       </View>
 
       <GestureDetector gesture={pan}>
@@ -163,18 +158,22 @@ export default function MazeScreen() {
             <Svg width={CW} height={CH}>
               <Defs>
                 <LinearGradient id="mazeBg" x1="0" y1="0" x2="1" y2="1">
-                  <Stop offset="0" stopColor="#7A3E66" />
-                  <Stop offset="1" stopColor="#3E1B33" />
+                  <Stop offset="0" stopColor="#5A2A4B" />
+                  <Stop offset="1" stopColor="#2E1024" />
                 </LinearGradient>
               </Defs>
 
               {/* ── Hedge background ── */}
-              <Rect x={0} y={0} width={CW} height={CH} fill="#5B2C4E" />
-              <Rect x={0} y={0} width={CW} height={CH} fill="url(#mazeBg)" opacity={0.35} />
+              <Rect x={0} y={0} width={CW} height={CH} fill="#451D38" />
+              <Rect x={0} y={0} width={CW} height={CH} fill="url(#mazeBg)" opacity={0.5} />
 
-              {/* ── Corridors: dark wall edge + light floor ── */}
-              <Path d={EDGES_D} stroke="#3E1B33" strokeWidth={38} fill="none" strokeLinecap="round" />
-              <Path d={EDGES_D} stroke="#F3E7EE" strokeWidth={28} fill="none" strokeLinecap="round" />
+              {/* ── Corridors: dark walls, dim floors — decoys recede ── */}
+              <Path d={EDGES_D} stroke="#2A0E21" strokeWidth={38} fill="none" strokeLinecap="round" />
+              <Path d={EDGES_D} stroke="#5C2B4B" strokeWidth={28} fill="none" strokeLinecap="round" />
+
+              {/* ── The 90-day route, paved light so it reads as the road ── */}
+              <Path d={fullRouteD} stroke="#F6EBF2" strokeWidth={20} fill="none"
+                strokeLinecap="round" strokeLinejoin="round" />
 
               {/* ── Decoy branches at off-track checkpoints ── */}
               {BRANCHES.map((br, i) => {
@@ -195,62 +194,74 @@ export default function MazeScreen() {
                 );
               })}
 
-              {/* ── Breadcrumb trail: the route still ahead ── */}
-              <Path d={aheadPathD} stroke="rgba(142,83,120,0.45)" strokeWidth={4} fill="none"
-                strokeLinecap="round" strokeLinejoin="round" strokeDasharray="1 12" />
+              {/* ── Breadcrumb beads: the route still ahead ── */}
+              <Path d={aheadPathD} stroke="#C4903A" strokeWidth={5.5} fill="none"
+                strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0.1 15" />
 
-              {/* ── Walked route ── */}
+              {/* ── Walked route: soft glow + solid stroke on the pale road ── */}
               {day > 0 && (
-                <Path d={donePathD} stroke={colors.plumBright} strokeWidth={20} fill="none"
-                  strokeLinecap="round" strokeLinejoin="round" />
+                <>
+                  <Path d={donePathD} stroke={colors.plumBright} strokeWidth={22} fill="none"
+                    strokeLinecap="round" strokeLinejoin="round" opacity={0.3} />
+                  <Path d={donePathD} stroke={colors.plum} strokeWidth={13} fill="none"
+                    strokeLinecap="round" strokeLinejoin="round" />
+                </>
               )}
 
-              {/* ── Checkpoint nodes ── */}
+              {/* ── Checkpoint medallions: white disc + status ring, always readable ── */}
               {CHECKPOINTS_GEO.map((cp, i) => {
                 const score = scores[i];
                 const passed = day >= cp.day;
                 return (
                   <G key={`cp-${cp.day}`}>
-                    <Circle cx={cp.x} cy={cp.y} r={15}
-                      fill={passed ? NODE_COLOR[score] : "rgba(243,231,238,0.9)"}
-                      stroke={passed ? NODE_STROKE[score] : "rgba(142,83,120,0.4)"}
-                      strokeWidth={2.5} />
-                    <SvgText x={cp.x} y={cp.y + 3.5} fontSize={9} fontFamily="DMSans_700Bold"
+                    <Circle cx={cp.x} cy={cp.y} r={16} fill="#fff"
+                      stroke={passed ? NODE_STROKE[score] : "rgba(255,255,255,0.45)"}
+                      strokeWidth={passed ? 4 : 2.5} />
+                    <SvgText x={cp.x} y={cp.y + 3.5} fontSize={10} fontFamily="DMSans_700Bold"
                       textAnchor="middle"
-                      fill={passed ? "#fff" : "rgba(142,83,120,0.7)"}>
+                      fill={passed ? NODE_STROKE[score] : "#8E5378"}>
                       {`D${cp.day}`}
                     </SvgText>
                   </G>
                 );
               })}
 
-              {/* ── GOAL ── */}
-              <Circle cx={GOAL_PT.x} cy={GOAL_PT.y} r={20} fill="#2E7A50" stroke="#1A5035" strokeWidth={3} />
-              <SvgText x={GOAL_PT.x} y={GOAL_PT.y + 6} fontSize={18} textAnchor="middle" fill="#fff">★</SvgText>
+              {/* ── GOAL: gold medallion ── */}
+              <Circle cx={GOAL_PT.x} cy={GOAL_PT.y} r={22} fill="#F0C75A" stroke="#B98A2E" strokeWidth={4} />
+              <SvgText x={GOAL_PT.x} y={GOAL_PT.y + 6.5} fontSize={19} textAnchor="middle" fill="#6B4A05">★</SvgText>
 
               {/* ── START ── */}
-              <Circle cx={START_PT.x} cy={START_PT.y} r={14} fill={colors.plumBright} stroke={colors.plum} strokeWidth={2.5} />
-              <SvgText x={START_PT.x} y={START_PT.y + 3.5} fontSize={7.5} fontFamily="DMSans_700Bold"
-                textAnchor="middle" fill="#fff" letterSpacing={0.3}>START</SvgText>
+              <Circle cx={START_PT.x} cy={START_PT.y} r={16} fill="#fff" stroke={colors.plum} strokeWidth={3} />
+              <SvgText x={START_PT.x} y={START_PT.y + 3.5} fontSize={8} fontFamily="DMSans_700Bold"
+                textAnchor="middle" fill={colors.plum} letterSpacing={0.3}>START</SvgText>
 
               {/* ── User dot ── */}
               {day > 0 && (
                 <G>
-                  <Circle cx={userPos.x} cy={userPos.y} r={16}
-                    fill="rgba(255,255,255,0.95)" stroke={colors.plumBright} strokeWidth={3} />
-                  <Circle cx={userPos.x} cy={userPos.y} r={7} fill={colors.plumBright} />
-                  <Circle cx={userPos.x} cy={userPos.y} r={22}
-                    fill="none" stroke={colors.plumBright} strokeWidth={2} opacity={0.3} />
+                  <Circle cx={userPos.x} cy={userPos.y} r={26}
+                    fill="none" stroke="#fff" strokeWidth={2.5} opacity={0.45} />
+                  <Circle cx={userPos.x} cy={userPos.y} r={18}
+                    fill="#fff" stroke={colors.plum} strokeWidth={4} />
+                  <Circle cx={userPos.x} cy={userPos.y} r={8} fill={colors.plum} />
                 </G>
               )}
             </Svg>
 
-            {/* ── Landmarks (emoji render better as RN Text than SvgText) ── */}
+            {/* ── Landmarks on white discs (emoji render better as RN Text than SvgText) ── */}
             {LANDMARKS.map((lm, i) => (
-              <Text key={`lm-${i}`} style={[styles.landmark, { left: lm.x - 14, top: lm.y - 14 }]}>
-                {lm.emoji}
-              </Text>
+              <View key={`lm-${i}`} style={[styles.landmark, { left: lm.x - 16, top: lm.y - 16 }]}>
+                <Text style={styles.landmarkEmoji}>{lm.emoji}</Text>
+              </View>
             ))}
+
+            {/* ── "You" label chip above the user dot ── */}
+            {day > 0 && (
+              <View style={[styles.youChipWrap, { left: userPos.x - 60, top: userPos.y - 52 }]}>
+                <View style={styles.youChip}>
+                  <Text style={styles.youChipText}>You · Day {day}</Text>
+                </View>
+              </View>
+            )}
           </Animated.View>
         </View>
       </GestureDetector>
@@ -258,18 +269,18 @@ export default function MazeScreen() {
       {/* ── Minimap ── */}
       <View style={styles.minimap}>
         <Svg width={MM_W} height={MM_H}>
-          <Rect x={0} y={0} width={MM_W} height={MM_H} rx={6} fill="rgba(62,27,51,0.88)" />
+          <Rect x={0} y={0} width={MM_W} height={MM_H} rx={6} fill="rgba(46,16,36,0.9)" />
           {/* Full route */}
           <Path
             d={SOLUTION.map((p, i) => `${i === 0 ? "M" : "L"} ${4 + p[0] * MM_SCALE} ${4 + p[1] * MM_SCALE}`).join(" ")}
-            stroke="rgba(255,255,255,0.25)" strokeWidth={2} fill="none"
+            stroke="rgba(246,235,242,0.5)" strokeWidth={2} fill="none"
           />
           {/* Walked portion */}
           {day > 0 && (
             <Path
               d={donePathD.replace(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g, (_, x, y) =>
                 `${4 + parseFloat(x) * MM_SCALE} ${4 + parseFloat(y) * MM_SCALE}`)}
-              stroke={colors.plumBright} strokeWidth={2} fill="none"
+              stroke="#C687AC" strokeWidth={2.5} fill="none"
             />
           )}
           <Circle cx={4 + userPos.x * MM_SCALE} cy={4 + userPos.y * MM_SCALE} r={3} fill="#fff" />
@@ -280,10 +291,11 @@ export default function MazeScreen() {
 
       {/* ── Legend ── */}
       <View style={styles.legend}>
+        <LegendDot color="#F6EBF2" label="Your road" />
+        <LegendDot color="#C4903A" label="Ahead" />
         <LegendDot color="#4F9D69" label="On track" />
         <LegendDot color="#C9A24A" label="Partial" />
         <LegendDot color="#C76B4A" label="Detour" />
-        <LegendDot color={colors.plumBright} label="You" />
       </View>
     </View>
   );
@@ -299,13 +311,25 @@ function LegendDot({ color, label }: { color: string; label: string }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#4A2440" },
+  root: { flex: 1, backgroundColor: "#3A162E" },
   hint: { paddingHorizontal: 18, paddingVertical: 8, alignItems: "center" },
   hintText: { fontSize: 11.5, fontFamily: fonts.sansMedium, color: "rgba(255,255,255,0.75)" },
 
   viewport: { flex: 1, overflow: "hidden" },
 
-  landmark: { position: "absolute", fontSize: 22, width: 28, height: 28, textAlign: "center" },
+  landmark: {
+    position: "absolute", width: 32, height: 32, borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.92)", alignItems: "center", justifyContent: "center",
+    shadowColor: "#2E1024", shadowOpacity: 0.3, shadowRadius: 5, shadowOffset: { width: 0, height: 2 }, elevation: 3,
+  },
+  landmarkEmoji: { fontSize: 16 },
+
+  youChipWrap: { position: "absolute", width: 120, alignItems: "center" },
+  youChip: {
+    backgroundColor: "#fff", borderRadius: 999, paddingVertical: 4, paddingHorizontal: 10,
+    shadowColor: "#2E1024", shadowOpacity: 0.35, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 4,
+  },
+  youChipText: { fontSize: 10.5, fontFamily: fonts.sansBold, color: colors.plum },
 
   minimap: {
     position: "absolute", top: 110, right: 14,
@@ -320,7 +344,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  legend: { flexDirection: "row", justifyContent: "center", gap: 18, paddingVertical: 10, backgroundColor: "#4A2440", borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.12)" },
+  legend: { flexDirection: "row", justifyContent: "center", gap: 14, paddingVertical: 10, backgroundColor: "#3A162E", borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.12)" },
   legendItem: { flexDirection: "row", alignItems: "center", gap: 5 },
   legendDot: { width: 9, height: 9, borderRadius: 5 },
   legendText: { fontSize: 10.5, fontFamily: fonts.sansMedium, color: "rgba(255,255,255,0.75)" },
