@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import Svg, { Path, Line, Circle, Defs, Stop, LinearGradient as SvgGradient } from "react-native-svg";
 import { LinearGradient } from "expo-linear-gradient";
@@ -7,18 +7,19 @@ import { ArrowRight } from "lucide-react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Header } from "@/components/ui/Header";
 import { PressableScale } from "@/components/ui/PressableScale";
+import { Avatar } from "@/components/ui/Avatar";
 import { Slider } from "@/components/ui/Slider";
 import { usePersona } from "@/context/PersonaContext";
 import { useForHer } from "@/lib/forher/state";
 import { personaTrack } from "@/lib/journey";
 import {
   cycleLengthFor, cycleDayFromLog, phaseForCycleDay, ovulationDay, hormoneModel,
-  PHASE_LABEL, PHASE_PROSE, HORMONES, type HormoneKey,
+  PHASE_LABEL, HORMONES, type HormoneKey,
 } from "@/lib/forher/cycleview";
 import { colors, fonts, gradients } from "@/theme/tokens";
 import type { CyclePhase } from "@/types/journey";
 
-const W = 320, H = 116, PAD = 6;
+const W = 320, H = 104, PAD = 6;
 
 const ATMOSPHERE: Record<CyclePhase, string> = {
   menstrual: "#C76B7A", follicular: "#C9A24A", ovulatory: "#2F7A7A", luteal: "#8E5378",
@@ -28,11 +29,12 @@ const HUE: Record<string, string> = {
 };
 const hueOf = (key: string) => HUE[key] ?? "#8E5378";
 
-const PHASE_RECS: Record<CyclePhase, { body: string; work: string; tip: string }> = {
-  menstrual: { body: "Energy is low; cramps and fatigue are common.", work: "Keep the load light — admin and planning over big pushes.", tip: "Iron-rich meals, warmth and earlier nights." },
-  follicular: { body: "Energy, mood and focus are climbing.", work: "Start new projects and tackle the hard problems.", tip: "A good week for a new class or a harder workout." },
-  ovulatory: { body: "Energy, confidence and libido peak.", work: "Book the big conversations and presentations.", tip: "Stay hydrated; strength work feels great now." },
-  luteal: { body: "Energy dips; bloating, cravings and mood shifts build.", work: "Wrap up and tidy — protect focus from overload.", tip: "Magnesium-rich foods and gentle movement help." },
+// One merged line per phase — what's happening + what to do with it.
+const PHASE_SUMMARY: Record<CyclePhase, string> = {
+  menstrual: "Energy is low; cramps and fatigue are common. Keep the load light — iron-rich meals, warmth and earlier nights.",
+  follicular: "Energy, mood and focus are climbing. A good week for new projects, a new class or a harder workout.",
+  ovulatory: "Energy, confidence and libido peak. Book the big conversations — and strength work feels great now.",
+  luteal: "Energy dips; bloating, cravings and mood shifts build. Wrap up and tidy — magnesium-rich foods and gentle movement help.",
 };
 
 export default function Hormones() {
@@ -48,7 +50,8 @@ export default function Hormones() {
   const phase = phaseForCycleDay(day, L, duration);
   const carePlan = personaTrack(persona) !== "none";
   const isToday = fh.cycleLog?.lastPeriod != null && day === todayCd;
-  const [sel, setSel] = useState<string | null>(null);
+  // null = focus follows the dominant hormone; "all" = every curve fully lit.
+  const [sel, setSel] = useState<HormoneKey | "all" | null>(null);
   const ovCd = ovulationDay(L);
 
   const lp = fh.cycleLog?.lastPeriod;
@@ -90,9 +93,10 @@ export default function Hormones() {
   const dv = val(dominant.key, day);
   const slope = val(dominant.key, Math.min(L, day + 1)) - val(dominant.key, Math.max(1, day - 1));
   const verb = slope > 0.035 ? "rising" : slope < -0.035 ? "easing" : dv > 0.6 ? "peaking" : "steady";
-  const activeKey = sel ?? dominant.key;
   const markerX = x(day);
-  const curveOpacity = (key: string) => (sel ? (key === sel ? 1 : 0.12) : key === dominant.key ? 1 : 0.5);
+  // "all" lights every curve fully; otherwise one focused curve, the rest ghosted.
+  const focusKey = sel === "all" ? null : sel ?? dominant.key;
+  const curveOpacity = (key: string) => (focusKey ? (key === focusKey ? 1 : 0.16) : 1);
 
   // Phase-map gradient for the scrubber track (hard segment stops).
   const b1 = Math.max(0, Math.min(1, duration / L));
@@ -101,21 +105,38 @@ export default function Hormones() {
   const trackColors = [ATMOSPHERE.menstrual, ATMOSPHERE.menstrual, ATMOSPHERE.follicular, ATMOSPHERE.follicular, ATMOSPHERE.ovulatory, ATMOSPHERE.ovulatory, ATMOSPHERE.luteal, ATMOSPHERE.luteal] as const;
   const trackLocations = [0, b1, b1, b2, b2, b3, b3, 1];
 
+  const phaseWord = PHASE_LABEL[phase].toLowerCase();
+
   return (
     <Screen>
       <Header title="For Her · Hormones" />
 
       <View style={styles.hero}>
         <Text style={styles.h1}>Your hormone <Text style={styles.h1em}>rhythm</Text></Text>
-        <Text style={styles.sub}>Day {day}{isToday ? " · today" : ""} · {PHASE_LABEL[phase]} phase</Text>
       </View>
 
-      <View style={styles.chartCard}>
-        <Text style={[styles.dominant, { color: hueOf(dominant.key) }]}>{dominant.label} {verb}</Text>
+      {/* ── Today (or scrubbed day) at a glance ── */}
+      <View style={styles.todayCard}>
+        <Text style={styles.todayTag}>{isToday ? "Today · " : ""}Day {day} · {PHASE_LABEL[phase]} phase</Text>
+        <View style={styles.headlineRow}>
+          <View style={[styles.headlineDot, { backgroundColor: hueOf(dominant.key) }]} />
+          <Text style={[styles.headline, { color: hueOf(dominant.key) }]}>{dominant.label} {verb}</Text>
+        </View>
+        <Text style={styles.summary}>{PHASE_SUMMARY[phase]}</Text>
+        {datesLine && <Text style={styles.dates}>{datesLine}</Text>}
+        {carePlan && (
+          <Text style={styles.pmosText}>
+            <Text style={styles.pmosStrong}>With PMOS,</Text> testosterone tends to run higher across the whole cycle — one reason skin, hair and cravings can flare. Steady blood sugar and movement help keep it in check.
+          </Text>
+        )}
+      </View>
 
+      {/* ── Explore: chart + scrubber, feeds the card above ── */}
+      <Text style={styles.sectionLabel}>Explore your cycle</Text>
+      <View style={styles.chartCard}>
         <View style={styles.chartWrap}>
           <View style={[styles.atmosphere, { backgroundColor: ATMOSPHERE[phase] }]} />
-          <Svg viewBox={`0 0 ${W} ${H}`} width="100%" height={130} preserveAspectRatio="none">
+          <Svg viewBox={`0 0 ${W} ${H}`} width="100%" height={116} preserveAspectRatio="none">
             <Defs>
               {paths.map((h) => (
                 <SvgGradient key={h.key} id={`grad-${h.key}`} x1="0" y1="0" x2="0" y2="1">
@@ -130,12 +151,12 @@ export default function Hormones() {
             ))}
             {paths.map((h) => (
               <Path key={`c-${h.key}`} d={h.line} fill="none" stroke={hueOf(h.key)}
-                strokeWidth={h.key === "estrogen" ? 2.9 : 2.2} strokeLinejoin="round" strokeLinecap="round" opacity={curveOpacity(h.key)} />
+                strokeWidth={h.key === focusKey ? 2.9 : 2.2} strokeLinejoin="round" strokeLinecap="round" opacity={curveOpacity(h.key)} />
             ))}
             <Line x1={markerX} y1={PAD} x2={markerX} y2={H - PAD} stroke="rgba(91,42,74,0.22)" strokeWidth={1.5} strokeDasharray={[3, 3]} />
             {HORMONES.map((h) => (
-              <Circle key={`d-${h.key}`} cx={markerX} cy={y(val(h.key, day))} r={h.key === activeKey ? 5 : 3.4}
-                fill={hueOf(h.key)} stroke="#fff" strokeWidth={1.5} opacity={sel ? (h.key === sel ? 1 : 0.15) : 1} />
+              <Circle key={`d-${h.key}`} cx={markerX} cy={y(val(h.key, day))} r={h.key === (focusKey ?? dominant.key) ? 5 : 3.4}
+                fill={hueOf(h.key)} stroke="#fff" strokeWidth={1.5} opacity={curveOpacity(h.key)} />
             ))}
           </Svg>
         </View>
@@ -152,62 +173,34 @@ export default function Hormones() {
             track={<LinearGradient colors={trackColors as unknown as [string, string, ...string[]]} locations={trackLocations as unknown as [number, number, ...number[]]}
               start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.trackBar} />} />
         </View>
-        <Text style={styles.scrubHint}>Drag to explore any day in your cycle</Text>
+        <Text style={styles.scrubHint}>Drag to see any day — the card above updates</Text>
 
         <View style={styles.legend}>
-          {HORMONES.map((h) => {
-            const on = sel === h.key;
-            const dim = sel && sel !== h.key;
+          {([{ key: "all" as const, label: "All" }, ...HORMONES]).map((h) => {
+            const on = h.key === "all" ? sel === "all" : (focusKey ?? dominant.key) === h.key && sel !== "all";
             return (
-              <PressableScale key={h.key} onPress={() => setSel(on ? null : h.key)} style={[styles.legItem, on && styles.legOn, dim && styles.legDim]}>
-                <View style={[styles.legDot, { backgroundColor: hueOf(h.key) }]} />
-                <Text style={styles.legLabel}>{h.label}</Text>
+              <PressableScale key={h.key} onPress={() => setSel(sel === h.key ? null : h.key)} style={[styles.legItem, on && styles.legOn]}>
+                {h.key !== "all" && <View style={[styles.legDot, { backgroundColor: hueOf(h.key) }]} />}
+                <Text style={[styles.legLabel, on && styles.legLabelOn]}>{h.label}</Text>
               </PressableScale>
             );
           })}
         </View>
       </View>
 
-      <View style={styles.phaseBox}>
-        <Text style={styles.phaseTag}>{PHASE_LABEL[phase]} phase{isToday ? ", right now" : ""}</Text>
-        <Text style={styles.phaseProse}>{PHASE_PROSE[phase]}</Text>
-        {datesLine && <Text style={styles.phaseDates}>{datesLine}</Text>}
-      </View>
-
-      <View style={styles.recs}>
-        {(["body", "work", "tip"] as const).map((k) => (
-          <View key={k} style={styles.recRow}>
-            <Text style={styles.recLabel}>{k === "body" ? "Your body" : k === "work" ? "At work" : "Try this"}</Text>
-            <Text style={styles.recText}>{PHASE_RECS[phase][k]}</Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.hList}>
-        {HORMONES.map((h) => {
-          const v = Math.round(val(h.key, day) * 100);
-          return (
-            <View key={h.key} style={styles.hRow}>
-              <View style={styles.hLabelWrap}>
-                <View style={[styles.hDot, { backgroundColor: hueOf(h.key) }]} />
-                <Text style={styles.hLabel}>{h.label}</Text>
-              </View>
-              <View style={styles.hBar}>
-                <View style={[styles.hBarFill, { width: `${v}%`, backgroundColor: hueOf(h.key) }]} />
-              </View>
-              <Text style={styles.hVal}>{v}</Text>
-            </View>
-          );
-        })}
-      </View>
-
-      {carePlan && (
-        <View style={styles.pmosNote}>
-          <Text style={styles.pmosText}>
-            <Text style={styles.pmosStrong}>With PMOS,</Text> testosterone tends to run higher across the whole cycle — one reason skin, hair and cravings can flare. Steady blood sugar and movement help keep it in check.
-          </Text>
+      {/* ── Redirect: your phase circle in the community ── */}
+      <PressableScale onPress={() => router.push("/community")} style={styles.commCard}>
+        <View style={styles.commAvatars}>
+          {[0, 1, 2].map((i) => (
+            <Avatar key={i} seed={`fh-pace-${phase}-${i}`} size={30} style={[styles.commAv, i > 0 && { marginLeft: -9 }]} />
+          ))}
         </View>
-      )}
+        <View style={styles.commBody}>
+          <Text style={styles.commTitle}>Women in your {phaseWord} phase</Text>
+          <Text style={styles.commSub}>See what they're sharing today — and add your own check-in.</Text>
+        </View>
+        <ArrowRight size={16} color={colors.plumBright} />
+      </PressableScale>
 
       <Text style={styles.disclaimer}>An educational model of how hormones move — not your measured levels.</Text>
 
@@ -222,13 +215,22 @@ export default function Hormones() {
 }
 
 const styles = StyleSheet.create({
-  hero: { paddingHorizontal: 18, paddingTop: 4, paddingBottom: 12 },
+  hero: { paddingHorizontal: 18, paddingTop: 4, paddingBottom: 10 },
   h1: { fontSize: 26, fontFamily: fonts.serif, color: colors.plumDeep },
   h1em: { fontFamily: fonts.serif, fontStyle: "italic", color: colors.plumBright },
-  sub: { fontSize: 12.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 6 },
 
+  todayCard: { marginHorizontal: 18, backgroundColor: "rgba(142,83,120,0.07)", borderWidth: 1, borderColor: "rgba(142,83,120,0.18)", borderRadius: 16, padding: 14 },
+  todayTag: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase", color: colors.plumBright },
+  headlineRow: { flexDirection: "row", alignItems: "center", gap: 7, marginTop: 8 },
+  headlineDot: { width: 10, height: 10, borderRadius: 5 },
+  headline: { fontSize: 15.5, fontFamily: fonts.sansBold },
+  summary: { fontSize: 13, fontFamily: fonts.sans, color: "#4A3A44", lineHeight: 19.5, marginTop: 6 },
+  dates: { fontSize: 11.5, fontFamily: fonts.sansBold, color: "#C9772A", marginTop: 9 },
+  pmosText: { fontSize: 11.5, fontFamily: fonts.sans, color: "#4A3A44", lineHeight: 17, marginTop: 10, paddingTop: 9, borderTopWidth: 1, borderTopColor: "rgba(142,83,120,0.2)", borderStyle: "dashed" },
+  pmosStrong: { fontFamily: fonts.sansBold, color: "#236B6B" },
+
+  sectionLabel: { fontSize: 10.5, fontFamily: fonts.sansBold, letterSpacing: 0.6, textTransform: "uppercase", color: colors.textMuted, marginHorizontal: 22, marginTop: 16, marginBottom: 8 },
   chartCard: { marginHorizontal: 18, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 18, padding: 14 },
-  dominant: { textAlign: "center", fontSize: 13, fontFamily: fonts.sansBold, marginBottom: 6 },
   chartWrap: { position: "relative" },
   atmosphere: { position: "absolute", left: -6, right: -6, top: -6, bottom: -6, borderRadius: 18, opacity: 0.10 },
   axis: { position: "relative", flexDirection: "row", justifyContent: "space-between", marginTop: 4, height: 14 },
@@ -237,42 +239,24 @@ const styles = StyleSheet.create({
   scrubHint: { fontSize: 10, fontFamily: fonts.sans, color: colors.textMuted, textAlign: "center", marginTop: 6 },
 
   trackWrap: { marginTop: 12, height: 24, justifyContent: "center" },
-  trackHit: { height: 24, justifyContent: "center" },
   trackBar: { height: 8, borderRadius: 999 },
-  thumb: { position: "absolute", width: 20, height: 20, borderRadius: 10, borderWidth: 2.5, top: 2 },
 
-  legend: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 10, marginTop: 12 },
-  legItem: { flexDirection: "row", alignItems: "center", gap: 5, borderWidth: 1, borderColor: "transparent", borderRadius: 999, paddingVertical: 4, paddingHorizontal: 9 },
-  legOn: { backgroundColor: "rgba(142,83,120,0.1)", borderColor: "rgba(142,83,120,0.3)" },
-  legDim: { opacity: 0.45 },
-  legDot: { width: 9, height: 9, borderRadius: 5 },
+  legend: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8, marginTop: 12 },
+  legItem: { flexDirection: "row", alignItems: "center", gap: 5, borderWidth: 1, borderColor: "rgba(91,42,74,0.14)", borderRadius: 999, paddingVertical: 4, paddingHorizontal: 10 },
+  legOn: { backgroundColor: "rgba(142,83,120,0.1)", borderColor: "rgba(142,83,120,0.4)" },
+  legDot: { width: 8, height: 8, borderRadius: 4 },
   legLabel: { fontSize: 10.5, fontFamily: fonts.sansMedium, color: colors.textSoft },
+  legLabelOn: { fontFamily: fonts.sansBold, color: colors.plumDeep },
 
-  phaseBox: { marginHorizontal: 18, marginTop: 14, backgroundColor: "rgba(142,83,120,0.07)", borderWidth: 1, borderColor: "rgba(142,83,120,0.18)", borderRadius: 15, padding: 13 },
-  phaseTag: { fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.5, textTransform: "uppercase", color: colors.plumBright },
-  phaseProse: { fontSize: 12.5, fontFamily: fonts.sans, color: "#4A3A44", marginTop: 6, lineHeight: 19 },
-  phaseDates: { fontSize: 11.5, fontFamily: fonts.sansBold, color: "#C9772A", marginTop: 8 },
+  commCard: { flexDirection: "row", alignItems: "center", gap: 11, marginHorizontal: 18, marginTop: 14, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 16, padding: 13 },
+  commAvatars: { flexDirection: "row", alignItems: "center" },
+  commAv: { borderWidth: 2, borderColor: "#fff" },
+  commBody: { flex: 1 },
+  commTitle: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.plumDeep },
+  commSub: { fontSize: 11.5, fontFamily: fonts.sans, color: colors.textSoft, marginTop: 2, lineHeight: 16 },
 
-  recs: { marginHorizontal: 18, marginTop: 14, gap: 9 },
-  recRow: { flexDirection: "row", gap: 10, backgroundColor: "#fff", borderWidth: 1, borderColor: colors.line, borderRadius: 13, padding: 11 },
-  recLabel: { width: 62, fontSize: 10, fontFamily: fonts.sansBold, letterSpacing: 0.4, textTransform: "uppercase", color: colors.plumBright },
-  recText: { flex: 1, fontSize: 12.5, fontFamily: fonts.sans, color: colors.plumDeep, lineHeight: 17 },
-
-  hList: { marginHorizontal: 18, marginTop: 16, gap: 10 },
-  hRow: { flexDirection: "row", alignItems: "center", gap: 9 },
-  hLabelWrap: { width: 96, flexDirection: "row", alignItems: "center", gap: 6 },
-  hDot: { width: 9, height: 9, borderRadius: 5 },
-  hLabel: { fontSize: 12, fontFamily: fonts.sansMedium, color: colors.plumDeep },
-  hBar: { flex: 1, height: 7, borderRadius: 999, backgroundColor: "rgba(91,42,74,0.08)", overflow: "hidden" },
-  hBarFill: { height: 7, borderRadius: 999 },
-  hVal: { width: 24, fontSize: 11, fontFamily: fonts.sansBold, color: colors.textSoft, textAlign: "right" },
-
-  pmosNote: { marginHorizontal: 18, marginTop: 16, backgroundColor: "rgba(47,122,122,0.07)", borderWidth: 1, borderColor: "rgba(47,122,122,0.2)", borderRadius: 15, padding: 13 },
-  pmosText: { fontSize: 12, fontFamily: fonts.sans, color: "#4A3A44", lineHeight: 18 },
-  pmosStrong: { fontFamily: fonts.sansBold, color: "#236B6B" },
-
-  disclaimer: { fontSize: 9.5, fontFamily: fonts.sans, fontStyle: "italic", color: colors.textMuted, textAlign: "center", marginHorizontal: 20, marginTop: 16 },
-  doneWrap: { marginHorizontal: 18, marginTop: 16, marginBottom: 6, borderRadius: 14, overflow: "hidden" },
+  disclaimer: { fontSize: 9.5, fontFamily: fonts.sans, fontStyle: "italic", color: colors.textMuted, textAlign: "center", marginHorizontal: 20, marginTop: 14 },
+  doneWrap: { marginHorizontal: 18, marginTop: 14, marginBottom: 6, borderRadius: 14, overflow: "hidden" },
   done: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingVertical: 14 },
   doneText: { color: "#fff", fontSize: 14.5, fontFamily: fonts.sansBold },
 });
