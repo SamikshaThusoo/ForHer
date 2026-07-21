@@ -1,5 +1,8 @@
+import { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Home, Gamepad2, User, Menu, Plus, type LucideIcon } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { Home, Gamepad2, User, Menu, Cross, type LucideIcon } from "lucide-react-native";
 import { hh } from "@/theme/habit";
 import { fonts } from "@/theme/tokens";
 
@@ -10,47 +13,65 @@ const TABS: { Icon: LucideIcon; label: string; active?: boolean }[] = [
   { Icon: Menu, label: "Menu" },
 ];
 
-/** Dark navy bottom bar — active tab in a blue pill, "My Benefits" button with
- *  a floating "+" badge, matching the real app. */
-export function BottomNav() {
+/** Floating bottom nav, matching the real app: white pill bar (active tab in a
+ *  light-blue chip) plus a separate "My Benefits" block flush to the right edge.
+ *  Slides off-screen while scrolling down and back in on scroll-up. */
+export function BottomNav({ hidden = false }: { hidden?: boolean }) {
+  const insets = useSafeAreaInsets();
+  const shift = useSharedValue(0);
+
+  useEffect(() => {
+    shift.value = withTiming(hidden ? 1 : 0, { duration: 240 });
+  }, [hidden, shift]);
+
+  const slide = useAnimatedStyle(() => ({
+    transform: [{ translateY: shift.value * 140 }],
+  }));
+
   return (
-    <View style={styles.nav}>
-      {TABS.map((t) => (
-        <View key={t.label} style={styles.tab}>
-          <View style={[styles.tabIc, t.active && styles.tabIcActive]}>
-            <t.Icon size={20} strokeWidth={1.75} color={t.active ? "#fff" : "#8FA0C4"} />
+    <Animated.View
+      style={[styles.wrap, { bottom: Math.max(insets.bottom - 12, 12) }, slide]}
+      pointerEvents={hidden ? "none" : "auto"}
+    >
+      <View style={styles.bar}>
+        {TABS.map((t) => (
+          <View key={t.label} style={styles.tab}>
+            <View style={[styles.tabIc, t.active && styles.tabIcActive]}>
+              <t.Icon
+                size={20}
+                strokeWidth={t.active ? 1.75 : 2}
+                color={t.active ? hh.blue : hh.text}
+                fill={t.active ? hh.blue : "none"}
+              />
+            </View>
+            <Text style={[styles.label, t.active && styles.labelActive]}>{t.label}</Text>
           </View>
-          <Text style={[styles.label, t.active && styles.labelActive]}>{t.label}</Text>
-        </View>
-      ))}
-      <View style={styles.benWrap}>
-        <View style={styles.fab}><Plus size={15} strokeWidth={2.5} color="#fff" /></View>
-        <View style={styles.ben}><Text style={styles.benText}>My Benefits</Text></View>
+        ))}
       </View>
-    </View>
+      <View style={styles.ben}>
+        <Cross size={18} strokeWidth={1.75} color="#fff" />
+        <Text style={styles.benText}>My Benefits</Text>
+      </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  nav: {
-    height: 76, backgroundColor: "#101E42", borderTopLeftRadius: 22, borderTopRightRadius: 22,
-    flexDirection: "row", alignItems: "center", justifyContent: "space-around", paddingHorizontal: 6,
-    shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 14, shadowOffset: { width: 0, height: -4 }, elevation: 12,
+  wrap: { position: "absolute", left: 0, right: 0, flexDirection: "row", alignItems: "center" },
+  bar: {
+    flex: 1, marginLeft: 10, height: 58, borderRadius: 29, backgroundColor: "#fff",
+    flexDirection: "row", alignItems: "center", justifyContent: "space-around", paddingHorizontal: 8,
+    shadowColor: "#1B2A3D", shadowOpacity: 0.18, shadowRadius: 14, shadowOffset: { width: 0, height: 5 }, elevation: 8,
   },
-  tab: { alignItems: "center", gap: 2 },
-  tabIc: { width: 40, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center" },
-  tabIcActive: { backgroundColor: hh.blueBright },
-  label: { fontSize: 10, fontFamily: fonts.sansMedium, color: "#8FA0C4" },
-  labelActive: { color: "#fff", fontFamily: fonts.sansBold },
-  benWrap: { alignItems: "flex-end" },
-  fab: {
-    width: 26, height: 26, borderRadius: 13, backgroundColor: hh.blueBright,
-    alignItems: "center", justifyContent: "center", marginBottom: -8, marginRight: -2, zIndex: 2,
-    borderWidth: 2, borderColor: "#101E42",
-  },
+  tab: { alignItems: "center", gap: 1 },
+  tabIc: { width: 44, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  tabIcActive: { backgroundColor: "#D2E1F0" },
+  label: { fontSize: 10.5, fontFamily: fonts.sansMedium, color: hh.text },
+  labelActive: { color: hh.blue, fontFamily: fonts.sansBold },
   ben: {
-    borderRadius: 13, paddingVertical: 11, paddingHorizontal: 15, backgroundColor: "#3D6EF0",
-    shadowColor: "#2060B0", shadowOpacity: 0.5, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 6,
+    marginLeft: 8, width: 94, height: 58, borderTopLeftRadius: 24, borderBottomLeftRadius: 24,
+    backgroundColor: "#1E5AAD", alignItems: "center", justifyContent: "center", gap: 3,
+    shadowColor: "#1E5AAD", shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 8,
   },
-  benText: { color: "#fff", fontSize: 11.5, fontFamily: fonts.sansBold },
+  benText: { color: "#fff", fontSize: 10.5, fontFamily: fonts.sansBold },
 });
